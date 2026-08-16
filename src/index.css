@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dsc-dark: #121212;
+  --color-dsc-darker: #0a0a0a;
+  --color-dsc-accent: #e5b999;
+  --color-dsc-gray: #a3a3a3;
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-dsc-dark);
+  color: white;
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif);
+}
