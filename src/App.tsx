@@ -1,12 +1,9 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import Preloader from './components/Preloader';
+import SmoothScroll from './components/SmoothScroll';
 import Home from './pages/Home';
 import Showcase from './pages/Showcase';
 import Experience from './pages/Experience';
@@ -26,7 +23,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <div className="font-sans text-white bg-dsc-dark min-h-screen">
+      <SmoothScroll />
+      <Preloader />
+      <div className="font-sans text-black bg-ll-white min-h-screen">
         <Navbar />
         <main>
           <Routes>
@@ -41,4 +40,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-

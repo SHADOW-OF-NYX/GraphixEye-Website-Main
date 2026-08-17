@@ -1,22 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { BrandLogo } from './ui';
+import { site } from '../data/site';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#111] py-12 px-8 mt-20 border-t border-gray-800">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-gray-400 text-sm">
-        <div className="mb-6 md:mb-0">
-          <Link to="/" className="text-4xl font-serif text-white tracking-widest block mb-2">
-            DSC
+    <footer className="bg-ll-white text-black px-5 md:px-8 pt-16 pb-10">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-12 pb-16">
+          <Link to="/" className="inline-flex items-center">
+            <BrandLogo className="h-20" />
           </Link>
-          <p>&copy; 2024 Desert Star Construction. All Rights Reserved. Built for the Personal Resort.</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-16 gap-y-4 text-[15px]">
+            <Link to="/showcase" className="hover:text-ll-highlight transition-colors">Showcase</Link>
+            <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
+            <Link to="/contact" className="hover:text-ll-highlight transition-colors">Contact</Link>
+            <a href={`mailto:${site.email}`} className="hover:text-ll-highlight transition-colors">Email</a>
+            <span className="text-black/50">Privacy Policy</span>
+            <span className="text-black/50">Press kit</span>
+          </div>
         </div>
-        
-        <div className="flex space-x-6">
-          <Link to="/" className="hover:text-dsc-accent transition-colors">Privacy Policy</Link>
-          <Link to="/" className="hover:text-dsc-accent transition-colors">Terms of Service</Link>
-          <Link to="/" className="hover:text-dsc-accent transition-colors">Press Kit</Link>
-          <Link to="/" className="hover:text-dsc-accent transition-colors">Careers</Link>
+
+        <div className="flex flex-col md:flex-row justify-between gap-4 text-[13px] text-black/45 border-t border-ll-stroke pt-6">
+          <p>© {new Date().getFullYear()} GraphixEye. {site.tagline}.</p>
+          <p>{site.address.join(' · ')}</p>
         </div>
       </div>
     </footer>

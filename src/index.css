@@ -1,20 +1,119 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 @theme {
-  --color-dsc-dark: #121212;
-  --color-dsc-darker: #0a0a0a;
-  --color-dsc-accent: #e5b999;
-  --color-dsc-gray: #a3a3a3;
-  --font-serif: "Playfair Display", serif;
-  --font-sans: "Inter", sans-serif;
+  --color-ll-white: #fcf8f1;
+  --color-ll-sand: #f2ece2;
+  --color-ll-black: #000000;
+  --color-ll-muted: #00000080;
+  --color-ll-highlight: #ff443a;
+  --color-ll-wine: #431616;
+  --color-ll-stroke: #ddd9d9;
+  --color-ll-br1: #ff443a;
+  --color-ll-br2: #ff5860;
+  --color-ll-br3: #ff6e8f;
+  --color-ll-br4: #ff9ae7;
+  --color-ll-br5: #ff93a5;
+  --color-ll-br6: #ff8958;
+  --color-ll-br7: #f6633c;
+  --font-display: "General Sans", "Satoshi", sans-serif;
+  --font-sans: "Switzer", "Inter", Arial, sans-serif;
 }
 
-body {
-  background-color: var(--color-dsc-dark);
-  color: white;
+html,
+body,
+#root {
+  background: var(--color-ll-white);
+  color: var(--color-ll-black);
   font-family: var(--font-sans);
 }
 
-h1, h2, h3, h4, h5, h6, .font-serif {
-  font-family: var(--font-serif);
+body {
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+::selection {
+  background: var(--color-ll-highlight);
+  color: var(--color-ll-white);
+}
+
+.hero-title {
+  font-size: clamp(3.5rem, 9vw, 7.75rem);
+  letter-spacing: -0.01em;
+  line-height: 0.92;
+}
+
+.display-xl {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+.display-md {
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.pill {
+  border-radius: 1600px;
+}
+
+.card-r {
+  border-radius: 2rem;
+}
+
+.placeholder-grid {
+  background-image:
+    linear-gradient(rgba(252, 248, 241, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252, 248, 241, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.glow-wash {
+  background:
+    radial-gradient(120% 80% at 50% 120%, var(--color-ll-br6) 0%, transparent 55%),
+    radial-gradient(80% 60% at 80% 0%, var(--color-ll-br4) 0%, transparent 50%),
+    linear-gradient(180deg, #2b0f0b 0%, var(--color-ll-wine) 55%, #6a2418 100%);
+}
+
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.preloader-bar {
+  animation: loadbar 1.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes loadbar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.faq-item[open] .faq-plus {
+  transform: rotate(45deg);
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.horiz-pin {
+  overflow: hidden;
 }

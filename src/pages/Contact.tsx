@@ -1,97 +1,71 @@
 import React from 'react';
+import { site } from '../data/site';
 
 export default function Contact() {
   return (
-    <div className="bg-dsc-darker min-h-screen pt-40 pb-32">
-      <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row gap-20">
-        
-        {/* Left Side: Text and Info */}
+    <div className="bg-ll-white min-h-screen pt-36 pb-24">
+      <div className="max-w-[1600px] mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-20">
         <div className="w-full md:w-1/2">
-          <h1 className="text-5xl md:text-7xl font-serif text-white leading-tight mb-8">
-            Begin the<br />Vision.
+          <h1 className="display-xl mb-8">
+            Not Sure Where<br />to Start?
           </h1>
-          <p className="text-gray-300 text-lg leading-relaxed mb-16 pr-12">
-            Every Personal Resort begins with a conversation. Share your vision, and our team of master builders and architects will reach out to explore the possibilities.
+          <p className="text-black/55 text-[16px] leading-relaxed mb-16 max-w-md">
+            {site.contactLead}
           </p>
-          
-          <div className="border-t border-gray-800 pt-12 mb-12">
-            <p className="text-dsc-accent text-xs tracking-widest uppercase font-semibold mb-4">Inquiries</p>
-            <p className="text-4xl md:text-5xl font-serif text-white">480.555.0199</p>
+
+          <div className="border-t border-ll-stroke pt-10 mb-10">
+            <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Inquiries</p>
+            <p className="font-display text-4xl md:text-5xl">{site.phone}</p>
           </div>
-          
+
           <div>
-            <p className="text-dsc-accent text-xs tracking-widest uppercase font-semibold mb-4">Headquarters</p>
-            <address className="not-italic text-gray-300 text-lg leading-loose">
-              8100 E. Camelback Road<br />
-              Suite 100<br />
-              Scottsdale, AZ 85251
+            <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Headquarters</p>
+            <address className="not-italic text-black/60 text-[16px] leading-loose">
+              {site.address.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
             </address>
           </div>
         </div>
 
-        {/* Right Side: Form */}
         <div className="w-full md:w-1/2">
-          <div className="border border-gray-800 p-8 md:p-12 rounded-sm bg-[#121212]">
-            <form className="flex flex-col gap-8">
-              
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-gray-400 font-semibold mb-3">Client Name</label>
-                <input 
-                  type="text" 
-                  placeholder="First and Last Name" 
-                  className="w-full bg-white text-black px-4 py-3 outline-none"
-                />
+          <form className="bg-ll-sand card-r p-8 md:p-12 flex flex-col gap-7">
+            <div>
+              <label className="block text-[12px] tracking-widest uppercase text-black/40 mb-3">Client name</label>
+              <input
+                type="text"
+                placeholder="First and last name"
+                className="w-full bg-ll-white text-black px-4 py-3 outline-none pill"
+              />
+            </div>
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="w-full md:w-1/2">
+                <label className="block text-[12px] tracking-widest uppercase text-black/40 mb-3">Email</label>
+                <input type="email" placeholder="client@example.com" className="w-full bg-ll-white text-black px-4 py-3 outline-none pill" />
               </div>
-
-              <div className="flex flex-col md:flex-row gap-8">
-                <div className="w-full md:w-1/2">
-                  <label className="block text-xs tracking-widest uppercase text-gray-400 font-semibold mb-3">Email Address</label>
-                  <input 
-                    type="email" 
-                    placeholder="client@example.com" 
-                    className="w-full bg-white text-black px-4 py-3 outline-none"
-                  />
-                </div>
-                <div className="w-full md:w-1/2">
-                  <label className="block text-xs tracking-widest uppercase text-gray-400 font-semibold mb-3">Phone Number</label>
-                  <input 
-                    type="tel" 
-                    placeholder="(123) 456-7890" 
-                    className="w-full bg-white text-black px-4 py-3 outline-none"
-                  />
-                </div>
+              <div className="w-full md:w-1/2">
+                <label className="block text-[12px] tracking-widest uppercase text-black/40 mb-3">Phone</label>
+                <input type="tel" placeholder="+966" className="w-full bg-ll-white text-black px-4 py-3 outline-none pill" />
               </div>
-
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-gray-400 font-semibold mb-3">Project Location</label>
-                <input 
-                  type="text" 
-                  placeholder="City, State, or Area" 
-                  className="w-full bg-white text-black px-4 py-3 outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-gray-400 font-semibold mb-3">The Vision</label>
-                <textarea 
-                  rows={4} 
-                  placeholder="Briefly describe the scope or inspiration for your Personal Resort..."
-                  className="w-full bg-white text-black px-4 py-3 outline-none resize-none"
-                ></textarea>
-              </div>
-
-              <div className="mt-4">
-                <button 
-                  type="button" 
-                  className="bg-[#e0ab85] text-black text-xs font-bold tracking-widest uppercase px-8 py-4 hover:bg-white transition-colors"
-                >
-                  Submit Inquiry
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            <div>
+              <label className="block text-[12px] tracking-widest uppercase text-black/40 mb-3">The vision</label>
+              <textarea
+                rows={4}
+                placeholder="Design, signage, print, packaging, or gifting..."
+                className="w-full bg-ll-white text-black px-4 py-3 outline-none resize-none rounded-3xl"
+              />
+            </div>
+            <button
+              type="button"
+              className="self-start pill bg-black text-ll-white h-[52px] px-8 text-[14px] hover:bg-ll-highlight transition-colors"
+            >
+              Submit inquiry
+            </button>
+          </form>
         </div>
-        
       </div>
     </div>
   );

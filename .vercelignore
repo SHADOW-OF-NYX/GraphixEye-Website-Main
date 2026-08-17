@@ -1,0 +1,7 @@
+public/brochure
+scripts
+node_modules
+dist
+.vercel
+.env*
+!.env.example
