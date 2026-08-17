@@ -40,6 +40,7 @@ export default function Showcase() {
           {filtered.map((work: Work, i) => (
             <article
               key={work.slug}
+              data-nav-tone="dark"
               className={`relative card-r overflow-hidden min-h-[420px] group ${i % 3 === 0 ? 'md:min-h-[520px]' : ''}`}
             >
               <Placeholder src={work.image} label={work.title} className="absolute inset-0" />

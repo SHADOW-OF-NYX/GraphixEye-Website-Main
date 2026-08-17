@@ -12,7 +12,10 @@ export default function SmoothScroll() {
       smoothWheel: true,
     });
 
-    lenis.on('scroll', ScrollTrigger.update);
+    lenis.on('scroll', () => {
+      ScrollTrigger.update();
+      window.dispatchEvent(new Event('site-scroll'));
+    });
 
     const ticker = (time: number) => {
       lenis.raf(time * 1000);

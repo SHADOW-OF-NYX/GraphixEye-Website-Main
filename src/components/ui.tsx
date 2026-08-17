@@ -68,7 +68,7 @@ export function Placeholder({
   eager?: boolean;
 }) {
   return (
-    <div data-slot={label} className={`relative overflow-hidden bg-ll-wine ${className}`}>
+    <div data-slot={label} data-nav-tone="dark" className={`relative overflow-hidden bg-ll-wine ${className}`}>
       <img
         src={src}
         alt={label}

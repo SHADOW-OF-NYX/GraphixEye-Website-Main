@@ -100,7 +100,7 @@ export default function Home() {
       {/* HERO */}
       <section ref={heroWrap} className="relative h-[280vh] bg-ll-white">
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-ll-white">
-          <div ref={heroFrame} className="absolute inset-0 overflow-hidden will-change-transform bg-black">
+          <div ref={heroFrame} data-nav-tone="dark" className="absolute inset-0 overflow-hidden will-change-transform bg-black">
             <HeroVideo src={heroVideo} poster={photos.hero} />
             <div ref={heroDim} className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0.12 }} />
           </div>
@@ -128,7 +128,7 @@ export default function Home() {
 
       {/* DEVICE / STUDIO */}
       <section className="px-4 md:px-8 py-10 md:py-16">
-        <div className="card-r glow-wash overflow-hidden min-h-[78vh] relative text-ll-white">
+        <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-[78vh] relative text-ll-white">
           <Placeholder src={photos.studio} label="The Studio — production floor" className="absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
           <div className="relative z-10 flex flex-col justify-between min-h-[78vh] p-8 md:p-12">
@@ -178,6 +178,7 @@ export default function Home() {
             {featured.map((work, i) => (
               <article
                 key={work.slug}
+                data-nav-tone="dark"
                 className="relative w-[72vw] md:w-[36vw] h-[62vh] card-r overflow-hidden shrink-0 bg-ll-sand group"
               >
                 <div className={`absolute inset-x-0 top-0 h-40 opacity-80 ${washes[i % washes.length]} blur-2xl`} />
@@ -326,7 +327,7 @@ export default function Home() {
       </section>
 
       {/* JOURNEY — dark */}
-      <section className="mx-4 md:mx-8 card-r glow-wash text-ll-white py-20 px-8 md:px-14 mb-8 overflow-hidden relative">
+      <section data-nav-tone="dark" className="mx-4 md:mx-8 card-r glow-wash text-ll-white py-20 px-8 md:px-14 mb-8 overflow-hidden relative">
         <Placeholder src={photos.craft} label="Craftsmanship — press / finishing" className="absolute inset-0 opacity-30" />
         <div className="relative z-10">
           <h2 className="display-md mb-3">Bring GraphixEye to your location</h2>
@@ -410,7 +411,7 @@ export default function Home() {
 
       {/* CONTACT STRIP */}
       <section className="px-6 md:px-12 pb-24">
-        <div className="card-r bg-black text-ll-white p-10 md:p-16 flex flex-col md:flex-row justify-between gap-10">
+        <div data-nav-tone="dark" className="card-r bg-black text-ll-white p-10 md:p-16 flex flex-col md:flex-row justify-between gap-10">
           <div>
             <h2 className="display-md mb-4">{site.contactHeadline}</h2>
             <p className="text-ll-white/60 max-w-md">

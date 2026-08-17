@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BrandLogo } from './ui';
 import { navLinks, site } from '../data/site';
-import { backdropLuma } from '../lib/backdropContrast';
+import { isDarkBackdrop } from '../lib/backdropContrast';
 
 export default function Navbar() {
   const location = useLocation();
@@ -20,8 +20,7 @@ export default function Navbar() {
       const nav = navRef.current;
       if (!nav) return;
 
-      const luma = backdropLuma(nav);
-      const next = onDarkRef.current ? luma < 0.52 : luma < 0.38;
+      const next = isDarkBackdrop(nav);
       if (next === onDarkRef.current) return;
       onDarkRef.current = next;
       setOnDark(next);
@@ -38,6 +37,7 @@ export default function Navbar() {
     const boot = window.requestAnimationFrame(schedule);
     const delayed = window.setTimeout(schedule, 80);
     window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('site-scroll', schedule);
     window.addEventListener('resize', schedule);
     window.addEventListener('load', schedule);
     document.addEventListener('loadeddata', schedule, true);
@@ -47,6 +47,7 @@ export default function Navbar() {
       window.clearTimeout(delayed);
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', schedule);
+      window.removeEventListener('site-scroll', schedule);
       window.removeEventListener('resize', schedule);
       window.removeEventListener('load', schedule);
       document.removeEventListener('loadeddata', schedule, true);
