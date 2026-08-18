@@ -60,11 +60,13 @@ export function Placeholder({
   label,
   src,
   className = '',
+  imgClassName = '',
   eager = false,
 }: {
   label: string;
   src: string;
   className?: string;
+  imgClassName?: string;
   eager?: boolean;
 }) {
   return (
@@ -73,7 +75,7 @@ export function Placeholder({
         src={src}
         alt={label}
         crossOrigin="anonymous"
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full object-cover ${imgClassName}`}
         loading={eager ? 'eager' : 'lazy'}
       />
     </div>

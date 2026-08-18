@@ -110,7 +110,13 @@ export default function Showcase() {
                   data-nav-tone="dark"
                   className="relative shrink-0 w-[240px] sm:w-[280px] md:w-[320px] h-[360px] md:h-[440px] card-r overflow-hidden bg-ll-sand shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
                 >
-                  <Placeholder src={work.image} label={work.title} eager className="w-full h-full" />
+                  <Placeholder
+                    src={work.image}
+                    label={work.title}
+                    eager
+                    className="w-full h-full"
+                    imgClassName="object-left origin-left scale-[1.22]"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6 text-ll-white">
                     <p className="text-[11px] tracking-widest uppercase opacity-70 mb-2">{work.category}</p>
