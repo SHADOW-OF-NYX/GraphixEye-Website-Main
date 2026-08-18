@@ -43,7 +43,7 @@ export default function Showcase() {
               data-nav-tone="dark"
               className={`relative card-r overflow-hidden min-h-[420px] group ${i % 3 === 0 ? 'md:min-h-[520px]' : ''}`}
             >
-              <Placeholder src={work.image} label={work.title} className="absolute inset-0" />
+              <Placeholder src={work.image} label={work.title} className="w-full h-full" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-8 left-8 right-8 text-ll-white">
                 <p className="text-[12px] tracking-widest uppercase opacity-70 mb-2">{work.category}</p>

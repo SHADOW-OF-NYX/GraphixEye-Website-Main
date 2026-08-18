@@ -128,7 +128,13 @@ export default function Home() {
       {/* DEVICE / STUDIO */}
       <section className="px-4 md:px-8 py-10 md:py-16">
         <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-[78vh] relative text-ll-white">
-          <Placeholder src={photos.studio} label="The Studio — production floor" className="absolute inset-0" />
+          <div className="absolute inset-0">
+            <Placeholder
+              src={photos.studio}
+              label="The Studio — production floor"
+              className="w-full h-full"
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
           <div className="relative z-10 flex flex-col justify-between min-h-[78vh] p-8 md:p-12">
             <div className="flex justify-between items-start gap-8">
@@ -185,7 +191,7 @@ export default function Home() {
                   src={work.image}
                   label={work.title}
                   eager
-                  className="absolute inset-0 opacity-90 group-hover:opacity-100 transition-opacity"
+                  className="w-full h-full opacity-90 group-hover:opacity-100 transition-opacity"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8 text-ll-white">
@@ -332,7 +338,13 @@ export default function Home() {
 
       {/* JOURNEY — dark */}
       <section data-nav-tone="dark" className="mx-4 md:mx-8 card-r glow-wash text-ll-white py-20 px-8 md:px-14 mb-8 overflow-hidden relative">
-        <Placeholder src={photos.craft} label="Craftsmanship — press / finishing" className="absolute inset-0 opacity-30" />
+        <div className="absolute inset-0">
+          <Placeholder
+            src={photos.craft}
+            label="Craftsmanship — press / finishing"
+            className="w-full h-full opacity-30"
+          />
+        </div>
         <div className="relative z-10">
           <h2 className="display-md mb-3">Bring GraphixEye to your location</h2>
           <p className="text-ll-sand/70 mb-14">From interest to live operation in clear steps</p>
