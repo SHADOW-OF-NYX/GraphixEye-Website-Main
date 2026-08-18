@@ -175,11 +175,13 @@ export default function Home() {
           AI, AR, VR & MR.{' '}
           <span className="text-black/40">Immersive services alongside integrated design and production</span>
         </h2>
-        <p className="mt-3 text-[14px] tracking-[0.08em] uppercase text-black/45">Services Provided</p>
       </section>
 
       <section ref={horizWrap} className="horiz-pin h-screen">
-        <div className="h-screen flex items-center">
+        <div className="h-screen flex flex-col justify-center">
+          <p className="px-8 mb-5 text-[18px] md:text-[22px] font-display tracking-[0.08em] uppercase text-black/55">
+            Services Provided
+          </p>
           <div ref={horizTrack} className="flex gap-6 px-8 will-change-transform">
             {featured.map((work, i) => (
               <article
