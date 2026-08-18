@@ -144,21 +144,35 @@ export const journey = [
   },
 ];
 
-export const testimonials = [
+export type Testimonial = {
+  id: string;
+  quote: string;
+  name: string;
+  role: string;
+  rating: number;
+};
+
+export const testimonials: Testimonial[] = [
   {
+    id: 'seed-1',
     quote: 'GraphixEye became the single production partner we actually trust — identity, environments, and print that feel like one system.',
     name: 'Placeholder name',
     role: 'Brand lead · replace this',
+    rating: 5,
   },
   {
+    id: 'seed-2',
     quote: 'From fleet wraps to exhibition builds, the finish is consistent. We stopped juggling five vendors.',
     name: 'Placeholder name',
     role: 'Operations · replace this',
+    rating: 5,
   },
   {
+    id: 'seed-3',
     quote: 'The brief was treated like a protocol, not a guess. Colour, materials, and install landed as promised.',
     name: 'Placeholder name',
     role: 'Project manager · replace this',
+    rating: 4,
   },
 ];
 

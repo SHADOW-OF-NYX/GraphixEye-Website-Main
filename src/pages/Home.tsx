@@ -17,9 +17,9 @@ import {
   standAlone,
   studioFeatures,
   studioSpecs,
-  testimonials,
 } from '../data/site';
-import { works } from '../data/works';
+import { horizontalScrollWorks } from '../data/works';
+import ReviewSection from '../components/ReviewSection';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,7 +35,6 @@ export default function Home() {
   const horizTrack = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState(0);
   const [faqGroup, setFaqGroup] = useState<'client' | 'partner'>('client');
-  const [slide, setSlide] = useState(0);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -93,7 +92,7 @@ export default function Home() {
   }, []);
 
   const faqItems = faqs[faqGroup];
-  const featured = works.slice(0, 5);
+  const featured = horizontalScrollWorks;
 
   return (
     <div className="bg-ll-white text-black">
@@ -167,8 +166,8 @@ export default function Home() {
       {/* MORE THAN PRINT + HORIZONTAL CARDS */}
       <section className="px-6 md:px-12 pt-20 pb-8" data-reveal>
         <h2 className="display-md max-w-3xl">
-          More than a printer.{' '}
-          <span className="text-black/40">Integrated design, production, and smart updates</span>
+          AI, AR, VR & MR.{' '}
+          <span className="text-black/40">Immersive services alongside integrated design and production</span>
         </h2>
       </section>
 
@@ -350,34 +349,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section className="px-6 md:px-12 py-24">
-        <p className="text-black/40 mb-3">Testimonials</p>
-        <h2 className="display-md mb-12">Operator Experience</h2>
-        <div className="max-w-3xl min-h-[200px]">
-          <p className="font-display text-[28px] md:text-[36px] leading-snug mb-8">“{testimonials[slide].quote}”</p>
-          <p className="text-[15px]">{testimonials[slide].name}</p>
-          <p className="text-[14px] text-black/45">{testimonials[slide].role}</p>
-        </div>
-        <div className="flex gap-3 mt-10">
-          <button
-            type="button"
-            onClick={() => setSlide((s) => (s === 0 ? testimonials.length - 1 : s - 1))}
-            className="pill border border-black w-12 h-12 inline-flex items-center justify-center hover:bg-black hover:text-ll-white transition-colors"
-            aria-label="Previous"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={() => setSlide((s) => (s + 1) % testimonials.length)}
-            className="pill border border-black w-12 h-12 inline-flex items-center justify-center hover:bg-black hover:text-ll-white transition-colors"
-            aria-label="Next"
-          >
-            ›
-          </button>
-        </div>
-      </section>
+      <ReviewSection />
 
       {/* FAQ */}
       <section className="px-6 md:px-12 py-24 grid md:grid-cols-[0.9fr_1.1fr] gap-12 items-start">

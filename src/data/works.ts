@@ -1,6 +1,6 @@
 import { u } from './images';
 
-export type WorkCategory = 'Design' | 'Signage' | 'Printing' | 'Packaging' | 'Gifting';
+export type WorkCategory = 'Design' | 'Signage' | 'Printing' | 'Packaging' | 'Gifting' | 'Immersive';
 
 export interface Work {
   slug: string;
@@ -17,8 +17,10 @@ export const works: Work[] = [
   { slug: 'digital-design', title: 'Digital Design', category: 'Design', location: 'Social & Web', image: u('photo-1498050108023-c5249f4df085') },
   { slug: 'packaging-design', title: 'Packaging Design', category: 'Design', location: 'Unboxing', image: u('photo-1553062407-98eeb64c6a62') },
   { slug: 'illustration-infographics', title: 'Illustration and Infographics', category: 'Design', location: 'Visual Systems', image: u('photo-1618005182384-a83a8bd57fbe') },
-  { slug: 'virtual-reality', title: 'Virtual Reality', category: 'Design', location: 'Immersive', image: u('photo-1593508512255-86ab42a8e620') },
-  { slug: 'augmented-reality', title: 'Augmented Reality', category: 'Design', location: 'Spatial', image: u('photo-1633356122544-f134324a6cee') },
+  { slug: 'ai-services', title: 'AI Services', category: 'Immersive', location: 'Smart Production', image: u('photo-1677442136019-21780ecad995') },
+  { slug: 'augmented-reality', title: 'Augmented Reality', category: 'Immersive', location: 'Spatial Overlays', image: u('photo-1633356122544-f134324a6cee') },
+  { slug: 'virtual-reality', title: 'Virtual Reality', category: 'Immersive', location: 'Immersive Worlds', image: u('photo-1593508512255-86ab42a8e620') },
+  { slug: 'mixed-reality', title: 'Mixed Reality', category: 'Immersive', location: 'Hybrid Experiences', image: u('photo-1617802690992-15d93242d430') },
   { slug: 'exterior-signage', title: 'Exterior Signage', category: 'Signage', location: 'Onshore & Offshore', image: u('photo-1486406146926-c627a92ad1ab') },
   { slug: 'interior-signage', title: 'Interior Signage', category: 'Signage', location: 'Wayfinding', image: u('photo-1497366811353-6870744d04b2') },
   { slug: 'directional-signage', title: 'Directional Signage', category: 'Signage', location: 'Traffic & Pedestrian', image: u('photo-1477959858617-67f85cf4f1df') },
@@ -55,4 +57,12 @@ export const featuredWorks = [
   works.find((w) => w.slug === 'packaging-custom')!,
 ];
 
-export const workFilters = ['All Projects', 'Design', 'Signage', 'Printing', 'Packaging', 'Gifting'] as const;
+/** Cards pinned in the home page horizontal scroll — AI, AR, VR, and MR. */
+export const horizontalScrollWorks = [
+  works.find((w) => w.slug === 'ai-services')!,
+  works.find((w) => w.slug === 'augmented-reality')!,
+  works.find((w) => w.slug === 'virtual-reality')!,
+  works.find((w) => w.slug === 'mixed-reality')!,
+];
+
+export const workFilters = ['All Projects', 'Design', 'Signage', 'Printing', 'Packaging', 'Gifting', 'Immersive'] as const;
