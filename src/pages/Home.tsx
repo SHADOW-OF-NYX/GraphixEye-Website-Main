@@ -181,7 +181,12 @@ export default function Home() {
                 className="relative w-[72vw] md:w-[36vw] h-[62vh] card-r overflow-hidden shrink-0 bg-ll-sand group"
               >
                 <div className={`absolute inset-x-0 top-0 h-40 opacity-80 ${washes[i % washes.length]} blur-2xl`} />
-                <Placeholder src={work.image} label={work.title} className="absolute inset-0 opacity-90 group-hover:opacity-100 transition-opacity" />
+                <Placeholder
+                  src={work.image}
+                  label={work.title}
+                  eager
+                  className="absolute inset-0 opacity-90 group-hover:opacity-100 transition-opacity"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8 text-ll-white">
                   <p className="text-[12px] tracking-widest uppercase opacity-70 mb-2">{work.category}</p>
