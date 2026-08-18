@@ -132,10 +132,10 @@ export default function Home() {
             <Placeholder
               src={photos.studio}
               label="The Studio — production floor"
-              className="w-full h-full opacity-65"
+              className="w-full h-full opacity-55"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/15" />
           <div className="relative z-10 flex flex-col justify-between min-h-[78vh] p-8 md:p-12">
             <div className="flex justify-between items-start gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
@@ -175,6 +175,7 @@ export default function Home() {
           AI, AR, VR & MR.{' '}
           <span className="text-black/40">Immersive services alongside integrated design and production</span>
         </h2>
+        <p className="mt-3 text-[14px] tracking-[0.08em] uppercase text-black/45">Services Provided</p>
       </section>
 
       <section ref={horizWrap} className="horiz-pin h-screen">
