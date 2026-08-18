@@ -17,24 +17,27 @@ export default function Experience() {
         <Placeholder src={photos.experienceExterior} label="Experience — exterior signage" className="w-full h-[70vh] card-r" />
       </section>
 
-      <section className="max-w-[1600px] mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-10 md:gap-16 mb-24 items-center">
-        <div>
+      <section className="max-w-[1600px] mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-0 card-r overflow-hidden bg-ll-sand mb-24">
+        <Placeholder src={photos.experiencePress} label="Experience — press floor" className="h-[420px] md:h-full md:min-h-[560px]" />
+        <div className="p-10 md:p-14 flex flex-col justify-center">
           <p className="text-[12px] tracking-[0.08em] uppercase text-black/40 mb-4">The Experience</p>
-          <h2 className="display-md mb-6 max-w-lg">From brief to press floor, one production standard.</h2>
-          <p className="text-black/55 leading-relaxed text-[16px] mb-8 max-w-md">
+          <h2 className="font-display text-[28px] md:text-[34px] leading-[1.15] mb-5">
+            From brief to press floor, one production standard.
+          </h2>
+          <p className="text-black/55 leading-relaxed text-[16px] mb-8">
             Visit the Dammam floor and see how identity, signage, print, and finishing move as one system — specified
             once, then repeated across sites without guesswork.
           </p>
-          <ul className="space-y-4 mb-10 max-w-md">
-            <li className="border-b border-ll-stroke pb-4">
+          <ul className="space-y-4 mb-8">
+            <li>
               <p className="font-display text-[17px] mb-1">Guided briefing</p>
               <p className="text-[14px] text-black/50">Goals, constraints, and colour logic before anything goes to press.</p>
             </li>
-            <li className="border-b border-ll-stroke pb-4">
+            <li>
               <p className="font-display text-[17px] mb-1">Live production</p>
               <p className="text-[14px] text-black/50">Offset, digital, silk screen, UV, and bindery under one roof.</p>
             </li>
-            <li className="pb-1">
+            <li>
               <p className="font-display text-[17px] mb-1">Install-ready finish</p>
               <p className="text-[14px] text-black/50">Protocols that hold through reprints, rollouts, and new locations.</p>
             </li>
@@ -46,7 +49,6 @@ export default function Experience() {
             Explore our approach →
           </Link>
         </div>
-        <Placeholder src={photos.experiencePress} label="Experience — press floor" className="card-r h-[420px] md:h-[560px]" />
       </section>
 
       <section className="max-w-[1600px] mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-0 card-r overflow-hidden bg-ll-sand mb-24">
