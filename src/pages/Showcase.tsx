@@ -1,15 +1,40 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Placeholder } from '../components/ui';
 import { photos } from '../data/images';
-import { workFilters, works, type Work, type WorkCategory } from '../data/works';
+import { workFilters, works, type WorkCategory } from '../data/works';
 
 export default function Showcase() {
   const [filter, setFilter] = useState<(typeof workFilters)[number]>('All Projects');
+  const [slide, setSlide] = useState(0);
 
   const filtered = useMemo(() => {
     if (filter === 'All Projects') return works;
     return works.filter((work) => work.category === (filter as WorkCategory));
   }, [filter]);
+
+  useEffect(() => {
+    setSlide(0);
+  }, [filter]);
+
+  useEffect(() => {
+    if (!filtered.length) return;
+    const timer = window.setInterval(() => {
+      setSlide((s) => (s + 1) % filtered.length);
+    }, 4500);
+    return () => window.clearInterval(timer);
+  }, [filtered]);
+
+  const active = filtered[slide];
+
+  const onPrev = () => {
+    if (!filtered.length) return;
+    setSlide((s) => (s === 0 ? filtered.length - 1 : s - 1));
+  };
+
+  const onNext = () => {
+    if (!filtered.length) return;
+    setSlide((s) => (s + 1) % filtered.length);
+  };
 
   return (
     <div className="bg-ll-white min-h-screen pt-28 pb-24">
@@ -36,22 +61,46 @@ export default function Showcase() {
       </section>
 
       <section className="max-w-[1600px] mx-auto px-6 md:px-8">
-        <div className="grid md:grid-cols-2 gap-5">
-          {filtered.map((work: Work, i) => (
+        {active ? (
+          <>
             <article
-              key={work.slug}
+              key={active.slug}
               data-nav-tone="dark"
-              className={`relative card-r overflow-hidden min-h-[420px] group ${i % 3 === 0 ? 'md:min-h-[520px]' : ''}`}
+              className="relative card-r overflow-hidden min-h-[460px] md:min-h-[560px] group"
             >
-              <Placeholder src={work.image} label={work.title} className="w-full h-full" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+              <Placeholder src={active.image} label={active.title} className="w-full h-full" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent opacity-85 transition-opacity" />
               <div className="absolute bottom-8 left-8 right-8 text-ll-white">
-                <p className="text-[12px] tracking-widest uppercase opacity-70 mb-2">{work.category}</p>
-                <h2 className="font-display text-3xl mb-1">{work.title}</h2>
-                <p className="text-[14px] text-ll-white/70">{work.location}</p>
+                <p className="text-[12px] tracking-widest uppercase opacity-70 mb-2">{active.category}</p>
+                <h2 className="font-display text-3xl md:text-5xl mb-2">{active.title}</h2>
+                <p className="text-[14px] md:text-[16px] text-ll-white/75">{active.location}</p>
               </div>
             </article>
-          ))}
+
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={onPrev}
+                className="pill border border-black w-12 h-12 inline-flex items-center justify-center hover:bg-black hover:text-ll-white transition-colors"
+                aria-label="Previous work"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={onNext}
+                className="pill border border-black w-12 h-12 inline-flex items-center justify-center hover:bg-black hover:text-ll-white transition-colors"
+                aria-label="Next work"
+              >
+                →
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-black/50">No works found for this filter.</p>
+        )}
+        <div className="mt-5 text-center text-[12px] text-black/40">
+          {filtered.length > 0 ? `${slide + 1} / ${filtered.length}` : ''}
         </div>
       </section>
     </div>
