@@ -66,3 +66,8 @@ export const horizontalScrollWorks = [
 ];
 
 export const workFilters = ['All Projects', 'Design', 'Signage', 'Printing', 'Packaging', 'Gifting', 'Immersive'] as const;
+
+/** Graphix banners with a navy brand panel; flash cards crop these so the panel is not visible. */
+export const bannerCropSlugs = new Set(
+  works.map((work) => work.slug).filter((slug) => slug !== 'ai-services' && slug !== 'mixed-reality'),
+);
