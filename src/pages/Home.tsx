@@ -180,7 +180,7 @@ export default function Home() {
       <section ref={horizWrap} className="horiz-pin h-screen">
         <div className="h-screen flex flex-col justify-center">
           <p className="px-8 mb-5 text-[18px] md:text-[22px] font-display tracking-[0.08em] uppercase text-black/55">
-            Services Provided
+            Newly Added Services
           </p>
           <div ref={horizTrack} className="flex gap-6 px-8 will-change-transform">
             {featured.map((work, i) => (
