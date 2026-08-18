@@ -132,10 +132,10 @@ export default function Home() {
             <Placeholder
               src={photos.studio}
               label="The Studio — production floor"
-              className="w-full h-full"
+              className="w-full h-full opacity-65"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
           <div className="relative z-10 flex flex-col justify-between min-h-[78vh] p-8 md:p-12">
             <div className="flex justify-between items-start gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
