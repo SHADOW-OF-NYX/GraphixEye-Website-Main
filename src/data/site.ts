@@ -20,78 +20,78 @@ export const navLinks = [
 ];
 
 export const heroPoints = [
-  'Guided briefs from identity to installation — designed for repeatable quality',
-  'Self-contained production with clear safety, colour, and finishing standards',
-  'Monitoring, reprints, new programs, and remote support across one point of contact',
+  'Identity, signage, print, packaging, and gifting from one factory floor',
+  'Offset, digital, silk screen, UV, and bindery with colour you can check on press',
+  'Reprints, rollouts, and install handled by the same Dammam team',
 ];
 
 export const studioSpecs = [
   { value: '2009', label: 'Established' },
-  { value: 'Dammam', label: 'Headquarters' },
-  { value: '1 POC', label: 'End-to-end production' },
+  { value: 'Dammam', label: 'Factory' },
+  { value: 'One floor', label: 'Design through finishing' },
 ];
 
 export const studioFeatures = [
-  { title: 'Design to install', body: 'Identity, signage, print, packaging, and gifting as one workflow.' },
+  { title: 'Design to install', body: 'Identity, signage, print, packaging, and gifting under one roof.' },
   { title: 'Press & finish', body: 'Offset, digital, silk screen, UV, hot stamping, bindery.' },
-  { title: 'Architectural fit', body: 'Exterior, interior, fleet, and exhibition systems for real spaces.' },
+  { title: 'Built for the site', body: 'Exterior, interior, fleet, and exhibition work made for real spaces.' },
 ];
 
 export const serviceTabs = [
   {
     id: 'design',
-    title: 'The Studio. Ready-to-run identity from day one, no guesswork required.',
+    title: 'Design on the floor. Artwork that is ready to go to press.',
     points: [
-      'Guided flow covering briefing to brand completion',
-      'Self-contained UX reduces client rework',
-      'Optional bilingual systems and custom protocols',
+      'Briefing through brand completion with our in-house designers',
+      'Proofs and colour checks before anything hits the machines',
+      'Bilingual artwork when the job needs Arabic and English together',
     ],
   },
   {
     id: 'signage',
-    title: 'Support & production. On-site fabrication, monitoring, and rollout across locations.',
+    title: 'Signage & environments. Fabricated here, fitted on your site.',
     points: [
-      'Remote coordination and optional 24/7 project health checks',
-      'Automatic reprints and rollout of new programs and protocols',
-      'Built for multi-location scaling',
+      'Exterior, interior, fleet, and exhibition builds from the Dammam floor',
+      'Site surveys and install by our own crews',
+      'Matching reprints when you open the next branch or hall',
     ],
   },
   {
     id: 'print',
-    title: 'The Ecosystem. From an on-site session to a long-term brand routine.',
+    title: 'Print & finish. A single run or a daily industrial load.',
     points: [
-      'Short-run and industrial capacity for high daily throughput',
-      'Flexible engagement: single jobs, packages, and retainers',
-      'Supports retention through structured brand systems',
+      'Short-run and high-volume capacity on the same floor',
+      'Offset, digital, silk screen, and UV printing',
+      'Binding, lamination, die cutting, and hot stamping in house',
     ],
   },
 ];
 
 export const operatorPoints = [
   {
-    title: 'Monetization & clarity.',
-    body: 'Campaigns, environments, and amenity upsells with a clear production case (unit cost × volume).',
+    title: 'Clear production.',
+    body: 'Finish, volume, and unit cost are agreed before we go to press — no catalogue guesswork.',
   },
   {
-    title: 'Operational simplicity.',
-    body: 'One partner reduces vendor load. Minimal briefing needs with clear, repeatable workflows.',
+    title: 'One factory.',
+    body: 'Design, print, finishing, and install from the same team instead of a chain of vendors.',
   },
   {
-    title: 'Premium differentiation.',
-    body: 'Craft meets industrial finish. Modern, design-forward, and high-end. No catalogue coldness.',
+    title: 'Craft at industrial scale.',
+    body: 'Design-forward work with the durability of a real production floor.',
   },
   {
-    title: 'Production you can defend.',
-    body: 'Guided colour and finishing logic instead of one-size-fits-all print. Updateable systems over time.',
+    title: 'Colour you can repeat.',
+    body: 'The next reprint and the next site follow the same locked specs.',
   },
 ];
 
 export const sessionSteps = [
   'Welcome & brief',
-  'Goal selection',
-  'Program explanation',
-  'Production guidance',
-  'Completion',
+  'Site & materials',
+  'Samples & proofs',
+  'Production',
+  'Delivery & install',
 ];
 
 export const industries = [
@@ -104,43 +104,43 @@ export const industries = [
 
 export const standAlone = [
   {
-    title: 'Architectural OpenFrame.',
-    body: 'A premium production system designed to feel integrated into your space — not added as an afterthought.',
+    title: 'The Dammam floor.',
+    body: 'Presses, finishing bays, and a sample room you can walk — a working factory, not a digital overlay.',
   },
   {
-    title: 'Customized Protocols.',
-    body: 'Precision-calibrated colour and material blends for repeatable outcomes and high brand retention.',
+    title: 'Colour & materials.',
+    body: 'We test, match, and lock specs so the next run looks like the first.',
   },
   {
-    title: 'Bespoke Execution.',
-    body: 'No two GraphixEye programs are identical. Each brief is planned around your room, journey, team, and budget.',
+    title: 'Made for the space.',
+    body: 'Signage, interiors, fleet, and exhibitions built for how the site actually works.',
   },
   {
-    title: 'Self-Service Autonomy.',
-    body: 'Clients can start safely via a guided brief, reducing dependency and improving scalability.',
+    title: 'One team to install.',
+    body: 'Our people fabricate and fit. No loose contractor chain at the end of the job.',
   },
 ];
 
 export const journey = [
   {
     title: 'Personal Consultation',
-    body: 'Book a call to define your vision. We analyze your space and timeline to deliver a tailored offer and a preliminary production snapshot.',
+    body: 'Book a call. We look at the brief, the site, and the timeline, then return with a clear offer.',
   },
   {
-    title: 'Bespoke Configuration',
-    body: 'Once the plan is set, we finalize custom elements: branding, signature protocols, bilingual systems, and material upgrades.',
+    title: 'Specification & samples',
+    body: 'Artwork, materials, colour tests, and bilingual needs are locked before anything goes to press.',
   },
   {
-    title: 'Dammam Craftsmanship',
-    body: 'Production begins in the 2nd Industrial City. Each system is built using high-end materials, colour tests, and full finishing integration.',
+    title: 'Dammam production',
+    body: 'The job runs in the 2nd Industrial City on our presses and finishing lines.',
   },
   {
-    title: 'White-Glove Deployment',
-    body: 'We handle logistics. Assembly is performed by our internal experts — no loose contractor chain. Every install ends with a final check.',
+    title: 'Delivery & install',
+    body: 'Logistics and fitting by our team. Every job ends with a check on site.',
   },
   {
-    title: 'Onboarding & Growth',
-    body: 'We do not just install; we launch. Training, marketing assets, reprint programs, and workshops to ensure long-term success.',
+    title: 'Reprints & care',
+    body: 'The same specs stay on file for the next run, the next branch, and the next event.',
   },
 ];
 
@@ -155,7 +155,7 @@ export type Testimonial = {
 export const testimonials: Testimonial[] = [
   {
     id: 'seed-1',
-    quote: 'GraphixEye became the single production partner we actually trust — identity, environments, and print that feel like one system.',
+    quote: 'GraphixEye became the production house we actually trust — identity, environments, and print from one floor.',
     name: 'Placeholder name',
     role: 'Brand lead · replace this',
     rating: 5,
@@ -169,7 +169,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: 'seed-3',
-    quote: 'The brief was treated like a protocol, not a guess. Colour, materials, and install landed as promised.',
+    quote: 'The brief was treated like a job sheet, not a guess. Colour, materials, and install landed as promised.',
     name: 'Placeholder name',
     role: 'Project manager · replace this',
     rating: 4,
@@ -180,41 +180,41 @@ export const faqs = {
   client: [
     {
       q: 'What does GraphixEye actually produce?',
-      a: 'Design, signage, printing, packaging, and gifting — from logo systems to architectural environments — as one production partner in Dammam.',
+      a: 'Design, signage, printing, packaging, and gifting — from logos to architectural environments — all from our factory in Dammam.',
     },
     {
       q: 'What happens during the first brief?',
-      a: 'We walk through welcome, safety and site constraints, goal selection, program explanation, then a production plan. After that the process is designed to feel simple, calm, and guided.',
+      a: 'We walk the job: site constraints, materials, quantities, and finish. Then we set a production plan you can follow from proof to install.',
     },
     {
-      q: 'How long does a typical program take?',
+      q: 'How long does a typical job take?',
       a: 'Short-run print can turn in days. Custom signage, packaging, and exhibition builds depend on site, materials, and approvals. We confirm a timeline in the first consultation.',
     },
     {
       q: 'Can we visit the factory?',
-      a: 'Yes. GraphixEye operates from the 2nd Industrial City, Dammam. Partner walkthroughs can include the guest experience of a project, the production floor, and partnership potential.',
+      a: 'Yes. GraphixEye is in the 2nd Industrial City, Dammam. We welcome walkthroughs of the press floor, finishing bays, and live work.',
     },
     {
       q: 'Do you work outside Dammam?',
-      a: 'Yes. We partner with industry leaders across the Kingdom — from headquarters and industrial sites to retail and events — from a single point of contact.',
+      a: 'Yes. We produce in Dammam and deliver and install across the Kingdom — headquarters, industrial sites, retail, and events.',
     },
   ],
   partner: [
     {
-      q: 'Who is GraphixEye designed for?',
-      a: 'Premium operators who want a high-value brand experience without adding vendor complexity: corporates, industrial sites, hospitality, retail, and events.',
+      q: 'Who do you work with?',
+      a: 'Corporates, industrial sites, hospitality, retail, and events that want serious production without a chain of vendors.',
     },
     {
-      q: 'Can the experience be customized for our brand?',
-      a: 'Yes. Visual presentation, room concept, guest journey, naming, and selected experience elements can be adapted. Premium partners can explore signature protocols.',
+      q: 'Can the work be customized for our brand?',
+      a: 'Yes. Artwork, materials, bilingual needs, and how the piece sits in the space are specified with you before we print.',
     },
     {
-      q: 'Can GraphixEye be used across multiple locations?',
-      a: 'Yes. Guided briefing, repeatable finishing logic, and one production standard make it suitable for partners who want to launch across several sites.',
+      q: 'Can you support several sites?',
+      a: 'Yes. Locked colour and finishing specs make reprints and new locations match the first install.',
     },
     {
       q: 'How do we start?',
-      a: 'Contact us. After a short partner call we provide a concrete offer with recommended setup, expected throughput, and a lightweight snapshot for your location.',
+      a: 'Contact us. After a short call we send a concrete offer with recommended materials, quantities, and a timeline from the Dammam floor.',
     },
   ],
 };

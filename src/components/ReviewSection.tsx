@@ -47,7 +47,7 @@ export default function ReviewSection() {
       <div className="grid md:grid-cols-[1fr_1fr] gap-12 items-start">
         <div>
           <p className="text-black/40 mb-3">Testimonials</p>
-          <h2 className="display-md mb-4">Operator Experience</h2>
+          <h2 className="display-md mb-4">What clients say</h2>
           <div className="flex items-center gap-3 mb-10">
             <StarRating value={Math.round(averageRating)} size="sm" />
             <p className="text-[14px] text-black/50">

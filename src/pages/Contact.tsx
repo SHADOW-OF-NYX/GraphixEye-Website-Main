@@ -19,7 +19,7 @@ export default function Contact() {
           </div>
 
           <div>
-            <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Headquarters</p>
+            <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Factory</p>
             <address className="not-italic text-black/60 text-[16px] leading-loose">
               {site.address.map((line) => (
                 <span key={line} className="block">

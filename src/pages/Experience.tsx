@@ -21,8 +21,8 @@ export default function Experience() {
         <div className="flex flex-col justify-center max-w-lg">
           <p className="font-display text-[18px] mb-8">The Experience</p>
           <p className="text-black/55 leading-relaxed text-[16px] mb-8">
-            Visit the Dammam floor and see how identity, signage, print, and finishing move as one system — specified
-            once, then repeated across sites without guesswork.
+            Visit the Dammam floor and see identity, signage, print, and finishing under one roof — a working factory
+            we are proud to show.
           </p>
           <Link
             to="/contact"
@@ -48,13 +48,13 @@ export default function Experience() {
           <p className="text-black/55 leading-relaxed text-[16px]">
             {tab === 'precision'
               ? 'Our commitment to quality extends beyond what is visible. Offset, digital, silk screen, and UV printing sit beside binding, lamination, die cutting, and hot stamping — so every GraphixEye piece is engineered for colour, durability, and a finish that lasts.'
-              : 'Hot stamping, lamination, die cutting, and bindery are treated as design tools, not afterthoughts. Finishes are specified as protocols so reprints and multi-site rollouts stay identical.'}
+              : 'Hot stamping, lamination, die cutting, and bindery are treated as part of the design, not afterthoughts. Finishes are written on the job sheet so reprints and other sites stay identical.'}
           </p>
         </div>
       </section>
 
       <section className="max-w-[1600px] mx-auto px-6 md:px-8">
-        <h2 className="display-md mb-10">From interest to live operation</h2>
+        <h2 className="display-md mb-10">From first call to finished work</h2>
         <div className="grid md:grid-cols-5 gap-4">
           {journey.map((step, i) => (
             <article key={step.title} className="bg-ll-sand card-r p-6 hover:bg-black hover:text-ll-white transition-colors duration-500 group">

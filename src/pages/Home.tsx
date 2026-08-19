@@ -116,11 +116,11 @@ export default function Home() {
 
           <div ref={introCopy} className="absolute bottom-16 right-6 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
             <p className="display-md mb-6">
-              A premium branding system your clients can self-start and your team can scale.
+              A Dammam factory for design, print, signage, and finishing.
             </p>
             <p className="text-[14px] leading-relaxed text-ll-white/80 mb-6">
-              GraphixEye is a connected full-spectrum production platform combining design, fabrication, and program
-              logic — built on a patented promise: {site.tagline}. Price on request.
+              GraphixEye is a production house in the 2nd Industrial City — presses, finishing lines, and craftsmen
+              under one roof. {site.tagline}. Price on request.
             </p>
             <ul className="space-y-2 text-[13px] text-ll-white/75">
               {heroPoints.map((p) => (
@@ -146,8 +146,9 @@ export default function Home() {
             <div className="flex justify-between items-start gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
               <p className="max-w-sm text-[14px] leading-relaxed text-ll-white/85">
-                Premium full-body brand production built for continuous professional use. GraphixEye brings{' '}
-                {site.parent}, est. {site.established} in Dammam, together with industrial-scale finishing.
+                Our production floor in Dammam’s 2nd Industrial City. Since {site.established} we have built identity,
+                environments, and print on industrial presses and finishing lines — a facility we are proud to walk you
+                through.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
@@ -243,7 +244,7 @@ export default function Home() {
             to="/experience"
             className="mt-10 pill border border-black h-[61px] px-8 inline-flex items-center text-[14px] hover:bg-black hover:text-ll-white transition-colors"
           >
-            Experience the Master system
+            Visit the factory
           </Link>
         </div>
         <div data-reveal>
@@ -274,7 +275,7 @@ export default function Home() {
             to="/contact"
             className="pill bg-black text-ll-white h-[61px] px-8 inline-flex items-center text-[14px] hover:bg-ll-highlight transition-colors"
           >
-            Experience the Master system
+            Visit the factory
           </Link>
         </div>
       </section>
@@ -282,7 +283,7 @@ export default function Home() {
       {/* GUIDED FLOW */}
       <section className="px-6 md:px-12 py-20">
         <h2 className="display-md mb-12" data-reveal>
-          Clients feel guided. Operators stay relaxed.
+          Clients feel guided. The floor stays clear.
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3" data-reveal>
           {sessionSteps.map((step, i) => (
@@ -298,7 +299,7 @@ export default function Home() {
         <div className="mt-16 grid md:grid-cols-2 gap-10 items-center">
           <Placeholder src={photos.guided} label="Guided session — tablet / brief flow" className="card-r h-[420px]" />
           <div>
-            <p className="text-black/50 font-display text-[18px] mb-6">One system — adapted to your location</p>
+            <p className="text-black/50 font-display text-[18px] mb-6">One factory — work made for the site</p>
             <div className="flex flex-wrap gap-2">
               {industries.map((ind) => (
                 <span key={ind} className="pill bg-ll-sand px-4 h-10 inline-flex items-center text-[13px]">
@@ -355,8 +356,8 @@ export default function Home() {
           />
         </div>
         <div className="relative z-10">
-          <h2 className="display-md mb-3">Bring GraphixEye to your location</h2>
-          <p className="text-ll-sand/70 mb-14">From interest to live operation in clear steps</p>
+          <h2 className="display-md mb-3">From the first call to the finished piece</h2>
+          <p className="text-ll-sand/70 mb-14">How a job moves through our Dammam floor</p>
           <div className="grid md:grid-cols-5 gap-8">
             {journey.map((step, i) => (
               <div key={step.title}>
@@ -389,7 +390,7 @@ export default function Home() {
                 onClick={() => setFaqGroup(g)}
                 className={`h-9 px-5 pill capitalize text-[14px] ${faqGroup === g ? 'bg-black text-ll-white' : ''}`}
               >
-                {g === 'client' ? 'Guest' : 'B2B'}
+                {g === 'client' ? 'Client' : 'B2B'}
               </button>
             ))}
           </div>
