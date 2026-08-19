@@ -1,7 +1,27 @@
 import React from 'react';
 
-export function BrandLogo({ className = 'h-10' }: { className?: string }) {
-  return <img src="/logo.png" alt="GraphixEye" className={`w-auto object-contain ${className}`} />;
+export function BrandLogo({
+  className = 'h-10',
+  onDark = false,
+}: {
+  className?: string;
+  onDark?: boolean;
+}) {
+  return (
+    <span className={`relative inline-block ${className}`}>
+      <img
+        src="/ge-logo.png"
+        alt="GraphixEye"
+        className={`h-full w-auto object-contain transition-opacity duration-500 ${onDark ? 'opacity-0' : 'opacity-100'}`}
+      />
+      <img
+        src="/ge-logo-2.png"
+        alt=""
+        aria-hidden="true"
+        className={`pointer-events-none absolute left-0 top-0 h-full w-auto object-contain transition-opacity duration-500 ${onDark ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </span>
+  );
 }
 
 export function LogoMark({ className = 'w-5 h-5' }: { className?: string }) {

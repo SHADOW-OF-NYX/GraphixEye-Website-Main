@@ -54,16 +54,23 @@ function toneFromElement(el: Element | null) {
 function hitBehindNav(x: number, y: number, nav: HTMLElement) {
   const prev = nav.style.pointerEvents;
   nav.style.pointerEvents = 'none';
-  const el = document.elementFromPoint(x, y);
+  const stack = document.elementsFromPoint(x, y).filter((el) => el !== nav && !nav.contains(el));
   nav.style.pointerEvents = prev;
-  return el;
+
+  const preferred = stack.find(
+    (el) =>
+      el instanceof HTMLVideoElement ||
+      el instanceof HTMLImageElement ||
+      (el instanceof Element && el.closest(DARK_HOST)),
+  );
+  return preferred ?? stack[0] ?? null;
 }
 
 /** True when the pixels under the nav links sit on a dark photo, video, or wash. */
 export function isDarkBackdrop(nav: HTMLElement) {
   const rect = nav.getBoundingClientRect();
   const y = Math.min(window.innerHeight - 1, Math.max(0, rect.top + rect.height * 0.62));
-  const xs = [0.36, 0.5, 0.64].map((t) =>
+  const xs = [0.08, 0.36, 0.5, 0.64].map((t) =>
     Math.min(window.innerWidth - 1, Math.max(0, window.innerWidth * t)),
   );
 

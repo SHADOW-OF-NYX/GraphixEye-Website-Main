@@ -35,22 +35,26 @@ export default function Navbar() {
     };
 
     const boot = window.requestAnimationFrame(schedule);
-    const delayed = window.setTimeout(schedule, 80);
+    const delayed = [80, 250, 800, 1600].map((ms) => window.setTimeout(schedule, ms));
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('site-scroll', schedule);
     window.addEventListener('resize', schedule);
     window.addEventListener('load', schedule);
     document.addEventListener('loadeddata', schedule, true);
+    document.addEventListener('playing', schedule, true);
+    document.addEventListener('canplay', schedule, true);
 
     return () => {
       window.cancelAnimationFrame(boot);
-      window.clearTimeout(delayed);
+      delayed.forEach((id) => window.clearTimeout(id));
       if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('site-scroll', schedule);
       window.removeEventListener('resize', schedule);
       window.removeEventListener('load', schedule);
       document.removeEventListener('loadeddata', schedule, true);
+      document.removeEventListener('playing', schedule, true);
+      document.removeEventListener('canplay', schedule, true);
     };
   }, [location.pathname]);
 
@@ -62,8 +66,8 @@ export default function Navbar() {
       className={`fixed top-0 left-0 w-full z-50 px-5 md:px-8 py-5 transition-colors duration-500 ${text}`}
     >
       <div className="max-w-[1600px] mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center rounded-2xl bg-ll-white/95 px-2 py-1.5 shadow-sm">
-          <BrandLogo className="h-11 md:h-12" />
+        <Link to="/" className="flex items-center">
+          <BrandLogo className="h-12 md:h-14" onDark={onDark} />
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
