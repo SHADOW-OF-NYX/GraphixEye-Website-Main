@@ -18,6 +18,6 @@ export const photos = {
 };
 
 /** Drop a replacement file at public/videos/hero.mp4 to swap the header video. */
-export const heroVideo = '/videos/hero.mp4?v=2';
+export const heroVideo = '/videos/hero.mp4?v=3';
 
 export { u };
