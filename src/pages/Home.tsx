@@ -29,7 +29,7 @@ export default function Home() {
   const heroWrap = useRef<HTMLDivElement>(null);
   const heroFrame = useRef<HTMLDivElement>(null);
   const heroDim = useRef<HTMLDivElement>(null);
-  const heroTitle = useRef<HTMLHeadingElement>(null);
+  const heroTitle = useRef<HTMLElement>(null);
   const introCopy = useRef<HTMLDivElement>(null);
   const horizWrap = useRef<HTMLDivElement>(null);
   const horizTrack = useRef<HTMLDivElement>(null);
@@ -104,8 +104,14 @@ export default function Home() {
             <div ref={heroDim} className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0.12 }} />
           </div>
 
-          <h1 ref={heroTitle} className="hero-title relative z-[5] text-ll-white text-center px-6 opacity-0 pointer-events-none">
-            GraphixEye
+          <h1 className="relative z-[5] w-full flex justify-center px-6 pointer-events-none">
+            <span ref={heroTitle} className="flex justify-center w-full opacity-0">
+              <img
+                src="/graphixeye-wordmark.png"
+                alt="GraphixEye"
+                className="block w-auto max-w-full h-auto max-h-[18vh] md:max-h-[26vh] object-contain drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]"
+              />
+            </span>
           </h1>
 
           <div ref={introCopy} className="absolute bottom-16 right-6 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
