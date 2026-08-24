@@ -6,8 +6,7 @@ const N = 32_000
 const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
-  // Cache-bust so rebakes show up after hard refresh / HMR
-  const res = await fetch(`${url}?v=face1`)
+  const res = await fetch(`${url}?v=face2`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)
@@ -19,8 +18,10 @@ async function loadBin(url: string): Promise<Float32Array> {
 
 export type BakedTargets = {
   eye: Float32Array
-  eyeBlink: Float32Array[] // open → mid → closed
+  eyeBlink: Float32Array[]
   eyeColors: Float32Array | null
+  face: Float32Array | null
+  faceColors: Float32Array | null
   bonsai: Float32Array
   bonsaiColors: Float32Array | null
   dna: Float32Array | null
@@ -44,6 +45,8 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
   ])
 
   let eyeColors: Float32Array | null = null
+  let face: Float32Array | null = null
+  let faceColors: Float32Array | null = null
   let bonsaiColors: Float32Array | null = null
   let dna: Float32Array | null = null
   let dnaColors: Float32Array | null = null
@@ -51,6 +54,16 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     eyeColors = await loadBin('/particle-targets/eye_colors.bin')
   } catch {
     eyeColors = null
+  }
+  try {
+    face = await loadBin('/particle-targets/face.bin')
+  } catch {
+    face = null
+  }
+  try {
+    faceColors = await loadBin('/particle-targets/face_colors.bin')
+  } catch {
+    faceColors = null
   }
   try {
     bonsaiColors = await loadBin('/particle-targets/bonsai_colors.bin')
@@ -68,7 +81,17 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     dnaColors = null
   }
 
-  cache = { eye, eyeBlink: [b0, b1, b2], eyeColors, bonsai, bonsaiColors, dna, dnaColors }
+  cache = {
+    eye,
+    eyeBlink: [b0, b1, b2],
+    eyeColors,
+    face,
+    faceColors,
+    bonsai,
+    bonsaiColors,
+    dna,
+    dnaColors,
+  }
   return cache
 }
 
@@ -78,7 +101,7 @@ export function sampleEyeBlink(
   t: number,
   out: Float32Array,
 ) {
-  const x = Math.max(0, Math.min(1, t)) * 2 // 0..2 across 3 frames
+  const x = Math.max(0, Math.min(1, t)) * 2
   const i0 = Math.min(Math.floor(x), 1)
   const i1 = i0 + 1
   const f = x - i0

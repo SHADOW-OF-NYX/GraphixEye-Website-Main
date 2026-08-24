@@ -1,5 +1,10 @@
 /** Shared scroll morph timing — keep ThreeScene + ServiceShowcase in sync. */
-export const SHAPE_COUNT = 4
+
+/** Morph sequence length: eye → face → dna → arc → bonsai */
+export const SHAPE_COUNT = 5
+
+/** Service titles skip the opening eye and map onto shapes 1..4 */
+export const TITLE_SHAPE_OFFSET = 1
 
 /** Fraction of each scroll segment spent fully formed (before morphing to next). */
 export const MORPH_HOLD = 0.45
@@ -8,14 +13,19 @@ export const MORPH_HOLD = 0.45
  * Opacity for service title i given scroll progress in [0,1].
  * Titles peak only while their paired shape is fully formed.
  */
-export function titleOpacityForProgress(progress: number, index: number, count = SHAPE_COUNT): number {
-  const n = count
-  const start = index / n
-  const end = (index + 1) / n
+export function titleOpacityForProgress(
+  progress: number,
+  serviceIndex: number,
+  shapeCount = SHAPE_COUNT,
+  shapeOffset = TITLE_SHAPE_OFFSET,
+): number {
+  const shapeIndex = serviceIndex + shapeOffset
+  const n = shapeCount
+  const start = shapeIndex / n
+  const end = (shapeIndex + 1) / n
   const span = end - start
   const holdEnd = start + span * MORPH_HOLD
 
-  // Fade in over first 20% of hold; fade out in first 15% of morph
   const fadeInEnd = start + span * MORPH_HOLD * 0.2
   const fadeOutEnd = holdEnd + span * (1 - MORPH_HOLD) * 0.18
 

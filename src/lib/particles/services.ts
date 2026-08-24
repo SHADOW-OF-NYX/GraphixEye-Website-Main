@@ -7,7 +7,7 @@ export type ImmersiveService = {
   eyebrow: string
   body: string
   /** Shape this service is paired with in the morph track */
-  shape: 'eye' | 'dna' | 'arc' | 'bonsai'
+  shape: 'face' | 'dna' | 'arc' | 'bonsai'
 }
 
 export const immersiveServices: ImmersiveService[] = [
@@ -17,7 +17,7 @@ export const immersiveServices: ImmersiveService[] = [
     title: 'AI Services',
     eyebrow: 'Smart Production',
     body: 'AI-assisted production workflows for brand and content programs — the machine as medium, the vision still human.',
-    shape: 'eye',
+    shape: 'face',
   },
   {
     id: 'augmented-reality',

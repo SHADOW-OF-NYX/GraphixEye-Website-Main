@@ -8,11 +8,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 function applyTitleOpacity(panels: HTMLElement[], progress: number) {
   panels.forEach((panel, i) => {
-    let o = titleOpacityForProgress(progress, i, panels.length)
-    if (i === 0) {
-      const gate = Math.max(0, Math.min(1, (progress - 0.02) / 0.06))
-      o *= gate * gate * (3 - 2 * gate)
-    }
+    const o = titleOpacityForProgress(progress, i)
     gsap.set(panel, {
       opacity: o,
       y: 18 * (1 - o),

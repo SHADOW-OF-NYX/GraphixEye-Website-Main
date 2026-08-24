@@ -64,7 +64,7 @@ const FRAGMENT_SHADER = /* glsl */`
   }
 `
 
-type ShapeName = 'eye' | 'dna' | 'arc' | 'bonsai'
+type ShapeName = 'eye' | 'face' | 'dna' | 'arc' | 'bonsai'
 
 const SHAPES: {
   name: ShapeName
@@ -75,6 +75,7 @@ const SHAPES: {
   noiseAmp: number
 }[] = [
   { name: 'eye',    cameraZ: 4.4, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
+  { name: 'face',   cameraZ: 3.4, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
   { name: 'dna',    cameraZ: 2.2, cageOpa: 0.03, pinkBias: 0.0,  bloom: 0.55, noiseAmp: 0.008 },
   { name: 'arc',    cameraZ: 5.0, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
   { name: 'bonsai', cameraZ: 5.0, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
@@ -83,6 +84,7 @@ const SHAPES: {
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
   switch (name) {
     case 'eye':    return baked?.eye ?? generateHandPositions(N)
+    case 'face':   return baked?.face ?? generateHandPositions(N)
     case 'dna':    return baked?.dna ?? generateXPositions(N)
     case 'arc':    return generateArcPositions(N)
     case 'bonsai': return baked?.bonsai ?? generateBonsaiPositions(N)
@@ -179,6 +181,8 @@ export default function ThreeScene() {
       const shapeColors = SHAPES.map((s) => {
         const c = new Float32Array(N * 3)
         if (s.name === 'eye') paintEyeRGB(c, baked?.eyeColors ?? null)
+        else if (s.name === 'face' && baked?.faceColors) c.set(baked.faceColors)
+        else if (s.name === 'face') paintEyeRGB(c, null)
         else if (s.name === 'dna' && baked?.dnaColors) c.set(baked.dnaColors)
         else if (s.name === 'dna') paintEyeRGB(c, null)
         else if (s.name === 'bonsai' && baked?.bonsaiColors) c.set(baked.bonsaiColors)
@@ -188,17 +192,21 @@ export default function ThreeScene() {
 
       const sizesDefault = new Float32Array(N)
       const sizesEye = new Float32Array(N)
+      const sizesFace = new Float32Array(N)
       const sizesBonsai = new Float32Array(N)
       for (let i = 0; i < N; i++) {
         const sparkle = Math.random() < 0.055
         sizesDefault[i] = sparkle ? 5.0 + Math.random() * 2.2 : 1.4 + Math.random() * 3.2
         sizesEye[i] = 1.1 + Math.random() * 2.2
         if (Math.random() < 0.04) sizesEye[i] = 3.8 + Math.random() * 1.2
+        sizesFace[i] = 1.0 + Math.random() * 1.8
+        if (Math.random() < 0.035) sizesFace[i] = 3.2 + Math.random() * 1.1
         sizesBonsai[i] = 0.9 + Math.random() * 1.6
         if (Math.random() < 0.03) sizesBonsai[i] = 2.8 + Math.random() * 1.0
       }
       const shapeSizes = SHAPES.map((s) =>
         s.name === 'eye' || s.name === 'dna' ? sizesEye
+          : s.name === 'face' ? sizesFace
           : s.name === 'bonsai' ? sizesBonsai
           : sizesDefault,
       )
@@ -208,11 +216,38 @@ export default function ThreeScene() {
       const sizes = new Float32Array(N)
       const alphas = new Float32Array(N)
       const colorsArr = new Float32Array(N * 3)
+      const baseAlphas = new Float32Array(N)
+
+      // Face leave/fade loop state — stagnant mesh, then particles drift off and die
+      const facePhase = new Float32Array(N)
+      const faceDirX = new Float32Array(N)
+      const faceDirY = new Float32Array(N)
+      const faceDirZ = new Float32Array(N)
+      const faceSpeed = new Float32Array(N)
+      const faceLeave = new Uint8Array(N) // 1 = this particle participates in leave cycle
+      const faceHome = shapePos[SHAPES.findIndex((s) => s.name === 'face')] ?? shapePos[1]
+      for (let i = 0; i < N; i++) {
+        const i3 = i * 3
+        const hx = faceHome[i3], hy = faceHome[i3 + 1], hz = faceHome[i3 + 2]
+        const len = Math.hypot(hx, hy, hz) || 1
+        // Outward from face center + noise
+        faceDirX[i] = hx / len + (Math.random() - 0.5) * 0.55
+        faceDirY[i] = hy / len + (Math.random() - 0.5) * 0.55
+        faceDirZ[i] = hz / len + (Math.random() - 0.5) * 0.35
+        const dlen = Math.hypot(faceDirX[i], faceDirY[i], faceDirZ[i]) || 1
+        faceDirX[i] /= dlen
+        faceDirY[i] /= dlen
+        faceDirZ[i] /= dlen
+        faceSpeed[i] = 0.35 + Math.random() * 0.55
+        facePhase[i] = Math.random() // stagger the loop
+        faceLeave[i] = Math.random() < 0.38 ? 1 : 0 // keep silhouette; ~38% peel off
+        baseAlphas[i] = 0.38 + Math.random() * 0.55
+      }
 
       const initScatter = generateScatterPositions(N)
       posArr.set(initScatter)
       sizes.set(sizesEye)
-      for (let i = 0; i < N; i++) alphas[i] = 0.32 + Math.random() * 0.68
+      alphas.set(baseAlphas)
       paintEyeRGB(colorsArr, baked?.eyeColors ?? null)
       if (baked?.eye) eyeLive.set(baked.eye)
 
@@ -475,11 +510,19 @@ export default function ThreeScene() {
 
         // Blink only while parked on eye (start of track)
         holdingEye =
-          i0 === 0 && localT < 0.08 && !!baked?.eyeBlink && baked.eyeBlink.length === 3
+          SHAPES[i0].name === 'eye' &&
+          localT < 0.08 &&
+          !!baked?.eyeBlink &&
+          baked.eyeBlink.length === 3
+
+        const holdingFace = SHAPES[i0].name === 'face' && localT < 0.12
+        const faceBlend =
+          (SHAPES[i0].name === 'face' ? 1 - localT : 0) +
+          (SHAPES[i1].name === 'face' ? localT : 0)
 
         if (holdingEye) {
           eyeHoldClock += delta
-          if (eyeHoldClock > EYE_TOTAL) eyeHoldClock = 0 // loop blink while idle at top
+          if (eyeHoldClock > EYE_TOTAL) eyeHoldClock = 0
           sampleEyeBlink(baked!.eyeBlink, blinkAmount(eyeHoldClock), eyeLive)
         } else {
           eyeHoldClock = 0
@@ -490,6 +533,22 @@ export default function ThreeScene() {
         const u = easeInOut(localT)
         const noiseAmp =
           SHAPES[i0].noiseAmp + (SHAPES[i1].noiseAmp - SHAPES[i0].noiseAmp) * u
+
+        // Face leave loop: settle on mesh → peel outward → fade → respawn
+        const FACE_SETTLE = 0.42
+        const FACE_DIST = 1.85
+        if (holdingFace) {
+          for (let i = 0; i < N; i++) {
+            facePhase[i] += delta * faceSpeed[i] * 0.42
+            if (facePhase[i] >= 1) facePhase[i] -= 1
+          }
+        } else if (faceBlend < 0.02) {
+          // Reset when fully off the face beat
+          for (let i = 0; i < N; i++) {
+            alphas[i] = baseAlphas[i]
+            if (facePhase[i] > FACE_SETTLE) facePhase[i] = Math.random() * FACE_SETTLE
+          }
+        }
 
         for (let i = 0; i < N; i++) {
           const i3 = i * 3
@@ -504,12 +563,41 @@ export default function ThreeScene() {
             bz = from[i3 + 2] + (to[i3 + 2] - from[i3 + 2]) * u
           }
 
-          const amp = holdingEye ? noiseAmp * 0.25 : noiseAmp
+          if (holdingFace && faceLeave[i]) {
+            const phase = facePhase[i]
+            if (phase < FACE_SETTLE) {
+              // Stagnant on mesh
+              alphas[i] = baseAlphas[i]
+            } else {
+              const leaveT = (phase - FACE_SETTLE) / (1 - FACE_SETTLE)
+              const ease = leaveT * leaveT * (3 - 2 * leaveT)
+              const dist = FACE_DIST * ease
+              bx += faceDirX[i] * dist
+              by += faceDirY[i] * dist
+              bz += faceDirZ[i] * dist
+              alphas[i] = baseAlphas[i] * (1 - ease)
+            }
+          } else if (holdingFace) {
+            alphas[i] = baseAlphas[i]
+          } else if (faceBlend > 0.01 && faceLeave[i] && facePhase[i] > FACE_SETTLE) {
+            // Softly wind down leave during morph away
+            const leaveT = Math.min(1, (facePhase[i] - FACE_SETTLE) / (1 - FACE_SETTLE))
+            const ease = leaveT * leaveT * (3 - 2 * leaveT) * faceBlend
+            bx += faceDirX[i] * FACE_DIST * ease
+            by += faceDirY[i] * FACE_DIST * ease
+            bz += faceDirZ[i] * FACE_DIST * ease
+            alphas[i] = baseAlphas[i] * (1 - ease * 0.85)
+          } else {
+            alphas[i] = baseAlphas[i]
+          }
+
+          const amp = holdingEye || holdingFace ? noiseAmp * 0.2 : noiseAmp
           posArr[i3] = bx + noise3D(bx * 0.9 + t, by * 0.9, bz * 0.9) * amp
           posArr[i3 + 1] = by + noise3D(bx * 0.9, by * 0.9 + t, bz * 0.9) * amp
           posArr[i3 + 2] = bz + noise3D(bx * 0.9, by * 0.9, bz * 0.9 + t) * amp * 0.7
         }
         geometry.attributes.position.needsUpdate = true
+        geometry.attributes.aAlpha.needsUpdate = true
 
         // Gentle motion accents per shape
         const dnaW =
@@ -522,6 +610,10 @@ export default function ThreeScene() {
         if (holdingEye) {
           points.rotation.y = Math.sin(eyeHoldClock * 0.35) * 0.06
           points.rotation.x *= 0.95
+          points.scale.lerp(v1, 0.06)
+        } else if (holdingFace) {
+          points.rotation.y = Math.sin(elapsed * 0.22) * 0.04
+          points.rotation.x *= 0.96
           points.scale.lerp(v1, 0.06)
         } else if (dnaW > 0.01) {
           points.rotation.y = Math.sin(elapsed * 0.28) * 0.35 * dnaW
