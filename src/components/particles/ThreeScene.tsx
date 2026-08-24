@@ -84,8 +84,8 @@ const SHAPES: {
   { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
   // AR hologram — zoomed 3/4 portrait on the right; copy on left
   { name: 'holo',   cameraX: -1.05, cameraY: -0.06, cameraZ: 3.05, lookX: 0.42,  lookY: 0.06, fov: 40, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.006 },
-  // VR Quest 3 — cam right so headset sits left; copy on right
-  { name: 'quest',  cameraX: 0.65, cameraY: 0.02, cameraZ: 4.35, lookX: -0.2,  lookY: 0.02, fov: 48, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.012 },
+  // VR Quest 3 — 3/4 angle, zoomed; headset on left, copy on right
+  { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.01 },
   // MR bonsai — cam right so tree sits left; copy on right
   { name: 'bonsai', cameraX: 0.95, cameraY: 0.1, cameraZ: 3.55, lookX: -0.48, lookY: -0.05, fov: 44, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
 ]
