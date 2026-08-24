@@ -6,7 +6,7 @@ const N = 32_000
 const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
-  const res = await fetch(`${url}?v=bonsai1`)
+  const res = await fetch(`${url}?v=holo3`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)

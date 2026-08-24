@@ -82,8 +82,8 @@ const SHAPES: {
   { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
   // AI face — cam right so mesh sits left; copy on right
   { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
-  // AR hologram — zoomed 3/4 portrait on the right; copy on left
-  { name: 'holo',   cameraX: -1.05, cameraY: -0.06, cameraZ: 3.05, lookX: 0.42,  lookY: 0.06, fov: 40, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.006 },
+  // AR hologram — Sketchfab match: low-angle hero, 3/4 yaw, model right / copy left
+  { name: 'holo',   cameraX: -0.72, cameraY: -0.44, cameraZ: 2.52, lookX: 0.36,  lookY: 0.20, fov: 36, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.005 },
   // VR Quest 3 — 3/4 angle, zoomed; headset on left, copy on right
   { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.01 },
   // MR bonsai — 3/4 angle on the right; copy on left
@@ -685,9 +685,10 @@ export default function ThreeScene() {
           points.rotation.x *= 0.96
           points.scale.lerp(v1, 0.06)
         } else if (holoW > 0.01) {
-          points.rotation.y = 0.18 * holoW
-          points.rotation.x = -0.04 * holoW
-          points.scale.setScalar(1 + Math.sin(elapsed * 0.85) * 0.006 * holoW)
+          // Keep baked Sketchfab pose — no extra spin
+          points.rotation.y *= 0.9
+          points.rotation.x *= 0.9
+          points.scale.lerp(v1, 0.08)
         } else if (bonsaiW > 0.01) {
           points.rotation.y = 0.1 * bonsaiW + Math.sin(elapsed * 0.28) * 0.022 * bonsaiW
           points.rotation.x = -0.05 * bonsaiW
