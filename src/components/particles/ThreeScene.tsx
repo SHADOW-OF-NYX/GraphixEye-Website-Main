@@ -64,7 +64,7 @@ const FRAGMENT_SHADER = /* glsl */`
   }
 `
 
-type ShapeName = 'eye' | 'face' | 'dna' | 'arc' | 'bonsai'
+type ShapeName = 'eye' | 'face' | 'holo' | 'arc' | 'bonsai'
 
 const SHAPES: {
   name: ShapeName
@@ -83,8 +83,8 @@ const SHAPES: {
   { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
   // AI face — push cam right so mesh sits left; copy on right
   { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
-  // AR DNA — dive in close, slight drift left
-  { name: 'dna',    cameraX: -0.45, cameraY: 0.12, cameraZ: 2.05, lookX: 0.2,  lookY: 0.0,  fov: 42, cageOpa: 0.03, pinkBias: 0.0,  bloom: 0.55, noiseAmp: 0.008 },
+  // AR hologram drone — tall portrait like reference (ring above, figure below)
+  { name: 'holo',   cameraX: 0.15, cameraY: 0.2,  cameraZ: 4.15, lookX: 0.0,  lookY: 0.05, fov: 48, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.85, noiseAmp: 0.01 },
   // VR arc — pull wide, ride to the right
   { name: 'arc',    cameraX: 0.55, cameraY: -0.05, cameraZ: 5.35, lookX: -0.15, lookY: 0.05, fov: 54, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
   // MR bonsai — cam left + zoom; tree on the right, copy on the left
@@ -95,7 +95,7 @@ function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array
   switch (name) {
     case 'eye':    return baked?.eye ?? generateHandPositions(N)
     case 'face':   return baked?.face ?? generateHandPositions(N)
-    case 'dna':    return baked?.dna ?? generateXPositions(N)
+    case 'holo':   return baked?.holo ?? generateXPositions(N)
     case 'arc':    return generateArcPositions(N)
     case 'bonsai': return baked?.bonsai ?? generateBonsaiPositions(N)
   }
@@ -195,8 +195,8 @@ export default function ThreeScene() {
         if (s.name === 'eye') paintEyeRGB(c, baked?.eyeColors ?? null)
         else if (s.name === 'face' && baked?.faceColors) c.set(baked.faceColors)
         else if (s.name === 'face') paintEyeRGB(c, null)
-        else if (s.name === 'dna' && baked?.dnaColors) c.set(baked.dnaColors)
-        else if (s.name === 'dna') paintEyeRGB(c, null)
+        else if (s.name === 'holo' && baked?.holoColors) c.set(baked.holoColors)
+        else if (s.name === 'holo') paintColors(c, 0.25)
         else if (s.name === 'bonsai' && baked?.bonsaiColors) c.set(baked.bonsaiColors)
         else paintColors(c, s.pinkBias)
         return c
@@ -217,8 +217,8 @@ export default function ThreeScene() {
         if (Math.random() < 0.03) sizesBonsai[i] = 2.8 + Math.random() * 1.0
       }
       const shapeSizes = SHAPES.map((s) =>
-        s.name === 'eye' || s.name === 'dna' ? sizesEye
-          : s.name === 'face' ? sizesFace
+        s.name === 'eye' ? sizesEye
+          : s.name === 'face' || s.name === 'holo' ? sizesFace
           : s.name === 'bonsai' ? sizesBonsai
           : sizesDefault,
       )
@@ -629,9 +629,9 @@ export default function ThreeScene() {
         geometry.attributes.aAlpha.needsUpdate = true
 
         // Gentle motion accents per shape
-        const dnaW =
-          (SHAPES[i0].name === 'dna' ? 1 - localT : 0) +
-          (SHAPES[i1].name === 'dna' ? localT : 0)
+        const holoW =
+          (SHAPES[i0].name === 'holo' ? 1 - localT : 0) +
+          (SHAPES[i1].name === 'holo' ? localT : 0)
         const bonsaiW =
           (SHAPES[i0].name === 'bonsai' ? 1 - localT : 0) +
           (SHAPES[i1].name === 'bonsai' ? localT : 0)
@@ -644,10 +644,11 @@ export default function ThreeScene() {
           points.rotation.y = Math.sin(elapsed * 0.22) * 0.04
           points.rotation.x *= 0.96
           points.scale.lerp(v1, 0.06)
-        } else if (dnaW > 0.01) {
-          points.rotation.y = Math.sin(elapsed * 0.28) * 0.35 * dnaW
-          points.rotation.x = Math.sin(elapsed * 0.19) * 0.12 * dnaW
-          points.scale.lerp(v1, 0.06)
+        } else if (holoW > 0.01) {
+          // Subtle hover — keep the portrait framing readable
+          points.rotation.y = Math.sin(elapsed * 0.2) * 0.05 * holoW
+          points.rotation.x = Math.sin(elapsed * 0.15) * 0.02 * holoW
+          points.scale.setScalar(1 + Math.sin(elapsed * 0.9) * 0.012 * holoW)
         } else if (bonsaiW > 0.01) {
           points.rotation.y = Math.sin(elapsed * 0.35) * 0.06 * bonsaiW
           points.rotation.x *= 0.95

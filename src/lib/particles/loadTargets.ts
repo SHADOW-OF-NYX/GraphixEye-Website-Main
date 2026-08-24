@@ -6,7 +6,7 @@ const N = 32_000
 const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
-  const res = await fetch(`${url}?v=face2`)
+  const res = await fetch(`${url}?v=holo1`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)
@@ -22,10 +22,10 @@ export type BakedTargets = {
   eyeColors: Float32Array | null
   face: Float32Array | null
   faceColors: Float32Array | null
+  holo: Float32Array | null
+  holoColors: Float32Array | null
   bonsai: Float32Array
   bonsaiColors: Float32Array | null
-  dna: Float32Array | null
-  dnaColors: Float32Array | null
 }
 
 let cache: BakedTargets | null = null
@@ -47,9 +47,9 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
   let eyeColors: Float32Array | null = null
   let face: Float32Array | null = null
   let faceColors: Float32Array | null = null
+  let holo: Float32Array | null = null
+  let holoColors: Float32Array | null = null
   let bonsaiColors: Float32Array | null = null
-  let dna: Float32Array | null = null
-  let dnaColors: Float32Array | null = null
   try {
     eyeColors = await loadBin('/particle-targets/eye_colors.bin')
   } catch {
@@ -66,19 +66,19 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     faceColors = null
   }
   try {
+    holo = await loadBin('/particle-targets/holo.bin')
+  } catch {
+    holo = null
+  }
+  try {
+    holoColors = await loadBin('/particle-targets/holo_colors.bin')
+  } catch {
+    holoColors = null
+  }
+  try {
     bonsaiColors = await loadBin('/particle-targets/bonsai_colors.bin')
   } catch {
     bonsaiColors = null
-  }
-  try {
-    dna = await loadBin('/particle-targets/dna.bin')
-  } catch {
-    dna = null
-  }
-  try {
-    dnaColors = await loadBin('/particle-targets/dna_colors.bin')
-  } catch {
-    dnaColors = null
   }
 
   cache = {
@@ -87,10 +87,10 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     eyeColors,
     face,
     faceColors,
+    holo,
+    holoColors,
     bonsai,
     bonsaiColors,
-    dna,
-    dnaColors,
   }
   return cache
 }

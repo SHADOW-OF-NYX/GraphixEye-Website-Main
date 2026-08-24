@@ -7,7 +7,7 @@ export type ImmersiveService = {
   eyebrow: string
   body: string
   /** Shape this service is paired with in the morph track */
-  shape: 'face' | 'dna' | 'arc' | 'bonsai'
+  shape: 'face' | 'holo' | 'arc' | 'bonsai'
   /** Which side the copy sits on for the camera ride */
   textSide: 'left' | 'right'
 }
@@ -28,7 +28,7 @@ export const immersiveServices: ImmersiveService[] = [
     title: 'Augmented Reality',
     eyebrow: 'Spatial Overlays',
     body: 'AR overlays that extend print and space into interactive layers — intent made visible in the room.',
-    shape: 'dna',
+    shape: 'holo',
     textSide: 'right',
   },
   {
