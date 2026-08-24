@@ -1,53 +1,106 @@
 export type WorkCategory = 'Design' | 'Signage' | 'Printing' | 'Packaging' | 'Gifting' | 'Immersive';
 
+/** Portfolio pieces that belong to one flash-card service only. Add more here anytime. */
+export interface ServiceProject {
+  id: string;
+  title: string;
+  location: string;
+  image: string;
+}
+
 export interface Work {
   slug: string;
   title: string;
   category: WorkCategory;
   location: string;
   image: string;
+  summary: string;
+  /** Only projects for this service — never mixes in sibling flash cards. */
+  projects: ServiceProject[];
 }
 
 const local = (slug: string) => `/images/works/${slug}.jpg`;
 
+/** Seed starter projects for a service. Replace / extend these as real portfolio files land. */
+function seedProjects(slug: string, title: string, location: string): ServiceProject[] {
+  return [
+    {
+      id: `${slug}-01`,
+      title: `${title} — Selected work 01`,
+      location,
+      image: local(slug),
+    },
+    {
+      id: `${slug}-02`,
+      title: `${title} — Selected work 02`,
+      location,
+      image: local(slug),
+    },
+    {
+      id: `${slug}-03`,
+      title: `${title} — Selected work 03`,
+      location,
+      image: local(slug),
+    },
+  ];
+}
+
+function service(
+  slug: string,
+  title: string,
+  category: WorkCategory,
+  location: string,
+  summary: string,
+): Work {
+  return {
+    slug,
+    title,
+    category,
+    location,
+    image: local(slug),
+    summary,
+    projects: seedProjects(slug, title, location),
+  };
+}
+
 export const works: Work[] = [
-  { slug: 'logo-design', title: 'Logo Design', category: 'Design', location: 'Brand Identity', image: local('logo-design') },
-  { slug: 'branding-identity', title: 'Branding and Identity', category: 'Design', location: 'Dammam, KSA', image: local('branding-identity') },
-  { slug: 'print-design', title: 'Print Design', category: 'Design', location: 'Collateral', image: local('print-design') },
-  { slug: 'digital-design', title: 'Digital Design', category: 'Design', location: 'Social & Web', image: local('digital-design') },
-  { slug: 'packaging-design', title: 'Packaging Design', category: 'Design', location: 'Unboxing', image: local('packaging-design') },
-  { slug: 'illustration-infographics', title: 'Illustration and Infographics', category: 'Design', location: 'Visual Systems', image: local('illustration-infographics') },
-  { slug: 'ai-services', title: 'AI Services', category: 'Immersive', location: 'Smart Production', image: local('ai-services') },
-  { slug: 'augmented-reality', title: 'Augmented Reality', category: 'Immersive', location: 'Spatial Overlays', image: local('augmented-reality') },
-  { slug: 'virtual-reality', title: 'Virtual Reality', category: 'Immersive', location: 'Immersive Worlds', image: local('virtual-reality') },
-  { slug: 'mixed-reality', title: 'Mixed Reality', category: 'Immersive', location: 'Hybrid Experiences', image: local('mixed-reality') },
-  { slug: 'exterior-signage', title: 'Exterior Signage', category: 'Signage', location: 'Onshore & Offshore', image: local('exterior-signage') },
-  { slug: 'interior-signage', title: 'Interior Signage', category: 'Signage', location: 'Wayfinding', image: local('interior-signage') },
-  { slug: 'directional-signage', title: 'Directional Signage', category: 'Signage', location: 'Traffic & Pedestrian', image: local('directional-signage') },
-  { slug: 'wall-branding', title: 'Wall Branding Signage', category: 'Signage', location: 'Workplace', image: local('wall-branding') },
-  { slug: 'display-stand', title: 'Display Stand Signage', category: 'Signage', location: 'Retail', image: local('display-stand') },
-  { slug: 'digital-signage', title: 'Digital Signage', category: 'Signage', location: 'LED & Screens', image: local('digital-signage') },
-  { slug: 'vehicle-graphics', title: 'Vehicle Graphics', category: 'Signage', location: 'Fleet Wraps', image: local('vehicle-graphics') },
-  { slug: 'road-signage', title: 'Road Signage', category: 'Signage', location: 'Regulatory', image: local('road-signage') },
-  { slug: 'exhibition-booth', title: 'Exhibition Booth', category: 'Signage', location: 'Design & Build', image: local('exhibition-booth') },
-  { slug: 'event-management', title: 'Event Management', category: 'Signage', location: 'On-Site Production', image: local('event-management') },
-  { slug: 'offset-printing', title: 'Offset Services', category: 'Printing', location: 'Commercial Press', image: local('offset-printing') },
-  { slug: 'digital-printing', title: 'Digital Printing', category: 'Printing', location: 'Short Run', image: local('digital-printing') },
-  { slug: 'silk-screen', title: 'Silk Screen Printing', category: 'Printing', location: 'Textiles & Metal', image: local('silk-screen') },
-  { slug: 'uv-hot-stamping', title: 'UV Printing / Hot Stamping', category: 'Printing', location: 'Premium Finish', image: local('uv-hot-stamping') },
-  { slug: 'continuous-forms', title: 'Continuous Forms', category: 'Printing', location: 'Invoices & Labels', image: local('continuous-forms') },
-  { slug: 'binding-finishing', title: 'Binding and Finishing', category: 'Printing', location: 'Bindery', image: local('binding-finishing') },
-  { slug: 'packaging-custom', title: 'Packaging Design & Customization', category: 'Packaging', location: 'Premium Materials', image: local('packaging-custom') },
-  { slug: 'packaging-innovative', title: 'Innovative Packaging Solutions', category: 'Packaging', location: 'Industry Specific', image: local('packaging-innovative') },
-  { slug: 'packaging-versatile', title: 'Versatile Packaging Options', category: 'Packaging', location: 'Boxes & Labels', image: local('packaging-versatile') },
-  { slug: 'packaging-flexible', title: 'Flexible Packaging', category: 'Packaging', location: 'Pouches & Bags', image: local('packaging-flexible') },
-  { slug: 'packaging-specialty', title: 'Specialty Packaging', category: 'Packaging', location: 'Custom Forms', image: local('packaging-specialty') },
-  { slug: 'packaging-sustainable', title: 'Sustainable Packaging', category: 'Packaging', location: 'Recyclable', image: local('packaging-sustainable') },
-  { slug: 'giveaways', title: 'Custom Made Giveaways', category: 'Gifting', location: 'Branded Kits', image: local('giveaways') },
-  { slug: 'trophies', title: 'Acrylic Trophies and Mementos', category: 'Gifting', location: 'Recognition', image: local('trophies') },
-  { slug: 'lanyards', title: 'Lanyards and Badge Pins', category: 'Gifting', location: 'Events', image: local('lanyards') },
-  { slug: 'uniforms', title: 'Uniforms and Apparel', category: 'Gifting', location: 'Corporate Wear', image: local('uniforms') },
-  { slug: 'safety-wears', title: 'Safety Wears', category: 'Gifting', location: 'Industrial PPE', image: local('safety-wears') },
+  service('logo-design', 'Logo Design', 'Design', 'Brand Identity', 'Marks and wordmarks built for print, signage, and digital systems.'),
+  service('branding-identity', 'Branding and Identity', 'Design', 'Dammam, KSA', 'Full identity systems — colour, type, and guidelines across touchpoints.'),
+  service('print-design', 'Print Design', 'Design', 'Collateral', 'Brochures, stationery, and collateral designed for press and finish.'),
+  service('digital-design', 'Digital Design', 'Design', 'Social & Web', 'Social, web, and screen graphics aligned to the brand system.'),
+  service('packaging-design', 'Packaging Design', 'Design', 'Unboxing', 'Structural and graphic packaging designed for shelf and unboxing.'),
+  service('illustration-infographics', 'Illustration and Infographics', 'Design', 'Visual Systems', 'Illustration and infographic systems for campaigns and reports.'),
+  service('ai-services', 'AI Services', 'Immersive', 'Smart Production', 'AI-assisted production workflows for brand and content programs.'),
+  service('augmented-reality', 'Augmented Reality', 'Immersive', 'Spatial Overlays', 'AR overlays that extend print and space into interactive layers.'),
+  service('virtual-reality', 'Virtual Reality', 'Immersive', 'Immersive Worlds', 'VR environments for brand, training, and exhibition experiences.'),
+  service('mixed-reality', 'Mixed Reality', 'Immersive', 'Hybrid Experiences', 'Hybrid MR experiences combining physical installs with digital layers.'),
+  service('exterior-signage', 'Exterior Signage', 'Signage', 'Onshore & Offshore', 'Building, site, and industrial exterior identification systems.'),
+  service('interior-signage', 'Interior Signage', 'Signage', 'Wayfinding', 'Interior identity and wayfinding for workplaces and venues.'),
+  service('directional-signage', 'Directional Signage', 'Signage', 'Traffic & Pedestrian', 'Traffic and pedestrian directional systems for complex sites.'),
+  service('wall-branding', 'Wall Branding Signage', 'Signage', 'Workplace', 'Environmental wall branding for lobbies, floors, and teams.'),
+  service('display-stand', 'Display Stand Signage', 'Signage', 'Retail', 'Retail and exhibition display stands and counters.'),
+  service('digital-signage', 'Digital Signage', 'Signage', 'LED & Screens', 'LED and screen-based digital signage programs.'),
+  service('vehicle-graphics', 'Vehicle Graphics', 'Signage', 'Fleet Wraps', 'Fleet wraps and vehicle graphics for brand mobility.'),
+  service('road-signage', 'Road Signage', 'Signage', 'Regulatory', 'Regulatory and road signage for industrial and public routes.'),
+  service('exhibition-booth', 'Exhibition Booth', 'Signage', 'Design & Build', 'Exhibition booth design and build for trade and brand events.'),
+  service('event-management', 'Event Management', 'Signage', 'On-Site Production', 'On-site event production, branding, and install support.'),
+  service('offset-printing', 'Offset Services', 'Printing', 'Commercial Press', 'Commercial offset press work for volume and colour accuracy.'),
+  service('digital-printing', 'Digital Printing', 'Printing', 'Short Run', 'Short-run digital print for speed and variable data.'),
+  service('silk-screen', 'Silk Screen Printing', 'Printing', 'Textiles & Metal', 'Silk screen on textiles, metal, and specialty substrates.'),
+  service('uv-hot-stamping', 'UV Printing / Hot Stamping', 'Printing', 'Premium Finish', 'UV print and hot stamping for premium finishes.'),
+  service('continuous-forms', 'Continuous Forms', 'Printing', 'Invoices & Labels', 'Continuous forms, invoices, and label production.'),
+  service('binding-finishing', 'Binding and Finishing', 'Printing', 'Bindery', 'Binding, lamination, die cutting, and finishing.'),
+  service('packaging-custom', 'Packaging Design & Customization', 'Packaging', 'Premium Materials', 'Custom packaging with premium materials and finishes.'),
+  service('packaging-innovative', 'Innovative Packaging Solutions', 'Packaging', 'Industry Specific', 'Industry-specific packaging engineered for product and transit.'),
+  service('packaging-versatile', 'Versatile Packaging Options', 'Packaging', 'Boxes & Labels', 'Boxes, labels, and versatile packaging formats.'),
+  service('packaging-flexible', 'Flexible Packaging', 'Packaging', 'Pouches & Bags', 'Pouches, bags, and flexible packaging systems.'),
+  service('packaging-specialty', 'Specialty Packaging', 'Packaging', 'Custom Forms', 'Specialty forms and custom packaging constructions.'),
+  service('packaging-sustainable', 'Sustainable Packaging', 'Packaging', 'Recyclable', 'Recyclable and sustainable packaging options.'),
+  service('giveaways', 'Custom Made Giveaways', 'Gifting', 'Branded Kits', 'Custom branded giveaways and kits.'),
+  service('trophies', 'Acrylic Trophies and Mementos', 'Gifting', 'Recognition', 'Acrylic trophies and recognition mementos.'),
+  service('lanyards', 'Lanyards and Badge Pins', 'Gifting', 'Events', 'Event lanyards, badges, and pins.'),
+  service('uniforms', 'Uniforms and Apparel', 'Gifting', 'Corporate Wear', 'Corporate uniforms and branded apparel.'),
+  service('safety-wears', 'Safety Wears', 'Gifting', 'Industrial PPE', 'Industrial PPE and safety wear branding.'),
 ];
 
 export const featuredWorks = [
@@ -66,6 +119,80 @@ export const horizontalScrollWorks = [
 ];
 
 export const workFilters = ['All Projects', 'Design', 'Signage', 'Printing', 'Packaging', 'Gifting', 'Immersive'] as const;
+
+export type WorkCategorySlug = 'design' | 'signage' | 'printing' | 'packaging' | 'gifting' | 'immersive';
+
+export interface WorkCategoryMeta {
+  slug: WorkCategorySlug;
+  category: WorkCategory;
+  title: string;
+  eyebrow: string;
+  body: string;
+  glow: string;
+}
+
+export const workCategories: WorkCategoryMeta[] = [
+  {
+    slug: 'design',
+    category: 'Design',
+    title: 'Design',
+    eyebrow: 'Identity systems',
+    body: 'Logo, branding, print and digital design, packaging systems, illustration, and infographics — built as one visual language.',
+    glow: 'from-[#ff443a] via-[#ff6e8f] to-[#ff9ae7]',
+  },
+  {
+    slug: 'signage',
+    category: 'Signage',
+    title: 'Signage',
+    eyebrow: 'Environments',
+    body: 'Exterior, interior, directional, wall branding, displays, digital screens, fleet wraps, road signage, exhibitions, and events.',
+    glow: 'from-[#ff8958] via-[#f6633c] to-[#ff5860]',
+  },
+  {
+    slug: 'printing',
+    category: 'Printing',
+    title: 'Printing',
+    eyebrow: 'Press & finish',
+    body: 'Offset, digital, silk screen, UV and hot stamping, continuous forms, binding, and finishing — colour you can check on press.',
+    glow: 'from-[#ff5860] via-[#ff93a5] to-[#ff9ae7]',
+  },
+  {
+    slug: 'packaging',
+    category: 'Packaging',
+    title: 'Packaging',
+    eyebrow: 'Unboxing',
+    body: 'Custom, innovative, versatile, flexible, specialty, and sustainable packaging engineered for shelf, transit, and brand moments.',
+    glow: 'from-[#f6633c] via-[#ff8958] to-[#ff6e8f]',
+  },
+  {
+    slug: 'gifting',
+    category: 'Gifting',
+    title: 'Gifting',
+    eyebrow: 'Branded kits',
+    body: 'Giveaways, acrylic trophies, lanyards and badges, uniforms and apparel, and safety wear for corporate and industrial programs.',
+    glow: 'from-[#ff6e8f] via-[#ff9ae7] to-[#ff443a]',
+  },
+  {
+    slug: 'immersive',
+    category: 'Immersive',
+    title: 'Immersive',
+    eyebrow: 'Spatial & AI',
+    body: 'AI services, augmented reality, virtual reality, and mixed reality experiences that extend the brand beyond print and space.',
+    glow: 'from-[#ff9ae7] via-[#ff5860] to-[#ff8958]',
+  },
+];
+
+export function getCategoryForWork(work: Work): WorkCategoryMeta | undefined {
+  return workCategories.find((c) => c.category === work.category);
+}
+
+export function getWorkBySlug(slug: string): Work | undefined {
+  return works.find((work) => work.slug === slug);
+}
+
+export function projectsForService(slug: string): ServiceProject[] {
+  return getWorkBySlug(slug)?.projects ?? [];
+}
 
 /** Graphix banners with a navy brand panel; flash cards crop these so the panel is not visible. */
 export const bannerCropSlugs = new Set(

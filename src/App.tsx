@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Preloader from './components/Preloader';
 import SmoothScroll from './components/SmoothScroll';
 import Home from './pages/Home';
 import Showcase from './pages/Showcase';
+import ServiceDetail from './pages/ServiceDetail';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
+import Expansions from './pages/Expansions';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -19,24 +21,42 @@ function ScrollToTop() {
   return null;
 }
 
+function AppShell() {
+  const { pathname } = useLocation();
+  const isExpansions = pathname === '/expansions';
+
+  return (
+    <div
+      className={`font-sans min-h-screen ${
+        isExpansions ? 'text-ll-white bg-[#080f18]' : 'text-black bg-ll-white'
+      }`}
+    >
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/services" element={<Showcase />} />
+          <Route path="/services/:slug" element={<ServiceDetail />} />
+          <Route path="/showcase" element={<Navigate to="/services" replace />} />
+          <Route path="/works" element={<Navigate to="/services" replace />} />
+          <Route path="/works/:slug" element={<Navigate to="/services" replace />} />
+          <Route path="/expansions" element={<Expansions />} />
+          <Route path="/experience" element={<Experience />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </main>
+      {!isExpansions && <Footer />}
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <SmoothScroll />
       <Preloader />
-      <div className="font-sans text-black bg-ll-white min-h-screen">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/showcase" element={<Showcase />} />
-            <Route path="/experience" element={<Experience />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <AppShell />
     </BrowserRouter>
   );
 }

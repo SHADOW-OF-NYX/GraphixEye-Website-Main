@@ -11,7 +11,7 @@ export default function Navbar() {
   const [onDark, setOnDark] = useState(location.pathname === '/');
 
   useEffect(() => {
-    onDarkRef.current = location.pathname === '/';
+    onDarkRef.current = location.pathname === '/' || location.pathname === '/expansions';
     setOnDark(onDarkRef.current);
 
     let frame = 0;
@@ -76,20 +76,16 @@ export default function Navbar() {
               key={link.name}
               to={link.path}
               className={`h-[42px] px-4 inline-flex items-center text-[16px] transition-colors ${
-                location.pathname === link.path ? '' : 'opacity-90 hover:opacity-100'
+                location.pathname === link.path ||
+                (link.path === '/services' && location.pathname.startsWith('/services')) ||
+                (link.path === '/expansions' && location.pathname.startsWith('/expansions'))
+                  ? ''
+                  : 'opacity-90 hover:opacity-100'
               }`}
             >
               {link.name}
             </Link>
           ))}
-          <Link
-            to="/showcase"
-            className={`h-[42px] px-4 inline-flex items-center text-[16px] transition-colors ${
-              location.pathname === '/showcase' ? '' : 'opacity-90 hover:opacity-100'
-            }`}
-          >
-            Works
-          </Link>
         </div>
 
         <Link

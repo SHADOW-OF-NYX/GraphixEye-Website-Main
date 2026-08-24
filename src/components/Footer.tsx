@@ -13,7 +13,8 @@ export default function Footer() {
           </Link>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-16 gap-y-4 text-[15px]">
-            <Link to="/showcase" className="hover:text-ll-highlight transition-colors">Showcase</Link>
+            <Link to="/services" className="hover:text-ll-highlight transition-colors">Services</Link>
+            <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
             <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
             <Link to="/contact" className="hover:text-ll-highlight transition-colors">Contact</Link>
             <a href={`mailto:${site.email}`} className="hover:text-ll-highlight transition-colors">Email</a>

@@ -1,0 +1,559 @@
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { createNoise3D } from 'simplex-noise'
+import {
+  generateScatterPositions,
+  generateXPositions,
+  generateArcPositions,
+  generateBonsaiPositions,
+  generateHandPositions,
+} from '../../lib/particles/shapes'
+import { loadBakedTargets, sampleEyeBlink, type BakedTargets } from '../../lib/particles/loadTargets'
+
+gsap.registerPlugin(ScrollTrigger)
+
+const N = 32_000
+const noise3D = createNoise3D()
+
+const VERTEX_SHADER = /* glsl */`
+  uniform float uPixelRatio;
+  uniform float uScale;
+  attribute float aSize;
+  attribute float aAlpha;
+  attribute vec3 aColor;
+  varying float vAlpha;
+  varying vec3 vColor;
+  varying float vIsSparkle;
+
+  void main() {
+    vec4 viewPosition = viewMatrix * modelMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * viewPosition;
+    float depthScale = uScale / max(-viewPosition.z, 0.001);
+    gl_PointSize = aSize * uPixelRatio * depthScale;
+    gl_PointSize = clamp(gl_PointSize, 0.5, 64.0);
+    vAlpha = aAlpha;
+    vColor = aColor;
+    vIsSparkle = aSize > 4.8 ? 1.0 : 0.0;
+  }
+`
+
+const FRAGMENT_SHADER = /* glsl */`
+  varying float vAlpha;
+  varying vec3 vColor;
+  varying float vIsSparkle;
+
+  void main() {
+    vec2 uv = gl_PointCoord - 0.5;
+    float dist = length(uv);
+    if (dist > 0.5) discard;
+
+    float alpha = (1.0 - smoothstep(0.22, 0.50, dist)) * vAlpha;
+
+    if (vIsSparkle > 0.5) {
+      float h = max(0.0, 1.0 - abs(uv.y) * 14.0) * max(0.0, 1.0 - abs(uv.x) * 2.2);
+      float v = max(0.0, 1.0 - abs(uv.x) * 14.0) * max(0.0, 1.0 - abs(uv.y) * 2.2);
+      float d1 = max(0.0, 1.0 - abs(uv.x + uv.y) * 10.0) * max(0.0, 1.0 - abs(uv.x - uv.y) * 3.0);
+      float star = (h + v + d1 * 0.55) * vAlpha * 0.85;
+      alpha = max(alpha, star);
+    }
+
+    gl_FragColor = vec4(vColor, alpha);
+  }
+`
+
+type ShapeName = 'eye' | 'dna' | 'arc' | 'bonsai'
+
+const SHAPES: {
+  name: ShapeName
+  cameraZ: number
+  cageOpa: number
+  pinkBias: number
+  bloom: number
+  noiseAmp: number
+}[] = [
+  { name: 'eye',    cameraZ: 4.4, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
+  { name: 'dna',    cameraZ: 2.2, cageOpa: 0.03, pinkBias: 0.0,  bloom: 0.55, noiseAmp: 0.008 },
+  { name: 'arc',    cameraZ: 5.0, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
+  { name: 'bonsai', cameraZ: 5.0, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
+]
+
+function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
+  switch (name) {
+    case 'eye':    return baked?.eye ?? generateHandPositions(N)
+    case 'dna':    return baked?.dna ?? generateXPositions(N)
+    case 'arc':    return generateArcPositions(N)
+    case 'bonsai': return baked?.bonsai ?? generateBonsaiPositions(N)
+  }
+}
+
+function paintColors(colors: Float32Array, pinkBias: number) {
+  for (let i = 0; i < N; i++) {
+    const usePink = Math.random() < pinkBias
+    if (usePink) {
+      const t = Math.random()
+      colors[i * 3]     = 0.83 + t * 0.10
+      colors[i * 3 + 1] = 0.45 + t * 0.22
+      colors[i * 3 + 2] = 0.88 + t * 0.08
+    } else {
+      const v = 0.92 + Math.random() * 0.08
+      colors[i * 3] = v
+      colors[i * 3 + 1] = v
+      colors[i * 3 + 2] = v
+    }
+  }
+}
+
+function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
+  if (baked && baked.length === colors.length) {
+    colors.set(baked)
+    return
+  }
+  for (let i = 0; i < N; i++) {
+    const roll = Math.random()
+    if (roll < 0.34) {
+      colors[i * 3] = 1; colors[i * 3 + 1] = 0.18; colors[i * 3 + 2] = 0.14
+    } else if (roll < 0.68) {
+      colors[i * 3] = 0.28; colors[i * 3 + 1] = 0.48; colors[i * 3 + 2] = 1
+    } else {
+      const v = 0.92 + Math.random() * 0.08
+      colors[i * 3] = v; colors[i * 3 + 1] = v; colors[i * 3 + 2] = v
+    }
+  }
+}
+
+function easeInOut(t: number) {
+  // Smootherstep — gentler accel/decel than quadratic ease
+  const x = Math.max(0, Math.min(1, t))
+  return x * x * x * (x * (x * 6 - 15) + 10)
+}
+
+export default function ThreeScene() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    let cancelled = false
+    const disposeList: Array<() => void> = []
+
+    const init = async () => {
+      const { EffectComposer } = await import('three/examples/jsm/postprocessing/EffectComposer.js')
+      const { RenderPass } = await import('three/examples/jsm/postprocessing/RenderPass.js')
+      const { UnrealBloomPass } = await import('three/examples/jsm/postprocessing/UnrealBloomPass.js')
+      if (cancelled) return
+
+      let baked: BakedTargets | null = null
+      try {
+        baked = await loadBakedTargets()
+      } catch (err) {
+        console.warn('[Expansions] baked targets missing, using procedural fallback', err)
+      }
+      if (cancelled) return
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true })
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setClearColor(0x000000, 0)
+      disposeList.push(() => renderer.dispose())
+
+      const scene = new THREE.Scene()
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100)
+      camera.position.set(0, 0, SHAPES[0].cameraZ)
+
+      const composer = new EffectComposer(renderer)
+      composer.addPass(new RenderPass(scene, camera))
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        1.15, 0.55, 0.12,
+      )
+      composer.addPass(bloomPass)
+      disposeList.push(() => composer.dispose())
+      bloomPass.strength = SHAPES[0].bloom
+
+      // ── Prefetch all shape targets for scroll scrubbing ──────────────────
+      const shapePos = SHAPES.map((s) => resolveShape(s.name, baked))
+      const shapeColors = SHAPES.map((s) => {
+        const c = new Float32Array(N * 3)
+        if (s.name === 'eye') paintEyeRGB(c, baked?.eyeColors ?? null)
+        else if (s.name === 'dna' && baked?.dnaColors) c.set(baked.dnaColors)
+        else if (s.name === 'dna') paintEyeRGB(c, null)
+        else if (s.name === 'bonsai' && baked?.bonsaiColors) c.set(baked.bonsaiColors)
+        else paintColors(c, s.pinkBias)
+        return c
+      })
+
+      const sizesDefault = new Float32Array(N)
+      const sizesEye = new Float32Array(N)
+      const sizesBonsai = new Float32Array(N)
+      for (let i = 0; i < N; i++) {
+        const sparkle = Math.random() < 0.055
+        sizesDefault[i] = sparkle ? 5.0 + Math.random() * 2.2 : 1.4 + Math.random() * 3.2
+        sizesEye[i] = 1.1 + Math.random() * 2.2
+        if (Math.random() < 0.04) sizesEye[i] = 3.8 + Math.random() * 1.2
+        sizesBonsai[i] = 0.9 + Math.random() * 1.6
+        if (Math.random() < 0.03) sizesBonsai[i] = 2.8 + Math.random() * 1.0
+      }
+      const shapeSizes = SHAPES.map((s) =>
+        s.name === 'eye' || s.name === 'dna' ? sizesEye
+          : s.name === 'bonsai' ? sizesBonsai
+          : sizesDefault,
+      )
+
+      const posArr = new Float32Array(N * 3)
+      const eyeLive = new Float32Array(N * 3)
+      const sizes = new Float32Array(N)
+      const alphas = new Float32Array(N)
+      const colorsArr = new Float32Array(N * 3)
+
+      const initScatter = generateScatterPositions(N)
+      posArr.set(initScatter)
+      sizes.set(sizesEye)
+      for (let i = 0; i < N; i++) alphas[i] = 0.32 + Math.random() * 0.68
+      paintEyeRGB(colorsArr, baked?.eyeColors ?? null)
+      if (baked?.eye) eyeLive.set(baked.eye)
+
+      const geometry = new THREE.BufferGeometry()
+      geometry.setAttribute('position', new THREE.BufferAttribute(posArr, 3))
+      geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1))
+      geometry.setAttribute('aAlpha', new THREE.BufferAttribute(alphas, 1))
+      geometry.setAttribute('aColor', new THREE.BufferAttribute(colorsArr, 3))
+      disposeList.push(() => geometry.dispose())
+
+      const material = new THREE.ShaderMaterial({
+        vertexShader: VERTEX_SHADER,
+        fragmentShader: FRAGMENT_SHADER,
+        uniforms: {
+          uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+          uScale: { value: 3.0 },
+        },
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+      })
+      disposeList.push(() => material.dispose())
+
+      const points = new THREE.Points(geometry, material)
+      scene.add(points)
+
+      // ── Wireframe cage ───────────────────────────────────────────────────
+      const cageGeo = new THREE.BoxGeometry(2.6, 3.2, 1.6)
+      const cageEdges = new THREE.EdgesGeometry(cageGeo)
+      const gridLines: number[] = []
+      const gx = 2.6 / 2, gy = 3.2 / 2, gz = 1.6 / 2
+      for (let r = 1; r < 6; r++) {
+        const y = -gy + (r / 6) * 3.2
+        gridLines.push(-gx, y, gz, gx, y, gz)
+      }
+      for (let c = 1; c < 5; c++) {
+        const x = -gx + (c / 5) * 2.6
+        gridLines.push(x, -gy, gz, x, gy, gz)
+      }
+      for (let r = 1; r < 5; r++) {
+        const y = -gy + (r / 5) * 3.2
+        gridLines.push(gx, y, -gz, gx, y, gz)
+        gridLines.push(-gx, y, -gz, -gx, y, gz)
+      }
+
+      const gridExtra = new THREE.BufferGeometry()
+      gridExtra.setAttribute('position', new THREE.BufferAttribute(new Float32Array(gridLines), 3))
+
+      const cageMat = new THREE.LineBasicMaterial({
+        color: 0xc4a0e8,
+        transparent: true,
+        opacity: SHAPES[0].cageOpa,
+      })
+      const gridMat = new THREE.LineBasicMaterial({
+        color: 0x96b4dc,
+        transparent: true,
+        opacity: SHAPES[0].cageOpa * 0.5,
+      })
+
+      const cage = new THREE.LineSegments(cageEdges, cageMat)
+      const cageGrid = new THREE.LineSegments(gridExtra, gridMat)
+      cage.rotation.x = -0.06
+      cage.rotation.y = 0.08
+      cageGrid.rotation.copy(cage.rotation)
+      scene.add(cage)
+      scene.add(cageGrid)
+
+      disposeList.push(() => {
+        cageGeo.dispose(); cageEdges.dispose(); gridExtra.dispose()
+        cageMat.dispose(); gridMat.dispose()
+      })
+
+      const mouse = { x: 0, y: 0 }
+      const onMouseMove = (e: MouseEvent) => {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1
+        mouse.y = (e.clientY / window.innerHeight) * 2 - 1
+      }
+      window.addEventListener('mousemove', onMouseMove)
+      disposeList.push(() => window.removeEventListener('mousemove', onMouseMove))
+
+      const onResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        composer.setSize(window.innerWidth, window.innerHeight)
+      }
+      window.addEventListener('resize', onResize)
+      disposeList.push(() => window.removeEventListener('resize', onResize))
+
+      // ── Scroll-driven morph state ────────────────────────────────────────
+      // target = raw ScrollTrigger progress; display = eased catch-up for smoother morphs
+      const scrollState = { target: 0, display: 0 }
+      let entryDone = false
+      let entryProgress = 0
+      const entryFrom = initScatter
+      const entryTo = shapePos[0]
+
+      // Intro: scatter → eye, then hand off to scroll
+      const entryTween = gsap.to({ t: 0 }, {
+        t: 1,
+        duration: 2.4,
+        delay: 0.5,
+        ease: 'power3.inOut',
+        onUpdate() {
+          entryProgress = (this.targets()[0] as { t: number }).t
+        },
+        onComplete() {
+          entryDone = true
+          entryProgress = 1
+          posArr.set(shapePos[0])
+          colorsArr.set(shapeColors[0])
+          sizes.set(shapeSizes[0])
+          geometry.attributes.aColor.needsUpdate = true
+          geometry.attributes.aSize.needsUpdate = true
+        },
+      })
+      disposeList.push(() => entryTween.kill())
+
+      gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 2.0, ease: 'power1.inOut' })
+
+      // Wait for morph track in DOM (page may hydrate after canvas mounts)
+      const bindScroll = () => {
+        const track = document.getElementById('morph-track')
+        if (!track) {
+          requestAnimationFrame(bindScroll)
+          return
+        }
+        const st = ScrollTrigger.create({
+          trigger: track,
+          start: 'top top',
+          end: 'bottom bottom',
+          // Higher scrub = more lag → morph eases after the wheel stops
+          scrub: 1.6,
+          onUpdate: (self) => {
+            scrollState.target = self.progress
+          },
+        })
+        disposeList.push(() => st.kill())
+      }
+      bindScroll()
+
+      // Eye blink while resting near start of scroll
+      const EYE_OPEN = 3.8
+      const EYE_CLOSE = 0.65
+      const EYE_SHUT = 0.3
+      const EYE_REOPEN = 0.85
+      const EYE_SETTLE = 1.15
+      const EYE_TOTAL = EYE_OPEN + EYE_CLOSE + EYE_SHUT + EYE_REOPEN + EYE_SETTLE
+      let eyeHoldClock = 0
+
+      const blinkAmount = (t: number) => {
+        if (t < EYE_OPEN) return 0
+        if (t < EYE_OPEN + EYE_CLOSE) return (t - EYE_OPEN) / EYE_CLOSE
+        if (t < EYE_OPEN + EYE_CLOSE + EYE_SHUT) return 1
+        const reopenAt = EYE_OPEN + EYE_CLOSE + EYE_SHUT
+        if (t < reopenAt + EYE_REOPEN) return 1 - (t - reopenAt) / EYE_REOPEN
+        return 0
+      }
+
+      const v1 = new THREE.Vector3(1, 1, 1)
+      const clock = new THREE.Clock()
+      let elapsed = 0
+      let rafId = 0
+      let lastI0 = 0
+
+      const applySegmentVisuals = (i0: number, i1: number, localT: number) => {
+        const a = SHAPES[i0]
+        const b = SHAPES[i1]
+        const u = easeInOut(localT)
+        // Softer camera / bloom catch-up so z-jumps don't feel abrupt
+        camera.position.z += ((a.cameraZ + (b.cameraZ - a.cameraZ) * u) - camera.position.z) * 0.06
+        bloomPass.strength += ((a.bloom + (b.bloom - a.bloom) * u) - bloomPass.strength) * 0.055
+        cageMat.opacity += ((a.cageOpa + (b.cageOpa - a.cageOpa) * u) - cageMat.opacity) * 0.055
+        gridMat.opacity = cageMat.opacity * 0.5
+      }
+
+      const tick = () => {
+        rafId = requestAnimationFrame(tick)
+        const delta = clock.getDelta()
+        elapsed += delta
+
+        camera.position.x += (mouse.x * 0.28 - camera.position.x) * 0.03
+        camera.position.y += (-mouse.y * 0.18 - camera.position.y) * 0.03
+        camera.lookAt(0, 0, 0)
+
+        cage.rotation.y = 0.08 + Math.sin(elapsed * 0.25) * 0.04
+        cage.rotation.x = -0.06 + Math.cos(elapsed * 0.2) * 0.02
+        cageGrid.rotation.copy(cage.rotation)
+
+        const t = elapsed * 0.55
+        const nShapes = SHAPES.length
+
+        // Resolve current/next shape from scroll (or entry intro)
+        let i0 = 0
+        let i1 = 0
+        let localT = 0
+        let holdingEye = false
+
+        if (!entryDone) {
+          i0 = 0
+          i1 = 0
+          localT = 0
+          const u = easeInOut(entryProgress)
+          for (let i = 0; i < N; i++) {
+            const i3 = i * 3
+            const bx = entryFrom[i3] + (entryTo[i3] - entryFrom[i3]) * u
+            const by = entryFrom[i3 + 1] + (entryTo[i3 + 1] - entryFrom[i3 + 1]) * u
+            const bz = entryFrom[i3 + 2] + (entryTo[i3 + 2] - entryFrom[i3 + 2]) * u
+            const amp = 0.02
+            posArr[i3] = bx + noise3D(bx * 0.9 + t, by * 0.9, bz * 0.9) * amp
+            posArr[i3 + 1] = by + noise3D(bx * 0.9, by * 0.9 + t, bz * 0.9) * amp
+            posArr[i3 + 2] = bz + noise3D(bx * 0.9, by * 0.9, bz * 0.9 + t) * amp * 0.7
+          }
+          geometry.attributes.position.needsUpdate = true
+          composer.render()
+          return
+        }
+
+        // Ease display progress toward scroll target (extra inertia beyond scrub)
+        scrollState.display += (scrollState.target - scrollState.display) * Math.min(1, delta * 3.2)
+        const p = scrollState.display
+
+        // Equal dwell per shape; morph across most of each slice (hold briefly, then glide)
+        const raw = p * nShapes
+        i0 = Math.min(Math.floor(raw), nShapes - 1)
+        const local = raw - Math.floor(raw)
+        const morphStart = 0.22
+        if (i0 >= nShapes - 1) {
+          i1 = i0
+          localT = 0
+        } else if (local < morphStart) {
+          i1 = i0
+          localT = 0
+        } else {
+          i1 = i0 + 1
+          localT = (local - morphStart) / (1 - morphStart)
+        }
+
+        applySegmentVisuals(i0, i1, localT)
+
+        // Soft color / size crossfade
+        if (i0 !== lastI0 || localT < 0.98) {
+          const u = easeInOut(localT)
+          const c0 = shapeColors[i0]
+          const c1 = shapeColors[i1]
+          const s0 = shapeSizes[i0]
+          const s1 = shapeSizes[i1]
+          for (let i = 0; i < N * 3; i++) {
+            colorsArr[i] = c0[i] + (c1[i] - c0[i]) * u
+          }
+          for (let i = 0; i < N; i++) {
+            sizes[i] = s0[i] + (s1[i] - s0[i]) * u
+          }
+          geometry.attributes.aColor.needsUpdate = true
+          geometry.attributes.aSize.needsUpdate = true
+        }
+        lastI0 = i0
+
+        // Blink only while parked on eye (start of track)
+        holdingEye =
+          i0 === 0 && localT < 0.08 && !!baked?.eyeBlink && baked.eyeBlink.length === 3
+
+        if (holdingEye) {
+          eyeHoldClock += delta
+          if (eyeHoldClock > EYE_TOTAL) eyeHoldClock = 0 // loop blink while idle at top
+          sampleEyeBlink(baked!.eyeBlink, blinkAmount(eyeHoldClock), eyeLive)
+        } else {
+          eyeHoldClock = 0
+        }
+
+        const from = shapePos[i0]
+        const to = shapePos[i1]
+        const u = easeInOut(localT)
+        const noiseAmp =
+          SHAPES[i0].noiseAmp + (SHAPES[i1].noiseAmp - SHAPES[i0].noiseAmp) * u
+
+        for (let i = 0; i < N; i++) {
+          const i3 = i * 3
+          let bx: number, by: number, bz: number
+          if (holdingEye) {
+            bx = eyeLive[i3]
+            by = eyeLive[i3 + 1]
+            bz = eyeLive[i3 + 2]
+          } else {
+            bx = from[i3] + (to[i3] - from[i3]) * u
+            by = from[i3 + 1] + (to[i3 + 1] - from[i3 + 1]) * u
+            bz = from[i3 + 2] + (to[i3 + 2] - from[i3 + 2]) * u
+          }
+
+          const amp = holdingEye ? noiseAmp * 0.25 : noiseAmp
+          posArr[i3] = bx + noise3D(bx * 0.9 + t, by * 0.9, bz * 0.9) * amp
+          posArr[i3 + 1] = by + noise3D(bx * 0.9, by * 0.9 + t, bz * 0.9) * amp
+          posArr[i3 + 2] = bz + noise3D(bx * 0.9, by * 0.9, bz * 0.9 + t) * amp * 0.7
+        }
+        geometry.attributes.position.needsUpdate = true
+
+        // Gentle motion accents per shape
+        const dnaW =
+          (SHAPES[i0].name === 'dna' ? 1 - localT : 0) +
+          (SHAPES[i1].name === 'dna' ? localT : 0)
+        const bonsaiW =
+          (SHAPES[i0].name === 'bonsai' ? 1 - localT : 0) +
+          (SHAPES[i1].name === 'bonsai' ? localT : 0)
+
+        if (holdingEye) {
+          points.rotation.y = Math.sin(eyeHoldClock * 0.35) * 0.06
+          points.rotation.x *= 0.95
+          points.scale.lerp(v1, 0.06)
+        } else if (dnaW > 0.01) {
+          points.rotation.y = Math.sin(elapsed * 0.28) * 0.35 * dnaW
+          points.rotation.x = Math.sin(elapsed * 0.19) * 0.12 * dnaW
+          points.scale.lerp(v1, 0.06)
+        } else if (bonsaiW > 0.01) {
+          points.rotation.y = Math.sin(elapsed * 0.35) * 0.06 * bonsaiW
+          points.rotation.x *= 0.95
+          points.scale.setScalar(1 + Math.sin(elapsed * 1.2) * 0.015 * bonsaiW)
+        } else {
+          points.rotation.y *= 0.95
+          points.rotation.x *= 0.95
+          points.scale.lerp(v1, 0.06)
+        }
+
+        composer.render()
+      }
+
+      tick()
+      disposeList.push(() => cancelAnimationFrame(rafId))
+    }
+
+    init().catch(console.error)
+
+    return () => {
+      cancelled = true
+      disposeList.forEach((fn) => fn())
+    }
+  }, [])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 w-full h-full block"
+      style={{ zIndex: 0, opacity: 0 }}
+    />
+  )
+}

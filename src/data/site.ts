@@ -14,7 +14,8 @@ export const site = {
 };
 
 export const navLinks = [
-  { name: 'Showcase', path: '/showcase' },
+  { name: 'Services', path: '/services' },
+  { name: 'Expansions', path: '/expansions' },
   { name: 'Experience', path: '/experience' },
   { name: 'Commercial', path: '/contact' },
 ];

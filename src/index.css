@@ -110,10 +110,121 @@ h4,
   transform: rotate(45deg);
 }
 
-.faq-item summary::-webkit-details-marker {
-  display: none;
+.work-glow-pulse {
+  animation: workGlow 5.5s ease-in-out infinite alternate;
 }
+
+@keyframes workGlow {
+  from {
+    transform: translate(-50%, 0) scale(0.92);
+    filter: blur(28px) saturate(1);
+  }
+  to {
+    transform: translate(-50%, 8%) scale(1.12);
+    filter: blur(36px) saturate(1.25);
+  }
+}
+
 
 .horiz-pin {
   overflow: hidden;
+}
+
+/* Mirror Hall — 3D reflective carousel stage */
+.mirror-hall {
+  position: relative;
+  background: #060507;
+  color: #fff;
+  isolation: isolate;
+}
+
+.mirror-hall-ambient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 50% 18%, rgba(255, 255, 255, 0.07), transparent 58%),
+    radial-gradient(50% 40% at 15% 80%, rgba(255, 68, 58, 0.12), transparent 60%),
+    radial-gradient(45% 35% at 88% 70%, rgba(255, 154, 231, 0.08), transparent 55%);
+}
+
+.mirror-hall-stage {
+  min-height: min(78vh, 700px);
+  padding: 1.25rem 0 7rem;
+}
+
+.mirror-hall-perspective {
+  perspective: 1400px;
+  perspective-origin: 50% 42%;
+}
+
+.mirror-hall-track {
+  transform-style: preserve-3d;
+}
+
+.mirror-hall-card {
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  transition: opacity 80ms linear;
+  will-change: transform, opacity;
+}
+
+.mirror-hall-panel {
+  border-radius: 1.15rem;
+  background: #121014;
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform-style: preserve-3d;
+}
+
+.mirror-hall-rim {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 42%, transparent 58%, rgba(255, 255, 255, 0.05));
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+.mirror-hall-reflection {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 2px);
+  height: 48%;
+  overflow: hidden;
+  transform: scaleY(-1);
+  transform-origin: center top;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 82%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 82%);
+  filter: blur(0.5px) brightness(0.65) saturate(0.85);
+}
+
+.mirror-hall-floor {
+  pointer-events: none;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 4.5rem;
+  height: 28%;
+  background:
+    linear-gradient(to top, rgba(6, 5, 7, 0.92), transparent),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+  border-radius: 50%;
+  filter: blur(18px);
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .mirror-hall-perspective {
+    perspective: 900px;
+  }
+
+  .mirror-hall-stage {
+    padding-bottom: 4rem;
+  }
 }
