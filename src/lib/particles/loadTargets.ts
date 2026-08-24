@@ -7,7 +7,7 @@ const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
   // Cache-bust so rebakes show up after hard refresh / HMR
-  const res = await fetch(`${url}?v=expansions1`)
+  const res = await fetch(`${url}?v=face1`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)

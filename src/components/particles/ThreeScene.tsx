@@ -11,6 +11,7 @@ import {
   generateHandPositions,
 } from '../../lib/particles/shapes'
 import { loadBakedTargets, sampleEyeBlink, type BakedTargets } from '../../lib/particles/loadTargets'
+import { MORPH_HOLD } from '../../lib/particles/morphTiming'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -433,12 +434,14 @@ export default function ThreeScene() {
         // Ease display progress toward scroll target (extra inertia beyond scrub)
         scrollState.display += (scrollState.target - scrollState.display) * Math.min(1, delta * 3.2)
         const p = scrollState.display
+        // Share with service titles so labels track the same damped morph clock
+        ;(window as unknown as { __morphProgress?: number }).__morphProgress = p
 
         // Equal dwell per shape; morph across most of each slice (hold briefly, then glide)
         const raw = p * nShapes
         i0 = Math.min(Math.floor(raw), nShapes - 1)
         const local = raw - Math.floor(raw)
-        const morphStart = 0.22
+        const morphStart = MORPH_HOLD
         if (i0 >= nShapes - 1) {
           i1 = i0
           localT = 0

@@ -2,12 +2,28 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { immersiveServices } from '../../lib/particles/services'
+import { titleOpacityForProgress } from '../../lib/particles/morphTiming'
 
 gsap.registerPlugin(ScrollTrigger)
 
+function applyTitleOpacity(panels: HTMLElement[], progress: number) {
+  panels.forEach((panel, i) => {
+    let o = titleOpacityForProgress(progress, i, panels.length)
+    if (i === 0) {
+      const gate = Math.max(0, Math.min(1, (progress - 0.02) / 0.06))
+      o *= gate * gate * (3 - 2 * gate)
+    }
+    gsap.set(panel, {
+      opacity: o,
+      y: 18 * (1 - o),
+      pointerEvents: o > 0.4 ? 'auto' : 'none',
+    })
+  })
+}
+
 /**
- * Fixed overlays that fade in/out with scroll, synced to morph segments
- * (eye → dna → arc → bonsai).
+ * Fixed overlays that fade in/out with scroll, synced to morph hold windows
+ * (title only while the paired particle shape is fully formed).
  */
 export default function ServiceShowcase() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -17,50 +33,33 @@ export default function ServiceShowcase() {
     if (!root) return
 
     const panels = Array.from(root.querySelectorAll<HTMLElement>('.service-panel'))
-    const ctx = gsap.context(() => {
-      const n = panels.length
-      panels.forEach((panel) => {
-        gsap.set(panel, { opacity: 0, y: 18, pointerEvents: 'none' })
-      })
+    panels.forEach((panel) => {
+      gsap.set(panel, { opacity: 0, y: 18, pointerEvents: 'none' })
+    })
 
-      const smoothstep = (t: number) => {
-        const x = Math.max(0, Math.min(1, t))
-        return x * x * x * (x * (x * 6 - 15) + 10)
-      }
+    const st = ScrollTrigger.create({
+      trigger: '#morph-track',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1.6,
+      onUpdate: (self) => {
+        const damped = (window as unknown as { __morphProgress?: number }).__morphProgress
+        applyTitleOpacity(panels, typeof damped === 'number' ? damped : self.progress)
+      },
+    })
 
-      ScrollTrigger.create({
-        trigger: '#morph-track',
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1.6,
-        onUpdate: (self) => {
-          const p = self.progress
-          panels.forEach((panel, i) => {
-            const start = i / n
-            const end = (i + 1) / n
-            const span = end - start
-            // Wider fade ramps so labels ease in/out with the morph
-            const fullIn = start + span * 0.32
-            const fullOut = end - span * 0.32
-            let o = 0
-            if (p >= start && p < fullIn) o = smoothstep((p - start) / (fullIn - start))
-            else if (p >= fullIn && p <= fullOut) o = 1
-            else if (p > fullOut && p <= end) o = smoothstep((end - p) / (end - fullOut))
+    let raf = 0
+    const tickTitles = () => {
+      raf = requestAnimationFrame(tickTitles)
+      const damped = (window as unknown as { __morphProgress?: number }).__morphProgress
+      if (typeof damped === 'number') applyTitleOpacity(panels, damped)
+    }
+    tickTitles()
 
-            // Let hero clear before AI label lands
-            if (i === 0) o *= smoothstep(Math.min(1, Math.max(0, (p - 0.04) / 0.12)))
-
-            gsap.set(panel, {
-              opacity: o,
-              y: 22 * (1 - o),
-              pointerEvents: o > 0.35 ? 'auto' : 'none',
-            })
-          })
-        },
-      })
-    }, root)
-
-    return () => ctx.revert()
+    return () => {
+      cancelAnimationFrame(raf)
+      st.kill()
+    }
   }, [])
 
   return (
