@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { BrandLogo } from './ui';
 import { navLinks, site } from '../data/site';
 import { isDarkBackdrop } from '../lib/backdropContrast';
+import { preloadExpansions } from '../lib/particles/preloadExpansions';
 
 export default function Navbar() {
   const location = useLocation();
@@ -75,6 +76,8 @@ export default function Navbar() {
             <Link
               key={link.name}
               to={link.path}
+              onMouseEnter={link.path === '/expansions' ? () => preloadExpansions() : undefined}
+              onFocus={link.path === '/expansions' ? () => preloadExpansions() : undefined}
               className={`h-[42px] px-4 inline-flex items-center text-[16px] transition-colors ${
                 location.pathname === link.path ||
                 (link.path === '/services' && location.pathname.startsWith('/services')) ||

@@ -10,6 +10,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Expansions from './pages/Expansions';
+import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -24,6 +25,11 @@ function ScrollToTop() {
 function AppShell() {
   const { pathname } = useLocation();
   const isExpansions = pathname === '/expansions';
+
+  // If user navigates before idle preload finishes, prioritize immediately
+  useEffect(() => {
+    if (isExpansions) preloadExpansions();
+  }, [isExpansions]);
 
   return (
     <div
@@ -51,6 +57,10 @@ function AppShell() {
 }
 
 export default function App() {
+  useEffect(() => {
+    scheduleExpansionsPreload();
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />

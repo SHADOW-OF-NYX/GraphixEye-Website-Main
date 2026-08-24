@@ -6,7 +6,7 @@ const N = 32_000
 const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
-  const res = await fetch(`${url}?v=holo1`)
+  const res = await fetch(`${url}?v=quest1`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)
@@ -14,6 +14,22 @@ async function loadBin(url: string): Promise<Float32Array> {
     console.warn(`[targets] ${url} length ${arr.length}, expected ${FLOATS}`)
   }
   return arr
+}
+
+/** Match Sketchfab reference: figure faces camera, peace sign on viewer's left, ring above. */
+function orientHoloPositions(arr: Float32Array) {
+  for (let i = 0; i < arr.length; i += 3) {
+    arr[i] *= -1
+  }
+  const angle = 0.12
+  const c = Math.cos(angle)
+  const s = Math.sin(angle)
+  for (let i = 0; i < arr.length; i += 3) {
+    const x = arr[i]
+    const z = arr[i + 2]
+    arr[i] = x * c + z * s
+    arr[i + 2] = -x * s + z * c
+  }
 }
 
 export type BakedTargets = {
@@ -24,6 +40,8 @@ export type BakedTargets = {
   faceColors: Float32Array | null
   holo: Float32Array | null
   holoColors: Float32Array | null
+  quest: Float32Array | null
+  questColors: Float32Array | null
   bonsai: Float32Array
   bonsaiColors: Float32Array | null
 }
@@ -49,6 +67,8 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
   let faceColors: Float32Array | null = null
   let holo: Float32Array | null = null
   let holoColors: Float32Array | null = null
+  let quest: Float32Array | null = null
+  let questColors: Float32Array | null = null
   let bonsaiColors: Float32Array | null = null
   try {
     eyeColors = await loadBin('/particle-targets/eye_colors.bin')
@@ -67,6 +87,7 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
   }
   try {
     holo = await loadBin('/particle-targets/holo.bin')
+    orientHoloPositions(holo)
   } catch {
     holo = null
   }
@@ -74,6 +95,16 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     holoColors = await loadBin('/particle-targets/holo_colors.bin')
   } catch {
     holoColors = null
+  }
+  try {
+    quest = await loadBin('/particle-targets/quest.bin')
+  } catch {
+    quest = null
+  }
+  try {
+    questColors = await loadBin('/particle-targets/quest_colors.bin')
+  } catch {
+    questColors = null
   }
   try {
     bonsaiColors = await loadBin('/particle-targets/bonsai_colors.bin')
@@ -89,6 +120,8 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
     faceColors,
     holo,
     holoColors,
+    quest,
+    questColors,
     bonsai,
     bonsaiColors,
   }

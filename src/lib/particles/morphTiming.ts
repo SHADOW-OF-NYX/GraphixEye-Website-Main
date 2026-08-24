@@ -1,6 +1,6 @@
 /** Shared scroll morph timing — keep ThreeScene + ServiceShowcase in sync. */
 
-/** Morph sequence length: eye → face → holo → arc → bonsai */
+/** Morph sequence length: eye → face → holo → quest → bonsai */
 export const SHAPE_COUNT = 5
 
 /** Service titles skip the opening eye and map onto shapes 1..4 */

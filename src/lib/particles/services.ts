@@ -7,7 +7,7 @@ export type ImmersiveService = {
   eyebrow: string
   body: string
   /** Shape this service is paired with in the morph track */
-  shape: 'face' | 'holo' | 'arc' | 'bonsai'
+  shape: 'face' | 'holo' | 'quest' | 'bonsai'
   /** Which side the copy sits on for the camera ride */
   textSide: 'left' | 'right'
 }
@@ -29,7 +29,7 @@ export const immersiveServices: ImmersiveService[] = [
     eyebrow: 'Spatial Overlays',
     body: 'AR overlays that extend print and space into interactive layers — intent made visible in the room.',
     shape: 'holo',
-    textSide: 'right',
+    textSide: 'left',
   },
   {
     id: 'virtual-reality',
@@ -37,7 +37,7 @@ export const immersiveServices: ImmersiveService[] = [
     title: 'Virtual Reality',
     eyebrow: 'Immersive Worlds',
     body: 'VR environments for brand, training, and exhibition experiences built as living spatial systems.',
-    shape: 'arc',
+    shape: 'quest',
     textSide: 'right',
   },
   {
@@ -47,6 +47,6 @@ export const immersiveServices: ImmersiveService[] = [
     eyebrow: 'Hybrid Experiences',
     body: 'Hybrid MR experiences combining physical installs with digital layers — form where worlds meet.',
     shape: 'bonsai',
-    textSide: 'left',
+    textSide: 'right',
   },
 ]

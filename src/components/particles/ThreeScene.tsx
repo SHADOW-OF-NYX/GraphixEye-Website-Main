@@ -6,7 +6,6 @@ import { createNoise3D } from 'simplex-noise'
 import {
   generateScatterPositions,
   generateXPositions,
-  generateArcPositions,
   generateBonsaiPositions,
   generateHandPositions,
 } from '../../lib/particles/shapes'
@@ -64,7 +63,7 @@ const FRAGMENT_SHADER = /* glsl */`
   }
 `
 
-type ShapeName = 'eye' | 'face' | 'holo' | 'arc' | 'bonsai'
+type ShapeName = 'eye' | 'face' | 'holo' | 'quest' | 'bonsai'
 
 const SHAPES: {
   name: ShapeName
@@ -81,14 +80,14 @@ const SHAPES: {
 }[] = [
   // Opening eye — centered
   { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
-  // AI face — push cam right so mesh sits left; copy on right
+  // AI face — cam right so mesh sits left; copy on right
   { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
-  // AR hologram drone — tall portrait like reference (ring above, figure below)
-  { name: 'holo',   cameraX: 0.15, cameraY: 0.2,  cameraZ: 4.15, lookX: 0.0,  lookY: 0.05, fov: 48, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.85, noiseAmp: 0.01 },
-  // VR arc — pull wide, ride to the right
-  { name: 'arc',    cameraX: 0.55, cameraY: -0.05, cameraZ: 5.35, lookX: -0.15, lookY: 0.05, fov: 54, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
-  // MR bonsai — cam left + zoom; tree on the right, copy on the left
-  { name: 'bonsai', cameraX: -1.05, cameraY: 0.1, cameraZ: 3.55, lookX: 0.55, lookY: -0.05, fov: 44, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
+  // AR hologram — frontal portrait (ring above figure), model on right; copy on left
+  { name: 'holo',   cameraX: -0.58, cameraY: -0.1,  cameraZ: 4.25, lookX: -0.58, lookY: 0.0,  fov: 45, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.85, noiseAmp: 0.008 },
+  // VR Quest 3 — cam right so headset sits left; copy on right
+  { name: 'quest',  cameraX: 0.65, cameraY: 0.02, cameraZ: 4.35, lookX: -0.2,  lookY: 0.02, fov: 48, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.012 },
+  // MR bonsai — cam right so tree sits left; copy on right
+  { name: 'bonsai', cameraX: 0.95, cameraY: 0.1, cameraZ: 3.55, lookX: -0.48, lookY: -0.05, fov: 44, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
 ]
 
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
@@ -96,7 +95,7 @@ function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array
     case 'eye':    return baked?.eye ?? generateHandPositions(N)
     case 'face':   return baked?.face ?? generateHandPositions(N)
     case 'holo':   return baked?.holo ?? generateXPositions(N)
-    case 'arc':    return generateArcPositions(N)
+    case 'quest':  return baked?.quest ?? generateXPositions(N)
     case 'bonsai': return baked?.bonsai ?? generateBonsaiPositions(N)
   }
 }
@@ -134,6 +133,37 @@ function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
       colors[i * 3] = v; colors[i * 3 + 1] = v; colors[i * 3 + 2] = v
     }
   }
+}
+
+/** Particles tagged as pupil in the baked eye palette (deep blue, darker than iris). */
+function buildEyePupilMask(colors: Float32Array | null, eyePos: Float32Array): Uint8Array {
+  const mask = new Uint8Array(N)
+  if (colors && colors.length === N * 3) {
+    for (let i = 0; i < N; i++) {
+      const i3 = i * 3
+      const r = colors[i3]
+      const g = colors[i3 + 1]
+      const b = colors[i3 + 2]
+      if (r < 0.14 && g < 0.22 && b > 0.38 && b < 0.72 && b > r * 2.2 && b > g * 1.6) {
+        mask[i] = 1
+      }
+    }
+    return mask
+  }
+  // Procedural fallback — center cluster of the open eye
+  for (let i = 0; i < N; i++) {
+    const i3 = i * 3
+    const x = eyePos[i3]
+    const y = eyePos[i3 + 1]
+    if (Math.hypot(x, y) < 0.22 && Math.abs(eyePos[i3 + 2]) < 0.18) mask[i] = 1
+  }
+  return mask
+}
+
+function pupilVisibilityFromBlink(blink: number) {
+  const t = Math.max(0, Math.min(1, blink))
+  // Smooth out during close / reopen so the pupil hides before lids meet
+  return 1 - t * t * (3 - 2 * t)
 }
 
 function easeInOut(t: number) {
@@ -197,6 +227,7 @@ export default function ThreeScene() {
         else if (s.name === 'face') paintEyeRGB(c, null)
         else if (s.name === 'holo' && baked?.holoColors) c.set(baked.holoColors)
         else if (s.name === 'holo') paintColors(c, 0.25)
+        else if (s.name === 'quest' && baked?.questColors) c.set(baked.questColors)
         else if (s.name === 'bonsai' && baked?.bonsaiColors) c.set(baked.bonsaiColors)
         else paintColors(c, s.pinkBias)
         return c
@@ -218,7 +249,7 @@ export default function ThreeScene() {
       }
       const shapeSizes = SHAPES.map((s) =>
         s.name === 'eye' ? sizesEye
-          : s.name === 'face' || s.name === 'holo' ? sizesFace
+          : s.name === 'face' || s.name === 'holo' || s.name === 'quest' ? sizesFace
           : s.name === 'bonsai' ? sizesBonsai
           : sizesDefault,
       )
@@ -262,6 +293,7 @@ export default function ThreeScene() {
       alphas.set(baseAlphas)
       paintEyeRGB(colorsArr, baked?.eyeColors ?? null)
       if (baked?.eye) eyeLive.set(baked.eye)
+      const eyePupilMask = buildEyePupilMask(baked?.eyeColors ?? null, shapePos[0])
 
       const geometry = new THREE.BufferGeometry()
       geometry.setAttribute('position', new THREE.BufferAttribute(posArr, 3))
@@ -557,6 +589,8 @@ export default function ThreeScene() {
           eyeHoldClock = 0
         }
 
+        const pupilVis = holdingEye ? pupilVisibilityFromBlink(blinkAmount(eyeHoldClock)) : 1
+
         const from = shapePos[i0]
         const to = shapePos[i1]
         const u = easeInOut(localT)
@@ -608,6 +642,8 @@ export default function ThreeScene() {
             }
           } else if (holdingFace) {
             alphas[i] = baseAlphas[i]
+          } else if (holdingEye && eyePupilMask[i]) {
+            alphas[i] = baseAlphas[i] * pupilVis
           } else if (faceBlend > 0.01 && faceLeave[i] && facePhase[i] > FACE_SETTLE) {
             // Softly wind down leave during morph away
             const leaveT = Math.min(1, (facePhase[i] - FACE_SETTLE) / (1 - FACE_SETTLE))
@@ -645,10 +681,10 @@ export default function ThreeScene() {
           points.rotation.x *= 0.96
           points.scale.lerp(v1, 0.06)
         } else if (holoW > 0.01) {
-          // Subtle hover — keep the portrait framing readable
-          points.rotation.y = Math.sin(elapsed * 0.2) * 0.05 * holoW
-          points.rotation.x = Math.sin(elapsed * 0.15) * 0.02 * holoW
-          points.scale.setScalar(1 + Math.sin(elapsed * 0.9) * 0.012 * holoW)
+          // Subtle hover — keep the portrait pose readable like the reference
+          points.rotation.y = Math.sin(elapsed * 0.16) * 0.022 * holoW
+          points.rotation.x = Math.sin(elapsed * 0.12) * 0.01 * holoW
+          points.scale.setScalar(1 + Math.sin(elapsed * 0.85) * 0.008 * holoW)
         } else if (bonsaiW > 0.01) {
           points.rotation.y = Math.sin(elapsed * 0.35) * 0.06 * bonsaiW
           points.rotation.x *= 0.95

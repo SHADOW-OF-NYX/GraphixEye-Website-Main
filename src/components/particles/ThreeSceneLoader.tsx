@@ -1,8 +1,9 @@
 import React, { Suspense, lazy } from 'react';
+import { importThreeScene } from '../../lib/particles/preloadExpansions';
 
-const ThreeScene = lazy(() => import('./ThreeScene'));
+const ThreeScene = lazy(importThreeScene);
 
-/** Lazy-load WebGL only on the Expansions route. */
+/** Lazy-load WebGL on Expansions — chunk is preloaded from the landing page. */
 export default function ThreeSceneLoader() {
   return (
     <Suspense fallback={null}>
