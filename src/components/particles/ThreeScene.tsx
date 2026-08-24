@@ -86,8 +86,8 @@ const SHAPES: {
   { name: 'holo',   cameraX: -1.05, cameraY: -0.06, cameraZ: 3.05, lookX: 0.42,  lookY: 0.06, fov: 40, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.006 },
   // VR Quest 3 — 3/4 angle, zoomed; headset on left, copy on right
   { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.01 },
-  // MR bonsai — cam right so tree sits left; copy on right
-  { name: 'bonsai', cameraX: 0.95, cameraY: 0.1, cameraZ: 3.55, lookX: -0.48, lookY: -0.05, fov: 44, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
+  // MR bonsai — 3/4 angle on the right; copy on left
+  { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
 ]
 
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
@@ -689,9 +689,9 @@ export default function ThreeScene() {
           points.rotation.x = -0.04 * holoW
           points.scale.setScalar(1 + Math.sin(elapsed * 0.85) * 0.006 * holoW)
         } else if (bonsaiW > 0.01) {
-          points.rotation.y = Math.sin(elapsed * 0.35) * 0.06 * bonsaiW
-          points.rotation.x *= 0.95
-          points.scale.setScalar(1 + Math.sin(elapsed * 1.2) * 0.015 * bonsaiW)
+          points.rotation.y = 0.1 * bonsaiW + Math.sin(elapsed * 0.28) * 0.022 * bonsaiW
+          points.rotation.x = -0.05 * bonsaiW
+          points.scale.setScalar(1 + Math.sin(elapsed * 1.1) * 0.01 * bonsaiW)
         } else {
           points.rotation.y *= 0.95
           points.rotation.x *= 0.95

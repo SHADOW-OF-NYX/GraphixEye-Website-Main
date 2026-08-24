@@ -47,6 +47,6 @@ export const immersiveServices: ImmersiveService[] = [
     eyebrow: 'Hybrid Experiences',
     body: 'Hybrid MR experiences combining physical installs with digital layers — form where worlds meet.',
     shape: 'bonsai',
-    textSide: 'right',
+    textSide: 'left',
   },
 ]
