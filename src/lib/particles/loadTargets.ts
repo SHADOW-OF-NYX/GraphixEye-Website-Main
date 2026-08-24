@@ -6,7 +6,7 @@ const N = 32_000
 const FLOATS = N * 3
 
 async function loadBin(url: string): Promise<Float32Array> {
-  const res = await fetch(`${url}?v=quest1`)
+  const res = await fetch(`${url}?v=fix2`)
   if (!res.ok) throw new Error(`Failed to load ${url}`)
   const buf = await res.arrayBuffer()
   const arr = new Float32Array(buf)
@@ -14,22 +14,6 @@ async function loadBin(url: string): Promise<Float32Array> {
     console.warn(`[targets] ${url} length ${arr.length}, expected ${FLOATS}`)
   }
   return arr
-}
-
-/** Match Sketchfab reference: figure faces camera, peace sign on viewer's left, ring above. */
-function orientHoloPositions(arr: Float32Array) {
-  for (let i = 0; i < arr.length; i += 3) {
-    arr[i] *= -1
-  }
-  const angle = 0.12
-  const c = Math.cos(angle)
-  const s = Math.sin(angle)
-  for (let i = 0; i < arr.length; i += 3) {
-    const x = arr[i]
-    const z = arr[i + 2]
-    arr[i] = x * c + z * s
-    arr[i + 2] = -x * s + z * c
-  }
 }
 
 export type BakedTargets = {
@@ -87,7 +71,6 @@ export async function loadBakedTargets(): Promise<BakedTargets> {
   }
   try {
     holo = await loadBin('/particle-targets/holo.bin')
-    orientHoloPositions(holo)
   } catch {
     holo = null
   }

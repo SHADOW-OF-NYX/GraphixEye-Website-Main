@@ -82,8 +82,8 @@ const SHAPES: {
   { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
   // AI face — cam right so mesh sits left; copy on right
   { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
-  // AR hologram — frontal portrait (ring above figure), model on right; copy on left
-  { name: 'holo',   cameraX: -0.58, cameraY: -0.1,  cameraZ: 4.25, lookX: -0.58, lookY: 0.0,  fov: 45, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.85, noiseAmp: 0.008 },
+  // AR hologram — zoomed 3/4 portrait on the right; copy on left
+  { name: 'holo',   cameraX: -1.05, cameraY: -0.06, cameraZ: 3.05, lookX: 0.42,  lookY: 0.06, fov: 40, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.006 },
   // VR Quest 3 — cam right so headset sits left; copy on right
   { name: 'quest',  cameraX: 0.65, cameraY: 0.02, cameraZ: 4.35, lookX: -0.2,  lookY: 0.02, fov: 48, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.012 },
   // MR bonsai — cam right so tree sits left; copy on right
@@ -135,35 +135,38 @@ function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
   }
 }
 
-/** Particles tagged as pupil in the baked eye palette (deep blue, darker than iris). */
-function buildEyePupilMask(colors: Float32Array | null, eyePos: Float32Array): Uint8Array {
-  const mask = new Uint8Array(N)
-  if (colors && colors.length === N * 3) {
-    for (let i = 0; i < N; i++) {
-      const i3 = i * 3
+/** Iris + pupil — fade the whole blue core during blinks, not just deep pupil dots. */
+function buildEyeCoreFadeWeights(eyeOpen: Float32Array, colors: Float32Array | null): Float32Array {
+  const weights = new Float32Array(N)
+  for (let i = 0; i < N; i++) {
+    const i3 = i * 3
+    const x = eyeOpen[i3]
+    const y = eyeOpen[i3 + 1]
+    const z = eyeOpen[i3 + 2]
+    const radial = Math.hypot(x, y * 0.95, z * 0.42)
+    let core = 0
+    if (radial < 0.64) {
+      const t = Math.max(0, Math.min(1, (radial - 0.1) / 0.42))
+      core = 1 - t * t * (3 - 2 * t)
+    }
+    if (colors) {
       const r = colors[i3]
       const g = colors[i3 + 1]
       const b = colors[i3 + 2]
-      if (r < 0.14 && g < 0.22 && b > 0.38 && b < 0.72 && b > r * 2.2 && b > g * 1.6) {
-        mask[i] = 1
+      if (b > 0.42 && b > r * 1.12 && b > g * 0.92 && r < 0.45) {
+        core = Math.max(core, 0.95)
       }
     }
-    return mask
+    weights[i] = core
   }
-  // Procedural fallback — center cluster of the open eye
-  for (let i = 0; i < N; i++) {
-    const i3 = i * 3
-    const x = eyePos[i3]
-    const y = eyePos[i3 + 1]
-    if (Math.hypot(x, y) < 0.22 && Math.abs(eyePos[i3 + 2]) < 0.18) mask[i] = 1
-  }
-  return mask
+  return weights
 }
 
 function pupilVisibilityFromBlink(blink: number) {
   const t = Math.max(0, Math.min(1, blink))
-  // Smooth out during close / reopen so the pupil hides before lids meet
-  return 1 - t * t * (3 - 2 * t)
+  if (t <= 0.01) return 1
+  // Drop quickly as lids close; stay hidden until fully open again
+  return Math.pow(1 - t, 1.35)
 }
 
 function easeInOut(t: number) {
@@ -293,7 +296,7 @@ export default function ThreeScene() {
       alphas.set(baseAlphas)
       paintEyeRGB(colorsArr, baked?.eyeColors ?? null)
       if (baked?.eye) eyeLive.set(baked.eye)
-      const eyePupilMask = buildEyePupilMask(baked?.eyeColors ?? null, shapePos[0])
+      const eyeCoreFade = buildEyeCoreFadeWeights(shapePos[0], baked?.eyeColors ?? null)
 
       const geometry = new THREE.BufferGeometry()
       geometry.setAttribute('position', new THREE.BufferAttribute(posArr, 3))
@@ -642,8 +645,9 @@ export default function ThreeScene() {
             }
           } else if (holdingFace) {
             alphas[i] = baseAlphas[i]
-          } else if (holdingEye && eyePupilMask[i]) {
-            alphas[i] = baseAlphas[i] * pupilVis
+          } else if (holdingEye && eyeCoreFade[i] > 0.001) {
+            const hide = eyeCoreFade[i] * (1 - pupilVis)
+            alphas[i] = baseAlphas[i] * (1 - hide)
           } else if (faceBlend > 0.01 && faceLeave[i] && facePhase[i] > FACE_SETTLE) {
             // Softly wind down leave during morph away
             const leaveT = Math.min(1, (facePhase[i] - FACE_SETTLE) / (1 - FACE_SETTLE))
@@ -681,10 +685,9 @@ export default function ThreeScene() {
           points.rotation.x *= 0.96
           points.scale.lerp(v1, 0.06)
         } else if (holoW > 0.01) {
-          // Subtle hover — keep the portrait pose readable like the reference
-          points.rotation.y = Math.sin(elapsed * 0.16) * 0.022 * holoW
-          points.rotation.x = Math.sin(elapsed * 0.12) * 0.01 * holoW
-          points.scale.setScalar(1 + Math.sin(elapsed * 0.85) * 0.008 * holoW)
+          points.rotation.y = 0.18 * holoW
+          points.rotation.x = -0.04 * holoW
+          points.scale.setScalar(1 + Math.sin(elapsed * 0.85) * 0.006 * holoW)
         } else if (bonsaiW > 0.01) {
           points.rotation.y = Math.sin(elapsed * 0.35) * 0.06 * bonsaiW
           points.rotation.x *= 0.95
