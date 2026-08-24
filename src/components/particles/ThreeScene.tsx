@@ -68,17 +68,27 @@ type ShapeName = 'eye' | 'face' | 'dna' | 'arc' | 'bonsai'
 
 const SHAPES: {
   name: ShapeName
+  cameraX: number
+  cameraY: number
   cameraZ: number
+  lookX: number
+  lookY: number
+  fov: number
   cageOpa: number
   pinkBias: number
   bloom: number
   noiseAmp: number
 }[] = [
-  { name: 'eye',    cameraZ: 4.4, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
-  { name: 'face',   cameraZ: 3.4, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
-  { name: 'dna',    cameraZ: 2.2, cageOpa: 0.03, pinkBias: 0.0,  bloom: 0.55, noiseAmp: 0.008 },
-  { name: 'arc',    cameraZ: 5.0, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
-  { name: 'bonsai', cameraZ: 5.0, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
+  // Opening eye — centered
+  { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
+  // AI face — push cam right so mesh sits left; copy on right
+  { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
+  // AR DNA — dive in close, slight drift left
+  { name: 'dna',    cameraX: -0.45, cameraY: 0.12, cameraZ: 2.05, lookX: 0.2,  lookY: 0.0,  fov: 42, cageOpa: 0.03, pinkBias: 0.0,  bloom: 0.55, noiseAmp: 0.008 },
+  // VR arc — pull wide, ride to the right
+  { name: 'arc',    cameraX: 0.55, cameraY: -0.05, cameraZ: 5.35, lookX: -0.15, lookY: 0.05, fov: 54, cageOpa: 0.03, pinkBias: 0.65, bloom: 1.15, noiseAmp: 0.028 },
+  // MR bonsai — cam left + zoom; tree on the right, copy on the left
+  { name: 'bonsai', cameraX: -1.05, cameraY: 0.1, cameraZ: 3.55, lookX: 0.55, lookY: -0.05, fov: 44, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
 ]
 
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
@@ -163,8 +173,10 @@ export default function ThreeScene() {
       disposeList.push(() => renderer.dispose())
 
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100)
-      camera.position.set(0, 0, SHAPES[0].cameraZ)
+      const camera = new THREE.PerspectiveCamera(SHAPES[0].fov, window.innerWidth / window.innerHeight, 0.1, 100)
+      camera.position.set(SHAPES[0].cameraX, SHAPES[0].cameraY, SHAPES[0].cameraZ)
+      const lookTarget = new THREE.Vector3(SHAPES[0].lookX, SHAPES[0].lookY, 0)
+      camera.lookAt(lookTarget)
 
       const composer = new EffectComposer(renderer)
       composer.addPass(new RenderPass(scene, camera))
@@ -417,8 +429,28 @@ export default function ThreeScene() {
         const a = SHAPES[i0]
         const b = SHAPES[i1]
         const u = easeInOut(localT)
-        // Softer camera / bloom catch-up so z-jumps don't feel abrupt
-        camera.position.z += ((a.cameraZ + (b.cameraZ - a.cameraZ) * u) - camera.position.z) * 0.06
+        const catchUp = 0.075
+
+        const tx = a.cameraX + (b.cameraX - a.cameraX) * u
+        const ty = a.cameraY + (b.cameraY - a.cameraY) * u
+        const tz = a.cameraZ + (b.cameraZ - a.cameraZ) * u
+        const lx = a.lookX + (b.lookX - a.lookX) * u
+        const ly = a.lookY + (b.lookY - a.lookY) * u
+        const fov = a.fov + (b.fov - a.fov) * u
+
+        // Ride framing + light mouse parallax on top
+        camera.position.x += (tx + mouse.x * 0.14 - camera.position.x) * catchUp
+        camera.position.y += (ty + -mouse.y * 0.1 - camera.position.y) * catchUp
+        camera.position.z += (tz - camera.position.z) * catchUp
+        lookTarget.x += (lx - lookTarget.x) * catchUp
+        lookTarget.y += (ly - lookTarget.y) * catchUp
+        camera.lookAt(lookTarget)
+
+        if (Math.abs(camera.fov - fov) > 0.05) {
+          camera.fov += (fov - camera.fov) * catchUp
+          camera.updateProjectionMatrix()
+        }
+
         bloomPass.strength += ((a.bloom + (b.bloom - a.bloom) * u) - bloomPass.strength) * 0.055
         cageMat.opacity += ((a.cageOpa + (b.cageOpa - a.cageOpa) * u) - cageMat.opacity) * 0.055
         gridMat.opacity = cageMat.opacity * 0.5
@@ -428,10 +460,6 @@ export default function ThreeScene() {
         rafId = requestAnimationFrame(tick)
         const delta = clock.getDelta()
         elapsed += delta
-
-        camera.position.x += (mouse.x * 0.28 - camera.position.x) * 0.03
-        camera.position.y += (-mouse.y * 0.18 - camera.position.y) * 0.03
-        camera.lookAt(0, 0, 0)
 
         cage.rotation.y = 0.08 + Math.sin(elapsed * 0.25) * 0.04
         cage.rotation.x = -0.06 + Math.cos(elapsed * 0.2) * 0.02
@@ -450,6 +478,7 @@ export default function ThreeScene() {
           i0 = 0
           i1 = 0
           localT = 0
+          applySegmentVisuals(0, 0, 0)
           const u = easeInOut(entryProgress)
           for (let i = 0; i < N; i++) {
             const i3 = i * 3
