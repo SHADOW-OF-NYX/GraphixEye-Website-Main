@@ -145,16 +145,21 @@ function buildEyeCoreFadeWeights(eyeOpen: Float32Array, colors: Float32Array | n
     const z = eyeOpen[i3 + 2]
     const radial = Math.hypot(x, y * 0.95, z * 0.42)
     let core = 0
-    if (radial < 0.64) {
-      const t = Math.max(0, Math.min(1, (radial - 0.1) / 0.42))
+    if (radial < 0.72) {
+      const t = Math.max(0, Math.min(1, (radial - 0.06) / 0.48))
       core = 1 - t * t * (3 - 2 * t)
     }
     if (colors) {
       const r = colors[i3]
       const g = colors[i3 + 1]
       const b = colors[i3 + 2]
-      if (b > 0.42 && b > r * 1.12 && b > g * 0.92 && r < 0.45) {
-        core = Math.max(core, 0.95)
+      // All iris / pupil blues
+      if (b > 0.32 && b > r * 1.05 && b > g * 0.88 && r < 0.52) {
+        core = 1
+      }
+      // Bright cornea glint at center — hide with pupil during blink
+      if (r > 0.88 && g > 0.88 && b > 0.9 && radial < 0.38) {
+        core = Math.max(core, 0.85)
       }
     }
     weights[i] = core
@@ -164,9 +169,10 @@ function buildEyeCoreFadeWeights(eyeOpen: Float32Array, colors: Float32Array | n
 
 function pupilVisibilityFromBlink(blink: number) {
   const t = Math.max(0, Math.min(1, blink))
-  if (t <= 0.01) return 1
-  // Drop quickly as lids close; stay hidden until fully open again
-  return Math.pow(1 - t, 1.35)
+  if (t <= 0.03) return 1
+  if (t >= 0.16) return 0
+  const u = (t - 0.03) / 0.13
+  return Math.pow(1 - u, 2.4)
 }
 
 function easeInOut(t: number) {
@@ -593,6 +599,9 @@ export default function ThreeScene() {
         }
 
         const pupilVis = holdingEye ? pupilVisibilityFromBlink(blinkAmount(eyeHoldClock)) : 1
+        const eyeBlinkAmt = holdingEye ? blinkAmount(eyeHoldClock) : 0
+        // Slit between lids shrinks as the eye closes — cull core particles in the gap
+        const eyeSlitHalf = 0.06 + (1 - eyeBlinkAmt) * 0.26
 
         const from = shapePos[i0]
         const to = shapePos[i1]
@@ -647,7 +656,19 @@ export default function ThreeScene() {
             alphas[i] = baseAlphas[i]
           } else if (holdingEye && eyeCoreFade[i] > 0.001) {
             const hide = eyeCoreFade[i] * (1 - pupilVis)
-            alphas[i] = baseAlphas[i] * (1 - hide)
+            let alpha = baseAlphas[i] * Math.max(0, 1 - hide)
+            // Fully extinguish iris/pupil caught in the closing slit
+            if (
+              eyeBlinkAmt > 0.05 &&
+              Math.abs(by) < eyeSlitHalf &&
+              Math.hypot(bx, bz * 0.85) < 0.58
+            ) {
+              alpha = 0
+            }
+            alphas[i] = alpha
+            if (eyeCoreFade[i] > 0.45 && pupilVis < 0.35) {
+              sizes[i] = shapeSizes[0][i] * Math.max(0.05, pupilVis)
+            }
           } else if (faceBlend > 0.01 && faceLeave[i] && facePhase[i] > FACE_SETTLE) {
             // Softly wind down leave during morph away
             const leaveT = Math.min(1, (facePhase[i] - FACE_SETTLE) / (1 - FACE_SETTLE))
@@ -667,6 +688,7 @@ export default function ThreeScene() {
         }
         geometry.attributes.position.needsUpdate = true
         geometry.attributes.aAlpha.needsUpdate = true
+        if (holdingEye) geometry.attributes.aSize.needsUpdate = true
 
         // Gentle motion accents per shape
         const holoW =
