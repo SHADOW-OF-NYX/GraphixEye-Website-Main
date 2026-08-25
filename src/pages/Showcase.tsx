@@ -222,27 +222,33 @@ export default function Showcase() {
                     {/* Label above card */}
                     <p className="mh-card-label">{work.title}</p>
 
-                    <div className="relative">
-                      <div className="mirror-hall-panel relative h-[260px] sm:h-[320px] md:h-[380px] overflow-hidden">
+                    {/* Card panel */}
+                    <div className="mirror-hall-panel relative h-[260px] sm:h-[320px] md:h-[380px] overflow-hidden">
+                      <Placeholder
+                        src={work.image}
+                        label={work.title}
+                        eager
+                        className="w-full h-full"
+                        imgClassName={bannerCropSlugs.has(work.slug) ? 'object-[24%_center]' : ''}
+                      />
+                      <div className="mirror-hall-rim" aria-hidden="true" />
+                    </div>
+
+                    {/* Water reflection — in natural flow so it's never clipped */}
+                    <div
+                      data-hall-mirror
+                      className="mirror-hall-reflection pointer-events-none h-[143px] sm:h-[176px] md:h-[209px]"
+                      aria-hidden="true"
+                    >
+                      {/* Full-height image inside; overflow:hidden on parent clips it to 55% */}
+                      <div className="h-[260px] sm:h-[320px] md:h-[380px] w-full">
                         <Placeholder
                           src={work.image}
-                          label={work.title}
+                          label=""
                           eager
                           className="w-full h-full"
                           imgClassName={bannerCropSlugs.has(work.slug) ? 'object-[24%_center]' : ''}
                         />
-                        <div className="mirror-hall-rim" aria-hidden="true" />
-                      </div>
-                      <div data-hall-mirror className="mirror-hall-reflection pointer-events-none" aria-hidden="true">
-                        <div className="relative h-[260px] sm:h-[320px] md:h-[380px] overflow-hidden rounded-[1rem]">
-                          <Placeholder
-                            src={work.image}
-                            label=""
-                            eager
-                            className="w-full h-full"
-                            imgClassName={bannerCropSlugs.has(work.slug) ? 'object-[24%_center]' : ''}
-                          />
-                        </div>
                       </div>
                     </div>
                   </Link>
