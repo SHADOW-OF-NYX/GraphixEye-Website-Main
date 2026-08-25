@@ -568,8 +568,12 @@ export default function CareerParticles({ variants, scrollTrack, className = '' 
 
         if (multi) {
           const nShapes = shapes.length;
-          // Centre shape i on section i: pure shape at p = (i + 0.5) / nShapes
-          const seg = scrollState.display * nShapes - 0.5;
+          /*
+           * The track spans (nShapes - 1) scroll units: progress 0 sits on the
+           * first section and 1 on the last, so shape i is fully formed at
+           * p = i / (nShapes - 1) — keeping each shape aligned with its section.
+           */
+          const seg = scrollState.display * (nShapes - 1);
           ai = Math.max(0, Math.min(nShapes - 2, Math.floor(seg)));
           bi = ai + 1;
           u = holdEase(Math.max(0, Math.min(1, seg - ai)));
