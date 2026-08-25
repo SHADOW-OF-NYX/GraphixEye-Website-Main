@@ -1,17 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Placeholder } from '../components/ui';
-import { photos } from '../data/images';
 import { bannerCropSlugs, workFilters, works, type WorkCategory } from '../data/works';
 
-const CARD_GAP = 28;
-const SPEED = 0.42;
+const CARD_GAP = 24;
+const SPEED = 0.38;
 const MAX_ROTATE = 38;
-const MAX_Z = 140;
+const MAX_Z = 160;
 
 export default function Showcase() {
   const [filter, setFilter] = useState<(typeof workFilters)[number]>('All Projects');
   const [paused, setPaused] = useState(false);
+  const [activeTitle, setActiveTitle] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
   const stageRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);
@@ -66,28 +67,38 @@ export default function Showcase() {
     const centerX = stageRect.left + stageRect.width / 2;
     const cards = track.querySelectorAll('[data-flash-card]') as NodeListOf<HTMLElement>;
 
-    cards.forEach((card) => {
+    let closestDelta = Infinity;
+    let closestIdx = 0;
+
+    cards.forEach((card, i) => {
       const cardCenter = trackRect.left + card.offsetLeft + card.offsetWidth / 2;
       const delta = (cardCenter - centerX) / Math.max(card.offsetWidth, 1);
       const rotateY = Math.max(-MAX_ROTATE, Math.min(MAX_ROTATE, -delta * 22));
       const abs = Math.min(Math.abs(delta), 2.4);
       const translateZ = MAX_Z * (1 - abs / 2.4);
-      const scale = 0.86 + 0.14 * (1 - abs / 2.4);
-      const opacity = 0.42 + 0.58 * (1 - Math.min(abs, 1.6) / 1.6);
+      const scale = 0.84 + 0.16 * (1 - abs / 2.4);
+      const opacity = 0.38 + 0.62 * (1 - Math.min(abs, 1.8) / 1.8);
 
       card.style.transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
       card.style.opacity = String(opacity);
 
-      const label = card.querySelector('[data-hall-label]') as HTMLElement | null;
-      if (label) {
-        label.style.opacity = String(0.35 + 0.65 * (1 - Math.min(abs, 1.2) / 1.2));
-      }
-
       const mirror = card.querySelector('[data-hall-mirror]') as HTMLElement | null;
       if (mirror) {
-        mirror.style.opacity = String(opacity * 0.5);
+        mirror.style.opacity = String(opacity * 0.55);
+      }
+
+      if (Math.abs(delta) < closestDelta) {
+        closestDelta = Math.abs(delta);
+        closestIdx = i;
       }
     });
+
+    // Map closestIdx back to filtered (not looped) index
+    if (filtered.length > 0) {
+      const trueIdx = closestIdx % filtered.length;
+      setActiveIndex(trueIdx);
+      setActiveTitle(filtered[trueIdx]?.title ?? '');
+    }
   };
 
   useEffect(() => {
@@ -114,17 +125,6 @@ export default function Showcase() {
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
   }, [filtered, looped, copies]);
-
-  const step = (direction: -1 | 1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.querySelector('[data-flash-card]') as HTMLElement | null;
-    const width = (card?.offsetWidth ?? 280) + CARD_GAP;
-    offsetRef.current += direction * width;
-    wrapOffset(track);
-    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
-    applyPerspective();
-  };
 
   const onPointerDown = (e: React.PointerEvent) => {
     const track = trackRef.current;
@@ -161,40 +161,34 @@ export default function Showcase() {
     pausedRef.current = paused;
   };
 
+  const dotCount = Math.min(filtered.length, 10);
+  const dotActive = activeIndex % dotCount;
+
   return (
-    <div className="bg-ll-white min-h-screen pt-28 pb-24">
-      <section className="px-4 md:px-8 mb-16">
-        <Placeholder src={photos.showcaseHero} label="Selected Works — hero" className="w-full h-[70vh] card-r" />
-      </section>
+    <div className="mh-page">
+      {/* Filter bar */}
+      <div className="mh-filter-bar">
+        {workFilters.map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => setFilter(item)}
+            className={`mh-filter-pill ${filter === item ? 'mh-filter-pill--active' : ''}`}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
 
-      <section className="max-w-[1600px] mx-auto px-6 md:px-8 mb-10 flex flex-col md:flex-row justify-between items-end gap-8">
-        <h1 className="display-md">Services</h1>
-        <div className="flex flex-wrap gap-2">
-          {workFilters.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setFilter(item)}
-              className={`h-10 px-4 pill text-[13px] transition-colors ${
-                filter === item ? 'bg-black text-ll-white' : 'bg-ll-sand text-black hover:bg-black/10'
-              }`}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </section>
-
+      {/* Mirror Hall section */}
       <section className="mirror-hall mx-4 md:mx-8 card-r overflow-hidden">
         <div className="mirror-hall-ambient" aria-hidden="true" />
-        <div className="relative z-10 px-6 md:px-10 pt-10 pb-4 flex items-end justify-between gap-6">
-          <div>
-            <p className="text-[11px] tracking-[0.22em] uppercase text-white/40 mb-2">Production house</p>
-            <h2 className="font-display text-[28px] md:text-[36px] text-white tracking-tight">Walk the floor</h2>
-          </div>
-          <p className="hidden md:block max-w-xs text-[13px] leading-relaxed text-white/45 text-right">
-            Drag through the hall. Each service catches the light — and its reflection — as it passes center.
-          </p>
+
+        {/* Header */}
+        <div className="mh-header">
+          <p className="mh-eyebrow">GraphixEye · Services</p>
+          <h1 className="mh-title">Mirror Hall</h1>
+          <p className="mh-subtitle">Every service, framed and reflected.</p>
         </div>
 
         {looped.length ? (
@@ -209,27 +203,24 @@ export default function Showcase() {
             onPointerCancel={onPointerUp}
           >
             <div className="mirror-hall-perspective">
-              <div ref={trackRef} className="mirror-hall-track flex gap-7 px-8 md:px-16 will-change-transform">
+              <div ref={trackRef} className="mirror-hall-track flex gap-6 px-8 md:px-16 will-change-transform">
                 {looped.map((work) => (
                   <Link
                     key={work.loopKey}
                     to={`/services/${work.slug}`}
                     data-flash-card
                     data-nav-tone="dark"
-                    className="mirror-hall-card group relative shrink-0 w-[200px] sm:w-[240px] md:w-[280px]"
+                    className="mirror-hall-card group relative shrink-0 w-[160px] sm:w-[200px] md:w-[240px]"
                     onClick={(e) => {
                       if (Math.abs(velocityRef.current) > 0.8) e.preventDefault();
                     }}
                     draggable={false}
                   >
-                    <p
-                      data-hall-label
-                      className="mb-3 text-center text-[10px] sm:text-[11px] tracking-[0.18em] uppercase text-white/55 truncate px-1"
-                    >
-                      {work.title}
-                    </p>
+                    {/* Label above card */}
+                    <p className="mh-card-label">{work.title}</p>
+
                     <div className="relative">
-                      <div className="mirror-hall-panel relative h-[300px] sm:h-[340px] md:h-[400px] overflow-hidden">
+                      <div className="mirror-hall-panel relative h-[280px] sm:h-[340px] md:h-[400px] overflow-hidden">
                         <Placeholder
                           src={work.image}
                           label={work.title}
@@ -237,16 +228,10 @@ export default function Showcase() {
                           className="w-full h-full"
                           imgClassName={bannerCropSlugs.has(work.slug) ? 'object-[24%_center]' : ''}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                        <div className="absolute bottom-5 left-5 right-5 text-ll-white">
-                          <p className="text-[10px] tracking-widest uppercase opacity-60 mb-1">{work.category}</p>
-                          <p className="font-display text-[18px] md:text-[20px] leading-tight">{work.title}</p>
-                          <p className="text-[12px] text-white/60 mt-1">{work.location}</p>
-                        </div>
                         <div className="mirror-hall-rim" aria-hidden="true" />
                       </div>
                       <div data-hall-mirror className="mirror-hall-reflection pointer-events-none" aria-hidden="true">
-                        <div className="relative h-[300px] sm:h-[340px] md:h-[400px] overflow-hidden rounded-[1.15rem]">
+                        <div className="relative h-[280px] sm:h-[340px] md:h-[400px] overflow-hidden rounded-[1.15rem]">
                           <Placeholder
                             src={work.image}
                             label=""
@@ -267,23 +252,19 @@ export default function Showcase() {
           <p className="px-8 py-20 text-white/50">No works found for this filter.</p>
         )}
 
-        <div className="relative z-10 mt-2 mb-10 flex items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => step(1)}
-            className="w-12 h-12 rounded-full border border-white/25 text-white/80 inline-flex items-center justify-center hover:bg-white hover:text-black transition-colors"
-            aria-label="Previous work"
-          >
-            ←
-          </button>
-          <button
-            type="button"
-            onClick={() => step(-1)}
-            className="w-12 h-12 rounded-full border border-white/25 text-white/80 inline-flex items-center justify-center hover:bg-white hover:text-black transition-colors"
-            aria-label="Next work"
-          >
-            →
-          </button>
+        {/* Active name + counter + dots */}
+        <div className="mh-footer">
+          <div className="mh-counter">
+            <span className="mh-counter-num">{String(activeIndex + 1).padStart(2, '0')}</span>
+            <span className="mh-counter-sep"> / </span>
+            <span className="mh-counter-total">{String(filtered.length).padStart(2, '0')}</span>
+          </div>
+          <p className="mh-active-name">{activeTitle}</p>
+          <div className="mh-dots" aria-hidden="true">
+            {Array.from({ length: dotCount }).map((_, i) => (
+              <span key={i} className={`mh-dot ${i === dotActive ? 'mh-dot--active' : ''}`} />
+            ))}
+          </div>
         </div>
       </section>
     </div>
