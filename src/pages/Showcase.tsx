@@ -84,7 +84,8 @@ export default function Showcase() {
 
       const mirror = card.querySelector('[data-hall-mirror]') as HTMLElement | null;
       if (mirror) {
-        mirror.style.opacity = String(opacity * 0.55);
+        // Keep reflections readable even when side cards fade
+        mirror.style.opacity = String(0.55 + opacity * 0.35);
       }
 
       if (Math.abs(delta) < closestDelta) {
@@ -165,6 +166,28 @@ export default function Showcase() {
 
   return (
     <div className="mh-page">
+      {/* Shared watery displacement filter for reflections */}
+      <svg width="0" height="0" aria-hidden="true" className="absolute">
+        <defs>
+          <filter id="mh-water-ripple" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.018 0.06"
+              numOctaves="2"
+              seed="3"
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="8"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Full-bleed mirror hall */}
       <section className="mirror-hall">
         <div className="mirror-hall-ambient" aria-hidden="true" />
@@ -234,14 +257,13 @@ export default function Showcase() {
                       <div className="mirror-hall-rim" aria-hidden="true" />
                     </div>
 
-                    {/* Water reflection — in natural flow so it's never clipped */}
+                    {/* Water reflection — clip outer, flip inner (origin must NOT be top) */}
                     <div
                       data-hall-mirror
-                      className="mirror-hall-reflection pointer-events-none h-[143px] sm:h-[176px] md:h-[209px]"
+                      className="mirror-hall-reflection pointer-events-none"
                       aria-hidden="true"
                     >
-                      {/* Full-height image inside; overflow:hidden on parent clips it to 55% */}
-                      <div className="h-[260px] sm:h-[320px] md:h-[380px] w-full">
+                      <div className="mirror-hall-reflection-flip">
                         <Placeholder
                           src={work.image}
                           label=""

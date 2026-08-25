@@ -17,7 +17,7 @@ export const navLinks = [
   { name: 'Services', path: '/services' },
   { name: 'Expansions', path: '/expansions' },
   { name: 'Experience', path: '/experience' },
-  { name: 'Commercial', path: '/contact' },
+  { name: 'Careers', path: '/contact' },
 ];
 
 export const heroPoints = [
