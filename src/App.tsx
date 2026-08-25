@@ -9,6 +9,7 @@ import Showcase from './pages/Showcase';
 import ServiceDetail from './pages/ServiceDetail';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
+import Careers from './pages/Careers';
 import Expansions from './pages/Expansions';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 
@@ -25,6 +26,8 @@ function ScrollToTop() {
 function AppShell() {
   const { pathname } = useLocation();
   const isExpansions = pathname === '/expansions';
+  const isCareers = pathname === '/careers';
+  const isDark = isExpansions || isCareers;
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -34,7 +37,11 @@ function AppShell() {
   return (
     <div
       className={`font-sans min-h-screen ${
-        isExpansions ? 'text-ll-white bg-[#080f18]' : 'text-black bg-ll-white'
+        isExpansions
+          ? 'text-ll-white bg-[#080f18]'
+          : isCareers
+            ? 'text-ll-white bg-black'
+            : 'text-black bg-ll-white'
       }`}
     >
       <Navbar />
@@ -49,9 +56,10 @@ function AppShell() {
           <Route path="/expansions" element={<Expansions />} />
           <Route path="/experience" element={<Experience />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/careers" element={<Careers />} />
         </Routes>
       </main>
-      {!isExpansions && <Footer />}
+      {!isDark && <Footer />}
     </div>
   );
 }

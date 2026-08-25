@@ -430,3 +430,591 @@ h4,
     padding-top: 5.5rem;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Careers — particle-driven dark experience
+   ═══════════════════════════════════════════ */
+
+.ce-page {
+  background: #000;
+  color: #fff;
+  overflow-x: clip;
+}
+
+.ce-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Particle canvas sits behind the content of each section */
+.ce-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ce-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+.ce-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Pill badge ── */
+.ce-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.72);
+  width: fit-content;
+}
+
+.ce-badge-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  opacity: 0.75;
+  flex-shrink: 0;
+}
+
+/* ── Headings with the sweeping shimmer from the reference ── */
+.ce-h1,
+.ce-h2 {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  color: #fff;
+}
+
+.ce-h1 {
+  font-size: clamp(2.4rem, 6.2vw, 4.9rem);
+  margin: 1.6rem 0 1.4rem;
+}
+
+.ce-h2 {
+  font-size: clamp(2rem, 4.8vw, 3.7rem);
+  margin: 1.4rem 0 1.2rem;
+}
+
+.ce-shimmer {
+  background: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #ffffff 34%,
+    rgba(255, 255, 255, 0.32) 50%,
+    #ffffff 66%,
+    #ffffff 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ce-sweep 8s ease-in-out infinite;
+}
+
+@keyframes ce-sweep {
+  0% {
+    background-position: 130% 0;
+  }
+  100% {
+    background-position: -30% 0;
+  }
+}
+
+.ce-lead {
+  font-size: clamp(0.88rem, 1.3vw, 1rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.5);
+  max-width: 34rem;
+}
+
+.ce-body {
+  font-size: clamp(0.88rem, 1.2vw, 0.98rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 32rem;
+}
+
+.ce-body--center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+/* ── Buttons ── */
+.ce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 2rem;
+}
+
+.ce-actions--center {
+  justify-content: center;
+}
+
+.ce-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 3rem;
+  padding: 0 0.5rem 0 1.4rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 180ms, border-color 180ms, transform 180ms;
+  white-space: nowrap;
+}
+
+.ce-btn--primary {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+.ce-btn--primary:hover {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.ce-btn--ghost {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0 1.4rem;
+  backdrop-filter: blur(10px);
+}
+
+.ce-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.ce-btn--sm {
+  height: 2.6rem;
+  font-size: 0.8rem;
+}
+
+.ce-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  flex-shrink: 0;
+}
+
+.ce-arrow svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+/* ── Hero ── */
+.ce-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 8rem 0 5rem;
+}
+
+/* ── Growth / wave ── */
+.ce-wave-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 7rem 0;
+}
+
+.ce-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.ce-split-right {
+  padding-top: 1rem;
+}
+
+/* ── Teams / galaxy ── */
+.ce-galaxy-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 7rem 0;
+}
+
+/* Push copy below the galaxy so the core stays readable */
+.ce-galaxy-inner {
+  padding-top: 2rem;
+}
+
+.ce-galaxy-body {
+  margin-top: 20rem;
+}
+
+/* ── Stats / helix ── */
+.ce-helix-section {
+  min-height: 100vh;
+  padding: 7rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.ce-helix-inner {
+  position: relative;
+  min-height: 34rem;
+}
+
+.ce-stat-card {
+  position: absolute;
+  width: 19rem;
+  max-width: 80vw;
+  padding: 1.5rem;
+  border-radius: 1.1rem;
+  background: rgba(14, 14, 18, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.ce-stat-card--left {
+  top: 3rem;
+  left: 0;
+}
+
+.ce-stat-card--right {
+  top: 10rem;
+  right: 0;
+}
+
+.ce-stat-card--bottom {
+  bottom: 1rem;
+  left: 4rem;
+}
+
+.ce-stat-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.6rem;
+}
+
+.ce-stat-value {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 400;
+  font-size: 2.9rem;
+  line-height: 1;
+  color: #ff6b7a;
+  margin-bottom: 0.7rem;
+}
+
+.ce-stat-value--blue {
+  color: #6b9cff;
+}
+
+.ce-stat-value--purple {
+  color: #b07cff;
+}
+
+.ce-stat-note {
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* ── Open roles ── */
+.ce-roles-section {
+  padding: 7rem 0;
+  background: radial-gradient(70% 50% at 50% 0%, rgba(40, 30, 90, 0.28), transparent 65%), #000;
+}
+
+.ce-roles-head {
+  margin-bottom: 2.5rem;
+}
+
+.ce-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.ce-filter {
+  height: 2.1rem;
+  padding: 0 0.95rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.5);
+  transition: background 160ms, color 160ms, border-color 160ms;
+  cursor: pointer;
+}
+
+.ce-filter:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ce-filter--active {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.ce-jobs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  max-width: 62rem;
+  margin: 0 auto;
+}
+
+.ce-job {
+  border-radius: 1rem;
+  background: rgba(14, 14, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: border-color 200ms, background 200ms;
+}
+
+.ce-job:hover {
+  border-color: rgba(255, 255, 255, 0.17);
+}
+
+.ce-job--open {
+  background: rgba(18, 18, 24, 0.8);
+  border-color: rgba(255, 255, 255, 0.19);
+}
+
+.ce-job-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.35rem 1.5rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ce-job-title {
+  font-family: var(--font-display, sans-serif);
+  font-weight: 400;
+  font-size: 1.12rem;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.ce-job-summary {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 34rem;
+}
+
+.ce-job-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.ce-tag {
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.ce-job-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.6);
+  transition: transform 240ms ease;
+  flex-shrink: 0;
+}
+
+.ce-job-toggle svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.ce-job--open .ce-job-toggle {
+  transform: rotate(180deg);
+}
+
+.ce-job-body {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  animation: ce-expand 260ms ease;
+}
+
+@keyframes ce-expand {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ce-job-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  padding-top: 1.4rem;
+}
+
+.ce-job-subhead {
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 0.8rem;
+}
+
+.ce-job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ce-job-list li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ce-job-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.ce-job-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.8rem;
+  padding-top: 1.3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ce-job-loc {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.ce-empty {
+  text-align: center;
+  padding: 3rem 0;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── CTA ── */
+.ce-cta-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 7rem 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .ce-split {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .ce-job-cols {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+
+  .ce-galaxy-body {
+    margin-top: 13rem;
+  }
+
+  .ce-stat-card {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .ce-helix-inner {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .ce-job-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .ce-job-meta {
+    flex-wrap: wrap;
+  }
+
+  .ce-galaxy-body {
+    margin-top: 9rem;
+  }
+
+  .ce-hero {
+    padding-top: 6.5rem;
+  }
+}
