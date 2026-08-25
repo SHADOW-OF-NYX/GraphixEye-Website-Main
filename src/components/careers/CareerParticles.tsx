@@ -39,7 +39,11 @@ interface SceneDef {
   colors: Float32Array;
   sizes: Float32Array;
   seeds: Float32Array;
-  camera: { x: number; y: number; z: number; lookY: number; fov: number };
+  camera: { x: number; y: number; z: number; lookY: number; lookZ?: number; fov: number };
+  /** Multiplier feeding gl_PointSize — keeps dots in the 1–3 CSS px range */
+  pointScale: number;
+  /** Per-particle alpha; low values stop additive blending from clipping to white */
+  alpha: number;
   /** GLSL applied to `vec3 p` in the vertex shader */
   displace: string;
   spin: (obj: THREE.Points, t: number) => void;
@@ -48,7 +52,7 @@ interface SceneDef {
 
 /* ── Hero: glowing torus ring facing the viewer ── */
 function buildRing(): SceneDef {
-  const count = 30000;
+  const count = 26000;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
@@ -87,7 +91,7 @@ function buildRing(): SceneDef {
     colors[i * 3 + 1] = c.g;
     colors[i * 3 + 2] = c.b;
 
-    sizes[i] = 0.9 + Math.random() * 1.1;
+    sizes[i] = 0.75 + Math.random() * 0.85;
     seeds[i] = Math.random();
   }
 
@@ -97,7 +101,9 @@ function buildRing(): SceneDef {
     colors,
     sizes,
     seeds,
-    camera: { x: 0, y: 0, z: 3.05, lookY: 0, fov: 46 },
+    camera: { x: 0, y: 0, z: 3.3, lookY: 0, fov: 46 },
+    pointScale: 3.0,
+    alpha: 0.5,
     displace: `
       float ang = atan(p.y, p.x);
       float w = sin(ang * 9.0 + uTime * 0.85) * 0.5
@@ -113,18 +119,19 @@ function buildRing(): SceneDef {
   };
 }
 
-/* ── Growth: particle wave terrain ── */
+/* ── Growth: particle wave terrain receding from the camera ── */
 function buildWave(): SceneDef {
-  const cols = 300;
-  const rows = 170;
+  const cols = 250;
+  const rows = 140;
   const count = cols * rows;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const seeds = new Float32Array(count);
 
-  const W = 7.2;
-  const D = 4.0;
+  const W = 8.0;
+  const NEAR_Z = 0.5;
+  const FAR_Z = -4.6;
   const stops: Stop[] = [
     [0.0, C.deep],
     [0.24, C.blue],
@@ -136,11 +143,11 @@ function buildWave(): SceneDef {
   let i = 0;
   for (let cx = 0; cx < cols; cx++) {
     for (let cz = 0; cz < rows; cz++) {
-      const x = (cx / (cols - 1) - 0.5) * W + (Math.random() - 0.5) * 0.012;
-      const z = (cz / (rows - 1) - 0.5) * D + (Math.random() - 0.5) * 0.012;
+      const x = (cx / (cols - 1) - 0.5) * W + (Math.random() - 0.5) * 0.015;
+      const z = NEAR_Z + (cz / (rows - 1)) * (FAR_Z - NEAR_Z) + (Math.random() - 0.5) * 0.015;
 
       positions[i * 3] = x;
-      positions[i * 3 + 1] = -0.62;
+      positions[i * 3 + 1] = -0.55;
       positions[i * 3 + 2] = z;
 
       const c = ramp(stops, cx / (cols - 1));
@@ -148,7 +155,7 @@ function buildWave(): SceneDef {
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
 
-      sizes[i] = 0.7 + Math.random() * 0.7;
+      sizes[i] = 0.55 + Math.random() * 0.6;
       seeds[i] = Math.random();
       i++;
     }
@@ -160,7 +167,9 @@ function buildWave(): SceneDef {
     colors,
     sizes,
     seeds,
-    camera: { x: 0, y: 0.34, z: 2.35, lookY: -0.36, fov: 52 },
+    camera: { x: 0, y: 0.34, z: 2.2, lookY: -0.5, lookZ: -1.4, fov: 55 },
+    pointScale: 2.4,
+    alpha: 0.45,
     displace: `
       float h = sin(p.x * 1.55 + uTime * 0.5) * 0.115
               + sin(p.z * 2.15 - uTime * 0.38) * 0.085
@@ -175,8 +184,8 @@ function buildWave(): SceneDef {
 /* ── Teams: orbiting galaxy with a bright core ── */
 function buildGalaxy(): SceneDef {
   const ringCount = 5;
-  const perRing = 5200;
-  const coreCount = 7000;
+  const perRing = 4600;
+  const coreCount = 6000;
   const count = ringCount * perRing + coreCount;
 
   const positions = new Float32Array(count * 3);
@@ -202,12 +211,12 @@ function buildGalaxy(): SceneDef {
     positions[i * 3 + 1] = (Math.random() - 0.5) * 0.05;
     positions[i * 3 + 2] = Math.sin(a) * rr * 0.9;
 
-    const c = ramp(outerStops, rr / 0.34 * 0.3);
+    const c = ramp(outerStops, (rr / 0.34) * 0.3);
     colors[i * 3] = c.r;
     colors[i * 3 + 1] = c.g;
     colors[i * 3 + 2] = c.b;
 
-    sizes[i] = 1.0 + Math.random() * 1.6;
+    sizes[i] = 0.7 + Math.random() * 0.9;
     seeds[i] = Math.random();
     i++;
   }
@@ -229,7 +238,7 @@ function buildGalaxy(): SceneDef {
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
 
-      sizes[i] = 0.7 + Math.random() * 0.9;
+      sizes[i] = 0.5 + Math.random() * 0.6;
       seeds[i] = Math.random();
       i++;
     }
@@ -241,8 +250,10 @@ function buildGalaxy(): SceneDef {
     colors,
     sizes,
     seeds,
-    camera: { x: 0, y: 0.62, z: 2.75, lookY: 0, fov: 48 },
-    groupRotX: -0.42,
+    camera: { x: 0, y: 0.72, z: 3.0, lookY: 0, fov: 46 },
+    pointScale: 2.6,
+    alpha: 0.45,
+    groupRotX: -0.5,
     displace: `
       float d = length(p.xz);
       p.y += sin(d * 5.0 - uTime * 0.7 + aSeed * 3.0) * 0.022;
@@ -255,8 +266,8 @@ function buildGalaxy(): SceneDef {
 
 /* ── Stats: DNA double helix ── */
 function buildHelix(): SceneDef {
-  const strandPts = 13000;
-  const rungPts = 6000;
+  const strandPts = 11000;
+  const rungPts = 5000;
   const count = strandPts * 2 + rungPts;
 
   const positions = new Float32Array(count * 3);
@@ -292,7 +303,7 @@ function buildHelix(): SceneDef {
       colors[i * 3 + 1] = c.g;
       colors[i * 3 + 2] = c.b;
 
-      sizes[i] = 0.8 + Math.random() * 1.2;
+      sizes[i] = 0.6 + Math.random() * 0.8;
       seeds[i] = Math.random();
       i++;
     }
@@ -316,7 +327,7 @@ function buildHelix(): SceneDef {
     colors[i * 3 + 1] = c.g;
     colors[i * 3 + 2] = c.b;
 
-    sizes[i] = 0.55 + Math.random() * 0.7;
+    sizes[i] = 0.45 + Math.random() * 0.5;
     seeds[i] = Math.random();
     i++;
   }
@@ -327,7 +338,9 @@ function buildHelix(): SceneDef {
     colors,
     sizes,
     seeds,
-    camera: { x: 0, y: 0, z: 3.5, lookY: 0, fov: 46 },
+    camera: { x: 0, y: 0, z: 3.6, lookY: 0, fov: 46 },
+    pointScale: 2.8,
+    alpha: 0.5,
     displace: `
       p.x += sin(p.y * 2.0 + uTime * 0.5) * 0.018;
       p.z += cos(p.y * 2.0 + uTime * 0.5) * 0.018;
@@ -340,7 +353,7 @@ function buildHelix(): SceneDef {
 
 /* ── CTA: vortex / event horizon ── */
 function buildVortex(): SceneDef {
-  const count = 26000;
+  const count = 22000;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
@@ -376,7 +389,7 @@ function buildVortex(): SceneDef {
 
     // Fade density near the event horizon
     const edge = Math.min(1, (rr - inner) / 0.5);
-    sizes[i] = (0.7 + Math.random() * 1.3) * (0.45 + edge * 0.55);
+    sizes[i] = (0.5 + Math.random() * 0.8) * (0.45 + edge * 0.55);
     seeds[i] = Math.random();
   }
 
@@ -386,7 +399,9 @@ function buildVortex(): SceneDef {
     colors,
     sizes,
     seeds,
-    camera: { x: 0, y: 0, z: 3.0, lookY: 0, fov: 50 },
+    camera: { x: 0, y: 0, z: 3.2, lookY: 0, fov: 50 },
+    pointScale: 2.6,
+    alpha: 0.5,
     displace: `
       float d = length(p.xy);
       float swirl = sin(d * 2.4 - uTime * 0.5 + aSeed * 6.28) * 0.03;
@@ -406,12 +421,18 @@ const BUILDERS: Record<SceneVariant, () => SceneDef> = {
   vortex: buildVortex,
 };
 
+/*
+ * gl_PointSize is in PHYSICAL pixels. Dividing a tuned scale by view depth keeps
+ * dots at roughly 1–3 CSS px; the clamp stops near-camera points from ballooning
+ * and blowing the additive blend out to solid white.
+ */
 const VERT = (displace: string) => `
   attribute float aSize;
   attribute vec3 aColor;
   attribute float aSeed;
   uniform float uTime;
   uniform float uScale;
+  uniform float uDpr;
   varying vec3 vColor;
 
   void main() {
@@ -419,19 +440,21 @@ const VERT = (displace: string) => `
     vec3 p = position;
     ${displace}
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = aSize * uScale * (300.0 / max(-mv.z, 0.001));
+    float ps = aSize * uScale * uDpr / max(-mv.z, 0.15);
+    gl_PointSize = clamp(ps, 0.5, 5.0 * uDpr);
     gl_Position = projectionMatrix * mv;
   }
 `;
 
 const FRAG = `
+  uniform float uAlpha;
   varying vec3 vColor;
   void main() {
     vec2 c = gl_PointCoord - 0.5;
     float d = length(c);
     if (d > 0.5) discard;
     float a = smoothstep(0.5, 0.0, d);
-    gl_FragColor = vec4(vColor, a * 0.92);
+    gl_FragColor = vec4(vColor, a * uAlpha);
   }
 `;
 
@@ -451,7 +474,8 @@ export default function CareerParticles({ variant, className = '' }: Props) {
     const def = BUILDERS[variant]();
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
     renderer.setClearColor(0x000000, 0);
     host.appendChild(renderer.domElement);
     renderer.domElement.style.width = '100%';
@@ -461,7 +485,7 @@ export default function CareerParticles({ variant, className = '' }: Props) {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(def.camera.fov, 1, 0.1, 100);
     camera.position.set(def.camera.x, def.camera.y, def.camera.z);
-    camera.lookAt(0, def.camera.lookY, 0);
+    camera.lookAt(0, def.camera.lookY, def.camera.lookZ ?? 0);
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(def.positions, 3));
@@ -472,7 +496,9 @@ export default function CareerParticles({ variant, className = '' }: Props) {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
-        uScale: { value: 1 },
+        uScale: { value: def.pointScale },
+        uDpr: { value: dpr },
+        uAlpha: { value: def.alpha },
       },
       vertexShader: VERT(def.displace),
       fragmentShader: FRAG,
@@ -493,8 +519,6 @@ export default function CareerParticles({ variant, className = '' }: Props) {
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      // Keep point density consistent across viewport sizes
-      material.uniforms.uScale.value = Math.min(1.6, Math.max(0.55, h / 900));
     };
     resize();
 

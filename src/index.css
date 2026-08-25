@@ -465,6 +465,22 @@ h4,
   width: 100%;
 }
 
+/* Soft dark scrim keeps copy readable where particles sit behind it */
+.ce-hero .ce-inner::before,
+.ce-cta-section .ce-inner::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 46rem;
+  height: 26rem;
+  max-width: 95vw;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.45) 55%, transparent 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
 .ce-center {
   text-align: center;
   display: flex;
@@ -673,7 +689,7 @@ h4,
 }
 
 .ce-galaxy-body {
-  margin-top: 20rem;
+  margin-top: 15rem;
 }
 
 /* ── Stats / helix ── */
