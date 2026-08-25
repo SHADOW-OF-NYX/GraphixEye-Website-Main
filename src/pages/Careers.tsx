@@ -52,13 +52,9 @@ function GhostButton({ children, href }: { children: React.ReactNode; href: stri
   );
 }
 
-function Scene({ variant }: { variant: SceneVariant }) {
-  return (
-    <Suspense fallback={null}>
-      <CareerParticles variant={variant} className="ce-scene" />
-    </Suspense>
-  );
-}
+/** Shapes morphed across the scroll track, one per section in order. */
+const MORPH_VARIANTS: SceneVariant[] = ['ring', 'wave', 'galaxy', 'helix'];
+const CTA_VARIANT: SceneVariant[] = ['vortex'];
 
 /* ── Job listing card ── */
 
@@ -136,9 +132,24 @@ export default function Careers() {
 
   return (
     <div className="ce-page" data-nav-tone="dark">
+      {/*
+        Morph track: one sticky canvas behind four scrolling sections.
+        Particles morph ring → wave → galaxy → helix as the track scrolls.
+      */}
+      <div className="ce-morph-track">
+        <div className="ce-morph-canvas">
+          <Suspense fallback={null}>
+            <CareerParticles
+              variants={MORPH_VARIANTS}
+              scrollTrack=".ce-morph-track"
+              className="ce-scene"
+            />
+          </Suspense>
+        </div>
+
+        <div className="ce-morph-content">
       {/* ── Hero: glowing ring ── */}
       <section className="ce-section ce-hero">
-        <Scene variant="ring" />
         <div className="ce-inner ce-center">
           <Badge>Welcome to the team</Badge>
           <h1 className="ce-h1 ce-shimmer">
@@ -159,7 +170,6 @@ export default function Careers() {
 
       {/* ── Growth: wave terrain ── */}
       <section className="ce-section ce-wave-section" id="life">
-        <Scene variant="wave" />
         <div className="ce-inner ce-split">
           <div className="ce-split-left">
             <Badge>The pull of growth</Badge>
@@ -187,7 +197,6 @@ export default function Careers() {
 
       {/* ── Teams: galaxy ── */}
       <section className="ce-section ce-galaxy-section">
-        <Scene variant="galaxy" />
         <div className="ce-inner ce-center ce-galaxy-inner">
           <Badge>Our team ecosystem</Badge>
           <h2 className="ce-h2 ce-shimmer">
@@ -209,7 +218,6 @@ export default function Careers() {
 
       {/* ── Stats: DNA helix with glass cards ── */}
       <section className="ce-section ce-helix-section">
-        <Scene variant="helix" />
         <div className="ce-inner ce-helix-inner">
           <div className="ce-stat-card ce-stat-card--left">
             <p className="ce-stat-label">Established</p>
@@ -234,6 +242,8 @@ export default function Careers() {
           </div>
         </div>
       </section>
+        </div>
+      </div>
 
       {/* ── Open roles ── */}
       <section className="ce-section ce-roles-section" id="open-roles">
@@ -271,7 +281,9 @@ export default function Careers() {
 
       {/* ── CTA: vortex ── */}
       <section className="ce-section ce-cta-section">
-        <Scene variant="vortex" />
+        <Suspense fallback={null}>
+          <CareerParticles variants={CTA_VARIANT} className="ce-scene" />
+        </Suspense>
         <div className="ce-inner ce-center">
           <Badge>Nothing that fits?</Badge>
           <h2 className="ce-h2 ce-shimmer">

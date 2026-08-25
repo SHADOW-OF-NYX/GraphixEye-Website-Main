@@ -444,16 +444,50 @@ h4,
 .ce-section {
   position: relative;
   isolation: isolate;
+}
+
+/* Only the standalone CTA scene paints its own background */
+.ce-cta-section,
+.ce-roles-section {
   overflow: hidden;
   background: #000;
 }
 
-/* Particle canvas sits behind the content of each section */
+/* Particle canvas fills its host */
 .ce-scene {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+/*
+ * Morph track — a single sticky canvas stays pinned for the height of the
+ * track while the four content sections scroll over it. The negative margin
+ * pulls the content back up over the space the sticky canvas reserves.
+ */
+.ce-morph-track {
+  position: relative;
+  background: #000;
+}
+
+.ce-morph-canvas {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  z-index: 0;
+}
+
+.ce-morph-content {
+  position: relative;
+  z-index: 2;
+  margin-top: -100vh;
+}
+
+/* Sections inside the track must stay transparent to reveal the canvas */
+.ce-morph-content .ce-section {
+  background: transparent;
 }
 
 .ce-inner {
