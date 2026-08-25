@@ -133,150 +133,19 @@ h4,
 /* ─── Mirror Hall page shell ─── */
 .mh-page {
   min-height: 100vh;
-  background: #05040a;
-  padding-top: 7rem;
-  padding-bottom: 4rem;
+  background: #05040d;
 }
 
-/* Filter bar */
-.mh-filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  padding: 0 1.5rem 2rem;
-}
-
-.mh-filter-pill {
-  height: 2.25rem;
-  padding: 0 1rem;
-  border-radius: 9999px;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: background 140ms, color 140ms, border-color 140ms;
-  cursor: pointer;
-}
-
-.mh-filter-pill:hover {
-  background: rgba(255, 255, 255, 0.11);
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.mh-filter-pill--active {
-  background: #fff;
-  color: #05040a;
-  border-color: #fff;
-}
-
-/* Mirror Hall header */
-.mh-header {
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  padding: 2.5rem 1rem 2rem;
-}
-
-.mh-eyebrow {
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.35);
-  margin-bottom: 0.75rem;
-}
-
-.mh-title {
-  font-family: var(--font-display, serif);
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 400;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  margin-bottom: 0.6rem;
-}
-
-.mh-subtitle {
-  font-size: 0.83rem;
-  color: rgba(255, 255, 255, 0.38);
-  letter-spacing: 0.01em;
-}
-
-/* Card label above card */
-.mh-card-label {
-  text-align: center;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
-  margin-bottom: 0.55rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 0 0.25rem;
-  transition: color 80ms linear;
-}
-
-/* Footer: counter + active name + dots */
-.mh-footer {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 1.5rem 1rem 2.5rem;
-}
-
-.mh-counter {
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.mh-counter-num {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.mh-active-name {
-  font-size: clamp(1.1rem, 3vw, 1.7rem);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #fff;
-  font-weight: 400;
-  text-align: center;
-}
-
-.mh-dots {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.mh-dot {
-  width: 0.3rem;
-  height: 0.3rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
-  transition: background 200ms, transform 200ms;
-}
-
-.mh-dot--active {
-  background: rgba(255, 255, 255, 0.9);
-  transform: scale(1.4);
-}
-
-/* Mirror Hall — 3D reflective carousel stage */
+/* Mirror Hall — full-bleed section */
 .mirror-hall {
   position: relative;
-  background: #07060d;
+  min-height: 100vh;
+  background: #05040d;
   color: #fff;
   isolation: isolate;
-  border-radius: 1.25rem;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .mirror-hall-ambient {
@@ -284,19 +153,104 @@ h4,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(70% 45% at 50% 22%, rgba(80, 60, 180, 0.18), transparent 60%),
-    radial-gradient(50% 35% at 12% 85%, rgba(255, 68, 58, 0.09), transparent 60%),
-    radial-gradient(45% 30% at 90% 75%, rgba(120, 80, 255, 0.07), transparent 55%);
+    radial-gradient(65% 50% at 50% 0%, rgba(55, 40, 160, 0.35), transparent 55%),
+    radial-gradient(50% 35% at 10% 90%, rgba(255, 50, 40, 0.08), transparent 60%),
+    radial-gradient(40% 28% at 92% 80%, rgba(100, 60, 220, 0.07), transparent 55%);
+  z-index: 0;
 }
 
+/* Header */
+.mh-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 6rem 1rem 2.5rem;
+}
+
+.mh-eyebrow {
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.32);
+  margin-bottom: 0.85rem;
+}
+
+.mh-title {
+  font-family: var(--font-display, serif);
+  font-size: clamp(2.2rem, 5.5vw, 4rem);
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 0.55rem;
+}
+
+.mh-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.01em;
+  margin-bottom: 2rem;
+}
+
+/* Filter bar */
+.mh-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.mh-filter-pill {
+  height: 2rem;
+  padding: 0 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: background 140ms, color 140ms, border-color 140ms;
+  cursor: pointer;
+}
+
+.mh-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mh-filter-pill--active {
+  background: rgba(255, 255, 255, 0.9);
+  color: #05040d;
+  border-color: transparent;
+}
+
+/* Card label above card */
+.mh-card-label {
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 0.2rem;
+  transition: color 80ms linear;
+}
+
+/* Carousel stage */
 .mirror-hall-stage {
-  min-height: min(72vh, 640px);
-  padding: 1rem 0 6.5rem;
+  flex: 1;
+  padding: 0.5rem 0 7rem;
+  position: relative;
 }
 
 .mirror-hall-perspective {
   perspective: 1400px;
-  perspective-origin: 50% 42%;
+  perspective-origin: 50% 44%;
 }
 
 .mirror-hall-track {
@@ -311,10 +265,10 @@ h4,
 }
 
 .mirror-hall-panel {
-  border-radius: 1rem;
-  background: #0e0c16;
+  border-radius: 0.85rem;
+  background: #0d0b18;
   box-shadow:
-    0 28px 60px rgba(0, 0, 0, 0.6),
+    0 32px 70px rgba(0, 0, 0, 0.65),
     0 0 0 1px rgba(255, 255, 255, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
   transform-style: preserve-3d;
@@ -326,9 +280,9 @@ h4,
   inset: 0;
   border-radius: inherit;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 42%, transparent 58%, rgba(255, 255, 255, 0.04));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.09), transparent 42%, transparent 58%, rgba(255, 255, 255, 0.04));
   mix-blend-mode: screen;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .mirror-hall-reflection {
@@ -336,28 +290,75 @@ h4,
   left: 0;
   right: 0;
   top: calc(100% + 2px);
-  height: 48%;
+  height: 50%;
   overflow: hidden;
   transform: scaleY(-1);
   transform-origin: center top;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 80%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45), transparent 80%);
-  filter: blur(0.5px) brightness(0.6) saturate(0.8);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.48), transparent 78%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.48), transparent 78%);
+  filter: blur(0.5px) brightness(0.55) saturate(0.8);
 }
 
 .mirror-hall-floor {
   pointer-events: none;
   position: absolute;
-  left: 8%;
-  right: 8%;
-  bottom: 5.5rem;
-  height: 26%;
-  background:
-    linear-gradient(to top, rgba(7, 6, 13, 0.95), transparent),
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  left: 0;
+  right: 0;
+  bottom: 5rem;
+  height: 30%;
+  background: linear-gradient(to top, rgba(5, 4, 13, 0.98) 30%, transparent);
+}
+
+/* Footer: counter + active name + dots */
+.mh-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 3rem;
+}
+
+.mh-counter {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.mh-counter-num {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.mh-active-name {
+  font-size: clamp(1rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  font-weight: 400;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.mh-dots {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.mh-dot {
+  width: 0.28rem;
+  height: 0.28rem;
   border-radius: 50%;
-  filter: blur(20px);
-  opacity: 0.95;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 200ms, transform 200ms, width 200ms;
+}
+
+.mh-dot--active {
+  background: rgba(255, 255, 255, 0.88);
+  width: 1rem;
+  border-radius: 0.14rem;
 }
 
 @media (max-width: 640px) {
@@ -365,11 +366,7 @@ h4,
     perspective: 900px;
   }
 
-  .mirror-hall-stage {
-    padding-bottom: 4.5rem;
-  }
-
-  .mh-page {
+  .mh-header {
     padding-top: 5.5rem;
   }
 }

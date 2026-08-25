@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Placeholder } from '../components/ui';
 import { bannerCropSlugs, workFilters, works, type WorkCategory } from '../data/works';
 
-const CARD_GAP = 24;
+const CARD_GAP = 20;
 const SPEED = 0.38;
-const MAX_ROTATE = 38;
-const MAX_Z = 160;
+const MAX_ROTATE = 40;
+const MAX_Z = 180;
 
 export default function Showcase() {
   const [filter, setFilter] = useState<(typeof workFilters)[number]>('All Projects');
@@ -73,11 +73,11 @@ export default function Showcase() {
     cards.forEach((card, i) => {
       const cardCenter = trackRect.left + card.offsetLeft + card.offsetWidth / 2;
       const delta = (cardCenter - centerX) / Math.max(card.offsetWidth, 1);
-      const rotateY = Math.max(-MAX_ROTATE, Math.min(MAX_ROTATE, -delta * 22));
-      const abs = Math.min(Math.abs(delta), 2.4);
-      const translateZ = MAX_Z * (1 - abs / 2.4);
-      const scale = 0.84 + 0.16 * (1 - abs / 2.4);
-      const opacity = 0.38 + 0.62 * (1 - Math.min(abs, 1.8) / 1.8);
+      const rotateY = Math.max(-MAX_ROTATE, Math.min(MAX_ROTATE, -delta * 24));
+      const abs = Math.min(Math.abs(delta), 2.5);
+      const translateZ = MAX_Z * (1 - abs / 2.5);
+      const scale = 0.82 + 0.18 * (1 - abs / 2.5);
+      const opacity = 0.32 + 0.68 * (1 - Math.min(abs, 1.8) / 1.8);
 
       card.style.transform = `translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
       card.style.opacity = String(opacity);
@@ -93,7 +93,6 @@ export default function Showcase() {
       }
     });
 
-    // Map closestIdx back to filtered (not looped) index
     if (filtered.length > 0) {
       const trueIdx = closestIdx % filtered.length;
       setActiveIndex(trueIdx);
@@ -161,27 +160,13 @@ export default function Showcase() {
     pausedRef.current = paused;
   };
 
-  const dotCount = Math.min(filtered.length, 10);
+  const dotCount = Math.min(filtered.length, 12);
   const dotActive = activeIndex % dotCount;
 
   return (
     <div className="mh-page">
-      {/* Filter bar */}
-      <div className="mh-filter-bar">
-        {workFilters.map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setFilter(item)}
-            className={`mh-filter-pill ${filter === item ? 'mh-filter-pill--active' : ''}`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-
-      {/* Mirror Hall section */}
-      <section className="mirror-hall mx-4 md:mx-8 card-r overflow-hidden">
+      {/* Full-bleed mirror hall */}
+      <section className="mirror-hall">
         <div className="mirror-hall-ambient" aria-hidden="true" />
 
         {/* Header */}
@@ -189,6 +174,20 @@ export default function Showcase() {
           <p className="mh-eyebrow">GraphixEye · Services</p>
           <h1 className="mh-title">Mirror Hall</h1>
           <p className="mh-subtitle">Every service, framed and reflected.</p>
+
+          {/* Filter bar inside header */}
+          <div className="mh-filter-bar">
+            {workFilters.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setFilter(item)}
+                className={`mh-filter-pill ${filter === item ? 'mh-filter-pill--active' : ''}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
 
         {looped.length ? (
@@ -203,14 +202,18 @@ export default function Showcase() {
             onPointerCancel={onPointerUp}
           >
             <div className="mirror-hall-perspective">
-              <div ref={trackRef} className="mirror-hall-track flex gap-6 px-8 md:px-16 will-change-transform">
+              <div
+                ref={trackRef}
+                style={{ gap: CARD_GAP }}
+                className="mirror-hall-track flex px-12 md:px-24 will-change-transform"
+              >
                 {looped.map((work) => (
                   <Link
                     key={work.loopKey}
                     to={`/services/${work.slug}`}
                     data-flash-card
                     data-nav-tone="dark"
-                    className="mirror-hall-card group relative shrink-0 w-[160px] sm:w-[200px] md:w-[240px]"
+                    className="mirror-hall-card group relative shrink-0 w-[140px] sm:w-[175px] md:w-[210px]"
                     onClick={(e) => {
                       if (Math.abs(velocityRef.current) > 0.8) e.preventDefault();
                     }}
@@ -220,7 +223,7 @@ export default function Showcase() {
                     <p className="mh-card-label">{work.title}</p>
 
                     <div className="relative">
-                      <div className="mirror-hall-panel relative h-[280px] sm:h-[340px] md:h-[400px] overflow-hidden">
+                      <div className="mirror-hall-panel relative h-[260px] sm:h-[320px] md:h-[380px] overflow-hidden">
                         <Placeholder
                           src={work.image}
                           label={work.title}
@@ -231,7 +234,7 @@ export default function Showcase() {
                         <div className="mirror-hall-rim" aria-hidden="true" />
                       </div>
                       <div data-hall-mirror className="mirror-hall-reflection pointer-events-none" aria-hidden="true">
-                        <div className="relative h-[280px] sm:h-[340px] md:h-[400px] overflow-hidden rounded-[1.15rem]">
+                        <div className="relative h-[260px] sm:h-[320px] md:h-[380px] overflow-hidden rounded-[1rem]">
                           <Placeholder
                             src={work.image}
                             label=""
