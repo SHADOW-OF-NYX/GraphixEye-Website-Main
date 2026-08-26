@@ -76,19 +76,18 @@ const SHAPES: {
   lookY: number
   fov: number
   cageOpa: number
-  pinkBias: number
   noiseAmp: number
 }[] = [
   // Opening eye — centered
-  { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  noiseAmp: 0.008 },
+  { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, noiseAmp: 0.008 },
   // AI face — cam right so mesh sits left; copy on right
-  { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, noiseAmp: 0.006 },
+  { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, noiseAmp: 0.006 },
   // AR hologram — low-angle hero, model faces camera, staged right / copy left
-  { name: 'holo',   cameraX: -0.28, cameraY: -0.38, cameraZ: 2.58, lookX: 0.36,  lookY: 0.18, fov: 38, cageOpa: 0.05, pinkBias: 0.2,  noiseAmp: 0.005 },
+  { name: 'holo',   cameraX: -0.28, cameraY: -0.38, cameraZ: 2.58, lookX: 0.36,  lookY: 0.18, fov: 38, cageOpa: 0.05, noiseAmp: 0.005 },
   // VR Quest 3 — 3/4 angle, zoomed; headset on left, copy on right
-  { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, noiseAmp: 0.01 },
+  { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, noiseAmp: 0.01 },
   // MR bonsai — 3/4 angle on the right; copy on left
-  { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, pinkBias: 0.12, noiseAmp: 0.008 },
+  { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, noiseAmp: 0.008 },
 ]
 
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
@@ -111,9 +110,113 @@ const _hsl = { h: 0, s: 0, l: 0 }
  * numbers by hand renders roughly twice as light as intended.
  */
 const INK_GRAPHITE = new THREE.Color('#17141a')
-const INK_ROSE = new THREE.Color('#b03047')
 const INK_RED = new THREE.Color('#8f1f16')
 const INK_INDIGO = new THREE.Color('#1f2a6b')
+
+type Stop = [number, THREE.Color]
+
+/*
+ * Service models are painted from brand ramps rather than their baked palettes.
+ * Hues stay deep — a light tint would disappear against cream — so these sit in
+ * the saturated mid-dark band where they read as colour and still hold form.
+ */
+const RAMP_FACE: Stop[] = [
+  [0.0, new THREE.Color('#2a1a6e')],
+  [0.34, new THREE.Color('#6a1fb0')],
+  [0.6, new THREE.Color('#b5179e')],
+  [0.84, new THREE.Color('#c8203a')],
+  [1.0, new THREE.Color('#cf4420')],
+]
+
+const RAMP_HOLO: Stop[] = [
+  [0.0, new THREE.Color('#1c2a78')],
+  [0.42, new THREE.Color('#3448c8')],
+  [0.72, new THREE.Color('#6a1fb0')],
+  [1.0, new THREE.Color('#b5179e')],
+]
+
+// Vivid end first: the headset's far side sits behind the copy panel
+const RAMP_QUEST: Stop[] = [
+  [0.0, new THREE.Color('#a8228c')],
+  [0.34, new THREE.Color('#7226b5')],
+  [0.7, new THREE.Color('#2f3fae')],
+  [1.0, new THREE.Color('#14205e')],
+]
+
+// Warm earth at the trunk lifting into digital magenta/violet in the canopy
+const RAMP_BONSAI: Stop[] = [
+  [0.0, new THREE.Color('#4a2410')],
+  [0.32, new THREE.Color('#8f3416')],
+  [0.52, new THREE.Color('#b01228')],
+  [0.74, new THREE.Color('#8f1470')],
+  [1.0, new THREE.Color('#4a1f96')],
+]
+
+const SERVICE_RAMPS: Record<Exclude<ShapeName, 'eye'>, { stops: Stop[]; axis: 'x' | 'y' }> = {
+  face: { stops: RAMP_FACE, axis: 'y' },
+  holo: { stops: RAMP_HOLO, axis: 'y' },
+  quest: { stops: RAMP_QUEST, axis: 'x' },
+  bonsai: { stops: RAMP_BONSAI, axis: 'y' },
+}
+
+function rampAt(stops: Stop[], t: number): THREE.Color {
+  const x = Math.max(0, Math.min(1, t))
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [p0, c0] = stops[i]
+    const [p1, c1] = stops[i + 1]
+    if (x >= p0 && x <= p1) {
+      const k = p1 === p0 ? 0 : (x - p0) / (p1 - p0)
+      return _c.copy(c0).lerp(c1, k)
+    }
+  }
+  return _c.copy(stops[stops.length - 1][1])
+}
+
+/**
+ * Paint a model from a brand ramp spread along one axis. The baked palette is
+ * still consulted for luminance only, darkening the model's shadowed areas so
+ * its form survives — colour comes entirely from the ramp.
+ */
+function colorizeShape(
+  positions: Float32Array,
+  bakedColors: Float32Array | null,
+  stops: Stop[],
+  axis: 'x' | 'y',
+): Float32Array {
+  const out = new Float32Array(N * 3)
+  const offset = axis === 'x' ? 0 : 1
+
+  let min = Infinity
+  let max = -Infinity
+  for (let i = 0; i < N; i++) {
+    const v = positions[i * 3 + offset]
+    if (v < min) min = v
+    if (v > max) max = v
+  }
+  const span = Math.max(1e-5, max - min)
+
+  const usable = bakedColors && bakedColors.length === N * 3 ? bakedColors : null
+
+  for (let i = 0; i < N; i++) {
+    const i3 = i * 3
+    const c = rampAt(stops, (positions[i3 + offset] - min) / span)
+
+    let k = 1
+    if (usable) {
+      const lum = 0.2126 * usable[i3] + 0.7152 * usable[i3 + 1] + 0.0722 * usable[i3 + 2]
+      k = 0.34 + 0.66 * Math.min(1, lum * 2.2)
+    }
+    // Per-particle jitter breaks up banding, capped at the ramp value so
+    // highlights never brighten past it and wash out against the cream
+    k = Math.min(1, k * (0.9 + Math.random() * 0.2))
+
+    out[i3] = c.r * k
+    out[i3 + 1] = c.g * k
+    out[i3 + 2] = c.b * k
+  }
+
+  return out
+}
 
 /**
  * Baked model colours were authored bright-on-dark. On the cream page they must
@@ -134,16 +237,6 @@ function inkify(src: Float32Array): Float32Array {
     out[i + 2] = _c.b
   }
   return out
-}
-
-function paintColors(colors: Float32Array, pinkBias: number) {
-  for (let i = 0; i < N; i++) {
-    const src = Math.random() < pinkBias ? INK_ROSE : INK_GRAPHITE
-    const jitter = 0.78 + Math.random() * 0.44
-    colors[i * 3] = src.r * jitter
-    colors[i * 3 + 1] = src.g * jitter
-    colors[i * 3 + 2] = src.b * jitter
-  }
 }
 
 function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
@@ -250,28 +343,25 @@ export default function ThreeScene() {
       composer.addPass(new RenderPass(scene, camera))
       disposeList.push(() => composer.dispose())
 
-      // Ink-mapped copies of the baked palettes (baked buffers stay untouched)
-      const ink = {
-        eye: baked?.eyeColors ? inkify(baked.eyeColors) : null,
-        face: baked?.faceColors ? inkify(baked.faceColors) : null,
-        holo: baked?.holoColors ? inkify(baked.holoColors) : null,
-        quest: baked?.questColors ? inkify(baked.questColors) : null,
-        bonsai: baked?.bonsaiColors ? inkify(baked.bonsaiColors) : null,
+      // The opening eye stays monochrome ink; the services carry the colour
+      const eyeInk = baked?.eyeColors ? inkify(baked.eyeColors) : null
+      const bakedColorsFor: Record<Exclude<ShapeName, 'eye'>, Float32Array | null> = {
+        face: baked?.faceColors ?? null,
+        holo: baked?.holoColors ?? null,
+        quest: baked?.questColors ?? null,
+        bonsai: baked?.bonsaiColors ?? null,
       }
 
       // ── Prefetch all shape targets for scroll scrubbing ──────────────────
       const shapePos = SHAPES.map((s) => resolveShape(s.name, baked))
-      const shapeColors = SHAPES.map((s) => {
-        const c = new Float32Array(N * 3)
-        if (s.name === 'eye') paintEyeRGB(c, ink.eye)
-        else if (s.name === 'face' && ink.face) c.set(ink.face)
-        else if (s.name === 'face') paintEyeRGB(c, null)
-        else if (s.name === 'holo' && ink.holo) c.set(ink.holo)
-        else if (s.name === 'holo') paintColors(c, 0.25)
-        else if (s.name === 'quest' && ink.quest) c.set(ink.quest)
-        else if (s.name === 'bonsai' && ink.bonsai) c.set(ink.bonsai)
-        else paintColors(c, s.pinkBias)
-        return c
+      const shapeColors = SHAPES.map((s, i) => {
+        if (s.name === 'eye') {
+          const c = new Float32Array(N * 3)
+          paintEyeRGB(c, eyeInk)
+          return c
+        }
+        const { stops, axis } = SERVICE_RAMPS[s.name]
+        return colorizeShape(shapePos[i], bakedColorsFor[s.name], stops, axis)
       })
 
       const sizesDefault = new Float32Array(N)
@@ -285,8 +375,10 @@ export default function ThreeScene() {
         if (Math.random() < 0.04) sizesEye[i] = 3.8 + Math.random() * 1.2
         sizesFace[i] = 1.0 + Math.random() * 1.8
         if (Math.random() < 0.035) sizesFace[i] = 3.2 + Math.random() * 1.1
-        sizesBonsai[i] = 0.9 + Math.random() * 1.6
-        if (Math.random() < 0.03) sizesBonsai[i] = 2.8 + Math.random() * 1.0
+        // Largest of the set — the tree spreads N points over thin branches, so
+        // smaller dots leave it too sparse to carry colour against the cream
+        sizesBonsai[i] = 1.45 + Math.random() * 2.1
+        if (Math.random() < 0.03) sizesBonsai[i] = 3.4 + Math.random() * 1.2
       }
       const shapeSizes = SHAPES.map((s) =>
         s.name === 'eye' ? sizesEye
@@ -337,7 +429,7 @@ export default function ThreeScene() {
       posArr.set(initScatter)
       sizes.set(sizesEye)
       alphas.set(baseAlphas)
-      paintEyeRGB(colorsArr, ink.eye)
+      paintEyeRGB(colorsArr, eyeInk)
       if (baked?.eye) eyeLive.set(baked.eye)
       // Blink weights read the raw baked palette — its thresholds key off the
       // original bright iris blues, not the ink-mapped versions
