@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Preloader from './components/Preloader';
 import SmoothScroll from './components/SmoothScroll';
+import { PageTransitionProvider } from './components/PageTransition';
 import Home from './pages/Home';
 import Showcase from './pages/Showcase';
 import ServiceDetail from './pages/ServiceDetail';
@@ -69,7 +70,9 @@ export default function App() {
       <ScrollToTop />
       <SmoothScroll />
       <Preloader />
-      <AppShell />
+      <PageTransitionProvider>
+        <AppShell />
+      </PageTransitionProvider>
     </BrowserRouter>
   );
 }

@@ -4,9 +4,18 @@ import { BrandLogo } from './ui';
 import { navLinks, site } from '../data/site';
 import { isDarkBackdrop } from '../lib/backdropContrast';
 import { preloadExpansions } from '../lib/particles/preloadExpansions';
+import { preloadCareers } from '../lib/particles/preloadCareers';
+import { usePageTransition } from './PageTransition';
+
+/** Routes whose heavy chunks are worth warming the moment a link is hovered. */
+const PRELOADERS: Record<string, () => void> = {
+  '/expansions': preloadExpansions,
+  '/careers': preloadCareers,
+};
 
 export default function Navbar() {
   const location = useLocation();
+  const { navigateWithVeil } = usePageTransition();
   const navRef = useRef<HTMLElement>(null);
   const onDarkRef = useRef(location.pathname === '/');
   const [onDark, setOnDark] = useState(location.pathname === '/');
@@ -61,13 +70,24 @@ export default function Navbar() {
 
   const text = onDark ? 'text-ll-white' : 'text-black';
 
+  // Let modified clicks (new tab, etc.) and same-page clicks behave normally
+  const handleNav = (event: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+      return;
+    }
+    if (path === location.pathname) return;
+
+    event.preventDefault();
+    navigateWithVeil(path, { x: event.clientX, y: event.clientY });
+  };
+
   return (
     <nav
       ref={navRef}
       className={`fixed top-0 left-0 w-full z-50 px-5 md:px-8 py-5 transition-colors duration-500 ${text}`}
     >
       <div className="max-w-[1600px] mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center">
+        <Link to="/" className="flex items-center" onClick={(e) => handleNav(e, '/')}>
           <BrandLogo className="h-12 md:h-14" onDark={onDark} />
         </Link>
 
@@ -76,8 +96,9 @@ export default function Navbar() {
             <Link
               key={link.name}
               to={link.path}
-              onMouseEnter={link.path === '/expansions' ? () => preloadExpansions() : undefined}
-              onFocus={link.path === '/expansions' ? () => preloadExpansions() : undefined}
+              onMouseEnter={PRELOADERS[link.path]}
+              onFocus={PRELOADERS[link.path]}
+              onClick={(e) => handleNav(e, link.path)}
               className={`h-[42px] px-4 inline-flex items-center text-[16px] transition-colors ${
                 location.pathname === link.path ||
                 (link.path === '/services' && location.pathname.startsWith('/services')) ||
@@ -93,6 +114,7 @@ export default function Navbar() {
 
         <Link
           to="/contact"
+          onClick={(e) => handleNav(e, '/contact')}
           className={`hidden md:inline-flex items-center h-[44px] px-6 text-[14px] pill transition-all duration-300 ${
             onDark
               ? 'bg-ll-white text-black hover:bg-ll-highlight hover:text-ll-white'
