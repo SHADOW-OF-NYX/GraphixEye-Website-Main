@@ -638,7 +638,14 @@ export default function ThreeScene() {
 
       const tick = () => {
         rafId = requestAnimationFrame(tick)
-        const delta = clock.getDelta()
+        /*
+         * Clamped to two frames' worth. Particle noise, the blink clock and the
+         * face loop all advance by delta, so one long frame — a GC pause, a
+         * texture upload, a backgrounded tab — would step the noise phase far
+         * enough to pop every particle at once. Better to lose a little time
+         * during a hitch than to jump.
+         */
+        const delta = Math.min(clock.getDelta(), 1 / 30)
         elapsed += delta
 
         cage.rotation.y = 0.08 + Math.sin(elapsed * 0.25) * 0.04
