@@ -49,7 +49,9 @@ const FRAGMENT_SHADER = /* glsl */`
     float dist = length(uv);
     if (dist > 0.5) discard;
 
-    float alpha = (1.0 - smoothstep(0.22, 0.50, dist)) * vAlpha;
+    // Wider solid core than the dark theme — a mostly-feathered dot disappears
+    // against cream once additive blending is gone
+    float alpha = (1.0 - smoothstep(0.34, 0.50, dist)) * vAlpha;
 
     if (vIsSparkle > 0.5) {
       float h = max(0.0, 1.0 - abs(uv.y) * 14.0) * max(0.0, 1.0 - abs(uv.x) * 2.2);
@@ -75,19 +77,18 @@ const SHAPES: {
   fov: number
   cageOpa: number
   pinkBias: number
-  bloom: number
   noiseAmp: number
 }[] = [
   // Opening eye — centered
-  { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  bloom: 0.75, noiseAmp: 0.008 },
+  { name: 'eye',    cameraX: 0.0,  cameraY: 0.05, cameraZ: 4.4, lookX: 0.0,  lookY: 0.0,  fov: 50, cageOpa: 0.12, pinkBias: 0.0,  noiseAmp: 0.008 },
   // AI face — cam right so mesh sits left; copy on right
-  { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, bloom: 0.7,  noiseAmp: 0.006 },
+  { name: 'face',   cameraX: 0.72, cameraY: 0.08, cameraZ: 3.15, lookX: -0.25, lookY: 0.05, fov: 46, cageOpa: 0.06, pinkBias: 0.15, noiseAmp: 0.006 },
   // AR hologram — low-angle hero, model faces camera, staged right / copy left
-  { name: 'holo',   cameraX: -0.28, cameraY: -0.38, cameraZ: 2.58, lookX: 0.36,  lookY: 0.18, fov: 38, cageOpa: 0.05, pinkBias: 0.2,  bloom: 0.88, noiseAmp: 0.005 },
+  { name: 'holo',   cameraX: -0.28, cameraY: -0.38, cameraZ: 2.58, lookX: 0.36,  lookY: 0.18, fov: 38, cageOpa: 0.05, pinkBias: 0.2,  noiseAmp: 0.005 },
   // VR Quest 3 — 3/4 angle, zoomed; headset on left, copy on right
-  { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, bloom: 0.95, noiseAmp: 0.01 },
+  { name: 'quest',  cameraX: 0.58, cameraY: 0.16, cameraZ: 3.55, lookX: -0.32, lookY: -0.05, fov: 42, cageOpa: 0.04, pinkBias: 0.55, noiseAmp: 0.01 },
   // MR bonsai — 3/4 angle on the right; copy on left
-  { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, pinkBias: 0.12, bloom: 0.55, noiseAmp: 0.008 },
+  { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, pinkBias: 0.12, noiseAmp: 0.008 },
 ]
 
 function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
@@ -100,20 +101,48 @@ function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array
   }
 }
 
+const _c = new THREE.Color()
+const _hsl = { h: 0, s: 0, l: 0 }
+
+/*
+ * Particle colours go straight into a buffer attribute, so the shader reads them
+ * as LINEAR values and the renderer gamma-encodes on output. Authoring these as
+ * THREE.Color from hex does the sRGB → linear conversion for us; picking the
+ * numbers by hand renders roughly twice as light as intended.
+ */
+const INK_GRAPHITE = new THREE.Color('#17141a')
+const INK_ROSE = new THREE.Color('#b03047')
+const INK_RED = new THREE.Color('#8f1f16')
+const INK_INDIGO = new THREE.Color('#1f2a6b')
+
+/**
+ * Baked model colours were authored bright-on-dark. On the cream page they must
+ * read as ink, so lightness is compressed into a dark band — order is preserved
+ * (highlights stay the lighter end) rather than inverted, which turned mid-tone
+ * models like the bonsai into pale washes. Saturation is lifted so hues survive
+ * the darkening. Returns a new array — baked buffers are cached and shared.
+ */
+function inkify(src: Float32Array): Float32Array {
+  const out = new Float32Array(src.length)
+  for (let i = 0; i < src.length; i += 3) {
+    _c.setRGB(src[i], src[i + 1], src[i + 2])
+    _c.getHSL(_hsl)
+    // Band chosen in linear terms: ~0.12–0.42 once gamma-encoded for display
+    _c.setHSL(_hsl.h, Math.min(1, _hsl.s * 1.45), 0.01 + _hsl.l * 0.14)
+    out[i] = _c.r
+    out[i + 1] = _c.g
+    out[i + 2] = _c.b
+  }
+  return out
+}
+
 function paintColors(colors: Float32Array, pinkBias: number) {
   for (let i = 0; i < N; i++) {
-    const usePink = Math.random() < pinkBias
-    if (usePink) {
-      const t = Math.random()
-      colors[i * 3]     = 0.83 + t * 0.10
-      colors[i * 3 + 1] = 0.45 + t * 0.22
-      colors[i * 3 + 2] = 0.88 + t * 0.08
-    } else {
-      const v = 0.92 + Math.random() * 0.08
-      colors[i * 3] = v
-      colors[i * 3 + 1] = v
-      colors[i * 3 + 2] = v
-    }
+    const src = Math.random() < pinkBias ? INK_ROSE : INK_GRAPHITE
+    const jitter = 0.78 + Math.random() * 0.44
+    colors[i * 3] = src.r * jitter
+    colors[i * 3 + 1] = src.g * jitter
+    colors[i * 3 + 2] = src.b * jitter
   }
 }
 
@@ -124,14 +153,11 @@ function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
   }
   for (let i = 0; i < N; i++) {
     const roll = Math.random()
-    if (roll < 0.34) {
-      colors[i * 3] = 1; colors[i * 3 + 1] = 0.18; colors[i * 3 + 2] = 0.14
-    } else if (roll < 0.68) {
-      colors[i * 3] = 0.28; colors[i * 3 + 1] = 0.48; colors[i * 3 + 2] = 1
-    } else {
-      const v = 0.92 + Math.random() * 0.08
-      colors[i * 3] = v; colors[i * 3 + 1] = v; colors[i * 3 + 2] = v
-    }
+    const src = roll < 0.34 ? INK_RED : roll < 0.68 ? INK_INDIGO : INK_GRAPHITE
+    const jitter = 0.78 + Math.random() * 0.44
+    colors[i * 3] = src.r * jitter
+    colors[i * 3 + 1] = src.g * jitter
+    colors[i * 3 + 2] = src.b * jitter
   }
 }
 
@@ -194,7 +220,6 @@ export default function ThreeScene() {
     const init = async () => {
       const { EffectComposer } = await import('three/examples/jsm/postprocessing/EffectComposer.js')
       const { RenderPass } = await import('three/examples/jsm/postprocessing/RenderPass.js')
-      const { UnrealBloomPass } = await import('three/examples/jsm/postprocessing/UnrealBloomPass.js')
       if (cancelled) return
 
       let baked: BakedTargets | null = null
@@ -217,27 +242,34 @@ export default function ThreeScene() {
       const lookTarget = new THREE.Vector3(SHAPES[0].lookX, SHAPES[0].lookY, 0)
       camera.lookAt(lookTarget)
 
+      /*
+       * No bloom on the light theme — bloom adds light, which only washes the
+       * cream background out and erases the ink particles.
+       */
       const composer = new EffectComposer(renderer)
       composer.addPass(new RenderPass(scene, camera))
-      const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.15, 0.55, 0.12,
-      )
-      composer.addPass(bloomPass)
       disposeList.push(() => composer.dispose())
-      bloomPass.strength = SHAPES[0].bloom
+
+      // Ink-mapped copies of the baked palettes (baked buffers stay untouched)
+      const ink = {
+        eye: baked?.eyeColors ? inkify(baked.eyeColors) : null,
+        face: baked?.faceColors ? inkify(baked.faceColors) : null,
+        holo: baked?.holoColors ? inkify(baked.holoColors) : null,
+        quest: baked?.questColors ? inkify(baked.questColors) : null,
+        bonsai: baked?.bonsaiColors ? inkify(baked.bonsaiColors) : null,
+      }
 
       // ── Prefetch all shape targets for scroll scrubbing ──────────────────
       const shapePos = SHAPES.map((s) => resolveShape(s.name, baked))
       const shapeColors = SHAPES.map((s) => {
         const c = new Float32Array(N * 3)
-        if (s.name === 'eye') paintEyeRGB(c, baked?.eyeColors ?? null)
-        else if (s.name === 'face' && baked?.faceColors) c.set(baked.faceColors)
+        if (s.name === 'eye') paintEyeRGB(c, ink.eye)
+        else if (s.name === 'face' && ink.face) c.set(ink.face)
         else if (s.name === 'face') paintEyeRGB(c, null)
-        else if (s.name === 'holo' && baked?.holoColors) c.set(baked.holoColors)
+        else if (s.name === 'holo' && ink.holo) c.set(ink.holo)
         else if (s.name === 'holo') paintColors(c, 0.25)
-        else if (s.name === 'quest' && baked?.questColors) c.set(baked.questColors)
-        else if (s.name === 'bonsai' && baked?.bonsaiColors) c.set(baked.bonsaiColors)
+        else if (s.name === 'quest' && ink.quest) c.set(ink.quest)
+        else if (s.name === 'bonsai' && ink.bonsai) c.set(ink.bonsai)
         else paintColors(c, s.pinkBias)
         return c
       })
@@ -293,15 +325,22 @@ export default function ThreeScene() {
         faceSpeed[i] = 0.35 + Math.random() * 0.55
         facePhase[i] = Math.random() // stagger the loop
         faceLeave[i] = Math.random() < 0.38 ? 1 : 0 // keep silhouette; ~38% peel off
-        baseAlphas[i] = 0.38 + Math.random() * 0.55
+        /*
+         * Additive blending let faint particles still register as glow. Blending
+         * normally over cream, anything under ~0.6 alpha washes out to nothing,
+         * so the floor is much higher here than in the dark theme.
+         */
+        baseAlphas[i] = 0.62 + Math.random() * 0.34
       }
 
       const initScatter = generateScatterPositions(N)
       posArr.set(initScatter)
       sizes.set(sizesEye)
       alphas.set(baseAlphas)
-      paintEyeRGB(colorsArr, baked?.eyeColors ?? null)
+      paintEyeRGB(colorsArr, ink.eye)
       if (baked?.eye) eyeLive.set(baked.eye)
+      // Blink weights read the raw baked palette — its thresholds key off the
+      // original bright iris blues, not the ink-mapped versions
       const eyeCoreFade = buildEyeCoreFadeWeights(shapePos[0], baked?.eyeColors ?? null)
 
       const geometry = new THREE.BufferGeometry()
@@ -319,7 +358,7 @@ export default function ThreeScene() {
           uScale: { value: 3.0 },
         },
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
+        blending: THREE.NormalBlending,
         transparent: true,
       })
       disposeList.push(() => material.dispose())
@@ -349,15 +388,16 @@ export default function ThreeScene() {
       const gridExtra = new THREE.BufferGeometry()
       gridExtra.setAttribute('position', new THREE.BufferAttribute(new Float32Array(gridLines), 3))
 
+      // Deep tints — the pale purple/blue of the dark theme vanishes on cream
       const cageMat = new THREE.LineBasicMaterial({
-        color: 0xc4a0e8,
+        color: 0x5b3f7a,
         transparent: true,
-        opacity: SHAPES[0].cageOpa,
+        opacity: SHAPES[0].cageOpa * 1.35,
       })
       const gridMat = new THREE.LineBasicMaterial({
-        color: 0x96b4dc,
+        color: 0x3d5c85,
         transparent: true,
-        opacity: SHAPES[0].cageOpa * 0.5,
+        opacity: SHAPES[0].cageOpa * 0.68,
       })
 
       const cage = new THREE.LineSegments(cageEdges, cageMat)
@@ -492,8 +532,8 @@ export default function ThreeScene() {
           camera.updateProjectionMatrix()
         }
 
-        bloomPass.strength += ((a.bloom + (b.bloom - a.bloom) * u) - bloomPass.strength) * 0.055
-        cageMat.opacity += ((a.cageOpa + (b.cageOpa - a.cageOpa) * u) - cageMat.opacity) * 0.055
+        const targetCage = (a.cageOpa + (b.cageOpa - a.cageOpa) * u) * 1.35
+        cageMat.opacity += (targetCage - cageMat.opacity) * 0.055
         gridMat.opacity = cageMat.opacity * 0.5
       }
 

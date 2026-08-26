@@ -19,7 +19,6 @@ export function preloadExpansions(): Promise<void> {
     importThreeScene(),
     import('three/examples/jsm/postprocessing/EffectComposer.js'),
     import('three/examples/jsm/postprocessing/RenderPass.js'),
-    import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
   ])
     .then(() => undefined)
     .catch((err) => {

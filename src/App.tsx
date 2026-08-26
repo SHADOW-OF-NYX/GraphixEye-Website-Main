@@ -27,7 +27,6 @@ function AppShell() {
   const { pathname } = useLocation();
   const isExpansions = pathname === '/expansions';
   const isCareers = pathname === '/careers';
-  const isDark = isExpansions || isCareers;
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -37,11 +36,7 @@ function AppShell() {
   return (
     <div
       className={`font-sans min-h-screen ${
-        isExpansions
-          ? 'text-ll-white bg-[#080f18]'
-          : isCareers
-            ? 'text-ll-white bg-black'
-            : 'text-black bg-ll-white'
+        isCareers ? 'text-ll-white bg-black' : 'text-black bg-ll-white'
       }`}
     >
       <Navbar />
@@ -59,7 +54,7 @@ function AppShell() {
           <Route path="/careers" element={<Careers />} />
         </Routes>
       </main>
-      {!isDark && <Footer />}
+      {!isCareers && <Footer />}
     </div>
   );
 }

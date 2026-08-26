@@ -5,7 +5,8 @@ import { site } from '../data/site';
 
 export default function Footer() {
   return (
-    <footer className="bg-ll-white text-black px-5 md:px-8 pt-16 pb-10">
+    // z-10 keeps the footer above Expansions' fixed particle canvas
+    <footer className="relative z-10 bg-ll-white text-black px-5 md:px-8 pt-16 pb-10">
       <div className="max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-12 pb-16">
           <Link to="/" className="inline-flex items-center">

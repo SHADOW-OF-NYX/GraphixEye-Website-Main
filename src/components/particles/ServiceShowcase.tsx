@@ -86,20 +86,31 @@ export default function ServiceShowcase() {
             data-service={s.id}
             data-side={s.textSide}
           >
+            {/* Cream fade so dark copy stays legible where a model drifts under it */}
+            <span
+              aria-hidden
+              className="absolute -inset-x-10 -inset-y-12 pointer-events-none"
+              style={{
+                zIndex: -1,
+                background: `radial-gradient(ellipse 68% 58% at ${
+                  onLeft ? '28%' : '72%'
+                } 50%, rgba(252,248,241,0.94) 0%, rgba(252,248,241,0.72) 45%, rgba(252,248,241,0) 74%)`,
+              }}
+            />
             <p
-              className="text-white/35 mb-3"
+              className="text-ll-highlight mb-3"
               style={{ fontSize: 11, letterSpacing: '0.18em' }}
             >
               {s.index} — {s.eyebrow.toUpperCase()}
             </p>
             <h2
-              className="text-white font-light uppercase leading-tight mb-4 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]"
+              className="text-black font-light uppercase leading-tight mb-4"
               style={{ fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '0.02em' }}
             >
               {s.title}
             </h2>
             <p
-              className={`text-white/50 leading-relaxed ${onLeft ? '' : 'ml-auto'}`}
+              className={`text-black/55 leading-relaxed ${onLeft ? '' : 'ml-auto'}`}
               style={{ fontSize: 14, letterSpacing: '0.02em', maxWidth: '28rem' }}
             >
               {s.body}
