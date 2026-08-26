@@ -116,43 +116,75 @@ const INK_INDIGO = new THREE.Color('#1f2a6b')
 type Stop = [number, THREE.Color]
 
 /*
- * Each service gets its own hue family so the four models read as distinct
- * chapters rather than one long gradient. Values stay saturated and mid-dark:
- * particles render with normal blending and no bloom over cream, so anything
- * light or desaturated dissolves into the background.
+ * Careers palette, referenced verbatim — the same deep-blue → violet → magenta
+ * → rose → red spectrum every shape on that page sweeps through.
+ *
+ * Those values are authored for additive blending and bloom on black, where
+ * near-white brightness is what makes them glow. Expansions renders with normal
+ * blending and no bloom over cream, so carrying the hex codes across directly
+ * would leave a pale wash. Hue and saturation transfer intact; only lightness is
+ * pulled into a band that holds against a light background.
  */
+const CAREERS_HEX = {
+  deep: '#2563eb',
+  blue: '#4d86ff',
+  violet: '#8b7cff',
+  purple: '#b57cff',
+  magenta: '#d946ef',
+  rose: '#ff5f7a',
+  red: '#ff4d3d',
+} as const
 
-// AI — cold petrol lifting into circuit green
+function forCream(hex: string, lightness: number): THREE.Color {
+  const c = new THREE.Color(hex)
+  // Read and rewrite in sRGB so the lightness figure means what it looks like
+  c.getHSL(_hsl, THREE.SRGBColorSpace)
+  return new THREE.Color().setHSL(_hsl.h, Math.min(1, _hsl.s), lightness, THREE.SRGBColorSpace)
+}
+
+const SPECTRUM = {
+  deep: forCream(CAREERS_HEX.deep, 0.25),
+  blue: forCream(CAREERS_HEX.blue, 0.31),
+  violet: forCream(CAREERS_HEX.violet, 0.35),
+  purple: forCream(CAREERS_HEX.purple, 0.35),
+  magenta: forCream(CAREERS_HEX.magenta, 0.36),
+  rose: forCream(CAREERS_HEX.rose, 0.38),
+  red: forCream(CAREERS_HEX.red, 0.36),
+}
+
+// AI — the full cool-to-warm sweep, as on the Careers ring
 const RAMP_FACE: Stop[] = [
-  [0.0, new THREE.Color('#04261c')],
-  [0.34, new THREE.Color('#0a5334')],
-  [0.66, new THREE.Color('#107a42')],
-  [1.0, new THREE.Color('#1f9636')],
+  [0.0, SPECTRUM.deep],
+  [0.24, SPECTRUM.blue],
+  [0.48, SPECTRUM.violet],
+  [0.72, SPECTRUM.magenta],
+  [1.0, SPECTRUM.rose],
 ]
 
-// AR — projected light: ember at the base burning up to gold
+// AR — warm-weighted, echoing the far end of the Careers wave
 const RAMP_HOLO: Stop[] = [
-  [0.0, new THREE.Color('#54130a')],
-  [0.4, new THREE.Color('#9c3108')],
-  [0.72, new THREE.Color('#c05f0a')],
-  [1.0, new THREE.Color('#c9880f')],
+  [0.0, SPECTRUM.blue],
+  [0.34, SPECTRUM.violet],
+  [0.64, SPECTRUM.magenta],
+  [0.84, SPECTRUM.rose],
+  [1.0, SPECTRUM.red],
 ]
 
-// VR — vivid end first: the headset's far side sits behind the copy panel
+// VR — cool-weighted, vivid end first: the headset's far side sits behind the copy panel
 const RAMP_QUEST: Stop[] = [
-  [0.0, new THREE.Color('#0d7fa8')],
-  [0.36, new THREE.Color('#14489f')],
-  [0.72, new THREE.Color('#232b7d')],
-  [1.0, new THREE.Color('#141546')],
+  [0.0, SPECTRUM.magenta],
+  [0.32, SPECTRUM.purple],
+  [0.66, SPECTRUM.blue],
+  [1.0, SPECTRUM.deep],
 ]
 
-// MR — dark plum trunk opening into fuchsia and violet through the canopy
+// MR — deep trunk opening through violet into a warm canopy
 const RAMP_BONSAI: Stop[] = [
-  [0.0, new THREE.Color('#380d2a')],
-  [0.32, new THREE.Color('#710e49')],
-  [0.58, new THREE.Color('#a81856')],
-  [0.8, new THREE.Color('#96259a')],
-  [1.0, new THREE.Color('#6a2ad0')],
+  [0.0, SPECTRUM.deep],
+  [0.3, SPECTRUM.violet],
+  [0.56, SPECTRUM.magenta],
+  [0.8, SPECTRUM.rose],
+  [1.0, SPECTRUM.red],
 ]
 
 const SERVICE_RAMPS: Record<Exclude<ShapeName, 'eye'>, { stops: Stop[]; axis: 'x' | 'y' }> = {
