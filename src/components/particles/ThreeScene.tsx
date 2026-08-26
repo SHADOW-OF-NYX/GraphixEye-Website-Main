@@ -583,12 +583,19 @@ export default function ThreeScene() {
       const EYE_TOTAL = EYE_OPEN + EYE_CLOSE + EYE_SHUT + EYE_REOPEN + EYE_SETTLE
       let eyeHoldClock = 0
 
+      /*
+       * Both ramps are eased rather than linear. A linear ramp holds constant lid
+       * speed and then stops dead where it meets the flat phases, and that velocity
+       * jump is what read as a jerk at the end of the cycle. Smootherstep leaves
+       * zero velocity at each end, so the lids ease out of open and settle back
+       * into it continuously.
+       */
       const blinkAmount = (t: number) => {
         if (t < EYE_OPEN) return 0
-        if (t < EYE_OPEN + EYE_CLOSE) return (t - EYE_OPEN) / EYE_CLOSE
+        if (t < EYE_OPEN + EYE_CLOSE) return easeInOut((t - EYE_OPEN) / EYE_CLOSE)
         if (t < EYE_OPEN + EYE_CLOSE + EYE_SHUT) return 1
         const reopenAt = EYE_OPEN + EYE_CLOSE + EYE_SHUT
-        if (t < reopenAt + EYE_REOPEN) return 1 - (t - reopenAt) / EYE_REOPEN
+        if (t < reopenAt + EYE_REOPEN) return 1 - easeInOut((t - reopenAt) / EYE_REOPEN)
         return 0
       }
 
@@ -724,7 +731,8 @@ export default function ThreeScene() {
 
         if (holdingEye) {
           eyeHoldClock += delta
-          if (eyeHoldClock > EYE_TOTAL) eyeHoldClock = 0
+          // Carry the overshoot instead of zeroing, so the cycle keeps exact time
+          if (eyeHoldClock > EYE_TOTAL) eyeHoldClock -= EYE_TOTAL
           sampleEyeBlink(baked!.eyeBlink, blinkAmount(eyeHoldClock), eyeLive)
         } else {
           eyeHoldClock = 0
