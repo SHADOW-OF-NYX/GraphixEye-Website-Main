@@ -116,40 +116,43 @@ const INK_INDIGO = new THREE.Color('#1f2a6b')
 type Stop = [number, THREE.Color]
 
 /*
- * Service models are painted from brand ramps rather than their baked palettes.
- * Hues stay deep — a light tint would disappear against cream — so these sit in
- * the saturated mid-dark band where they read as colour and still hold form.
+ * Each service gets its own hue family so the four models read as distinct
+ * chapters rather than one long gradient. Values stay saturated and mid-dark:
+ * particles render with normal blending and no bloom over cream, so anything
+ * light or desaturated dissolves into the background.
  */
+
+// AI — cold petrol lifting into circuit green
 const RAMP_FACE: Stop[] = [
-  [0.0, new THREE.Color('#2a1a6e')],
-  [0.34, new THREE.Color('#6a1fb0')],
-  [0.6, new THREE.Color('#b5179e')],
-  [0.84, new THREE.Color('#c8203a')],
-  [1.0, new THREE.Color('#cf4420')],
+  [0.0, new THREE.Color('#04261c')],
+  [0.34, new THREE.Color('#0a5334')],
+  [0.66, new THREE.Color('#107a42')],
+  [1.0, new THREE.Color('#1f9636')],
 ]
 
+// AR — projected light: ember at the base burning up to gold
 const RAMP_HOLO: Stop[] = [
-  [0.0, new THREE.Color('#1c2a78')],
-  [0.42, new THREE.Color('#3448c8')],
-  [0.72, new THREE.Color('#6a1fb0')],
-  [1.0, new THREE.Color('#b5179e')],
+  [0.0, new THREE.Color('#54130a')],
+  [0.4, new THREE.Color('#9c3108')],
+  [0.72, new THREE.Color('#c05f0a')],
+  [1.0, new THREE.Color('#c9880f')],
 ]
 
-// Vivid end first: the headset's far side sits behind the copy panel
+// VR — vivid end first: the headset's far side sits behind the copy panel
 const RAMP_QUEST: Stop[] = [
-  [0.0, new THREE.Color('#a8228c')],
-  [0.34, new THREE.Color('#7226b5')],
-  [0.7, new THREE.Color('#2f3fae')],
-  [1.0, new THREE.Color('#14205e')],
+  [0.0, new THREE.Color('#0d7fa8')],
+  [0.36, new THREE.Color('#14489f')],
+  [0.72, new THREE.Color('#232b7d')],
+  [1.0, new THREE.Color('#141546')],
 ]
 
-// Warm earth at the trunk lifting into digital magenta/violet in the canopy
+// MR — dark plum trunk opening into fuchsia and violet through the canopy
 const RAMP_BONSAI: Stop[] = [
-  [0.0, new THREE.Color('#4a2410')],
-  [0.32, new THREE.Color('#8f3416')],
-  [0.52, new THREE.Color('#b01228')],
-  [0.74, new THREE.Color('#8f1470')],
-  [1.0, new THREE.Color('#4a1f96')],
+  [0.0, new THREE.Color('#380d2a')],
+  [0.32, new THREE.Color('#710e49')],
+  [0.58, new THREE.Color('#a81856')],
+  [0.8, new THREE.Color('#96259a')],
+  [1.0, new THREE.Color('#6a2ad0')],
 ]
 
 const SERVICE_RAMPS: Record<Exclude<ShapeName, 'eye'>, { stops: Stop[]; axis: 'x' | 'y' }> = {
