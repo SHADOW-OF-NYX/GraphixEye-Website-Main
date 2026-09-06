@@ -10,11 +10,13 @@ type Origin = { x: number; y: number };
  * on the dark pages the ink veil fades over an already-ink page and all you see
  * is the content arriving. Values track --color-ll-ink / --color-ll-white.
  */
-const DARK_ROUTES = new Set(['/careers', '/vendors']);
-const VEIL_DARK = '#150907';
 const VEIL_LIGHT = '#fcf8f1';
+const VEIL_BY_ROUTE: Record<string, string> = {
+  '/careers': '#000000',
+  '/vendors': '#150907', // --color-ll-ink, the vendor foundry ground
+};
 
-const veilColorFor = (path: string) => (DARK_ROUTES.has(path) ? VEIL_DARK : VEIL_LIGHT);
+const veilColorFor = (path: string) => VEIL_BY_ROUTE[path] ?? VEIL_LIGHT;
 
 const COVER_SECONDS = 0.62;
 const REVEAL_SECONDS = 0.55;

@@ -55,8 +55,9 @@ function GhostButton({ children, href }: { children: React.ReactNode; href: stri
   );
 }
 
-const MORPH_VARIANTS: SceneVariant[] = ['ring', 'wave', 'galaxy', 'helix'];
-const CTA_VARIANT: SceneVariant[] = ['vortex'];
+/* Supply-floor shapes and the foundry palette — deliberately not the Careers set */
+const MORPH_VARIANTS: SceneVariant[] = ['lattice', 'lanes', 'orbit', 'stack'];
+const CTA_VARIANT: SceneVariant[] = ['converge'];
 
 type VendorFormState = {
   company: string;
@@ -183,12 +184,13 @@ export default function Vendors() {
   };
 
   return (
-    <div className="ce-page" data-nav-tone="dark">
+    <div className="ce-page ce-page--vendors" data-nav-tone="dark">
       <div className="ce-morph-track">
         <div className="ce-morph-canvas">
           <Suspense fallback={null}>
             <CareerParticles
               variants={MORPH_VARIANTS}
+              palette="vendors"
               scrollTrack=".ce-morph-track"
               className="ce-scene"
             />
@@ -281,7 +283,7 @@ export default function Vendors() {
 
               <div className="ce-stat-card ce-stat-card--bottom">
                 <p className="ce-stat-label">Why partners stay</p>
-                <p className="ce-stat-value ce-stat-value--orchid">1</p>
+                <p className="ce-stat-value ce-stat-value--gold">1</p>
                 <p className="ce-stat-note">
                   One buyer for the whole floor — clearer specs, fewer handoffs.
                 </p>
@@ -485,7 +487,7 @@ export default function Vendors() {
 
       <section className="ce-section ce-cta-section">
         <Suspense fallback={null}>
-          <CareerParticles variants={CTA_VARIANT} className="ce-scene" />
+          <CareerParticles variants={CTA_VARIANT} palette="vendors" className="ce-scene" />
         </Suspense>
         <div className="ce-inner ce-center">
           <Badge>Already a supplier?</Badge>

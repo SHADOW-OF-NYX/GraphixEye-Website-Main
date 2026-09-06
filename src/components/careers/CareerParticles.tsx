@@ -6,7 +6,19 @@ import { createNoise3D } from 'simplex-noise';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export type SceneVariant = 'ring' | 'wave' | 'galaxy' | 'helix' | 'vortex';
+export type SceneVariant =
+  // Careers
+  | 'ring'
+  | 'wave'
+  | 'galaxy'
+  | 'helix'
+  | 'vortex'
+  // Vendors
+  | 'lattice'
+  | 'lanes'
+  | 'orbit'
+  | 'stack'
+  | 'converge';
 
 const TAU = Math.PI * 2;
 const N = 26_000;
@@ -16,19 +28,37 @@ const noise3D = createNoise3D();
 const MORPH_HOLD = 0.24;
 
 /*
- * The brand ramp from index.css, ordered ember → blossom. Rendered additively
- * with bloom on a dark ground, so these keep their authored brightness — that
- * is what makes them glow. Every shape slices this same spectrum.
+ * Two identities share this renderer. A palette is an ordered ramp, darkest
+ * first, so every builder indexes the same seven positions and a page can swap
+ * its whole colour identity with one prop. Values keep their authored
+ * brightness — additive blending plus bloom on a dark ground is what turns
+ * them into glow, so darkening them here would only dim the effect.
  */
-const C = {
-  ember: new THREE.Color('#a8321a'),
-  orange: new THREE.Color('#f6633c'),
-  coral: new THREE.Color('#ff443a'),
-  red: new THREE.Color('#ff5860'),
-  pink: new THREE.Color('#ff6e8f'),
-  rose: new THREE.Color('#ff93a5'),
-  orchid: new THREE.Color('#ff9ae7'),
-  white: new THREE.Color('#ffffff'),
+export type PaletteName = 'careers' | 'vendors';
+
+interface Palette {
+  ramp: THREE.Color[];
+  white: THREE.Color;
+}
+
+const hexRamp = (hexes: string[]) => hexes.map((h) => new THREE.Color(h));
+
+const PALETTES: Record<PaletteName, Palette> = {
+  // Careers — the original cool spectrum, climbing from deep blue to hot red
+  careers: {
+    ramp: hexRamp(['#2563eb', '#4d86ff', '#8b7cff', '#b57cff', '#d946ef', '#ff5f7a', '#ff4d3d']),
+    white: new THREE.Color('#ffffff'),
+  },
+  /*
+   * Vendors — a foundry pour: copper through amber to white-hot. Like the
+   * Careers ramp, even the "dark" end has to carry real luminance; additive
+   * blending has nothing to subtract from, so a near-black stop renders as
+   * absence rather than as shadow.
+   */
+  vendors: {
+    ramp: hexRamp(['#b4400a', '#e0651a', '#ff8c1f', '#ffa93a', '#ffc65c', '#ffdc90', '#fff0c8']),
+    white: new THREE.Color('#fff6e2'),
+  },
 };
 
 type Stop = [number, THREE.Color];
@@ -71,7 +101,7 @@ interface ShapeConfig {
 /* ─────────────── Shape builders — every shape emits exactly N points
    so positions/colors/sizes can be lerped attribute-for-attribute ─────────────── */
 
-function buildRing(n: number): Built {
+function buildRing(n: number, P: Palette): Built {
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 3);
   const sizes = new Float32Array(n);
@@ -80,12 +110,12 @@ function buildRing(n: number): Built {
   const r = 0.3;
   const BANDS = 46;
   const stops: Stop[] = [
-    [0.0, C.ember],
-    [0.22, C.orange],
-    [0.45, C.coral],
-    [0.62, C.pink],
-    [0.8, C.rose],
-    [1.0, C.orchid],
+    [0.0, P.ramp[0]],
+    [0.22, P.ramp[1]],
+    [0.45, P.ramp[2]],
+    [0.62, P.ramp[4]],
+    [0.8, P.ramp[5]],
+    [1.0, P.ramp[6]],
   ];
 
   for (let i = 0; i < n; i++) {
@@ -111,7 +141,7 @@ function buildRing(n: number): Built {
   return { positions, colors, sizes };
 }
 
-function buildWave(n: number): Built {
+function buildWave(n: number, P: Palette): Built {
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 3);
   const sizes = new Float32Array(n);
@@ -122,11 +152,11 @@ function buildWave(n: number): Built {
   const NEAR_Z = 0.5;
   const FAR_Z = -4.6;
   const stops: Stop[] = [
-    [0.0, C.ember],
-    [0.24, C.orange],
-    [0.5, C.coral],
-    [0.72, C.pink],
-    [1.0, C.orchid],
+    [0.0, P.ramp[0]],
+    [0.24, P.ramp[1]],
+    [0.5, P.ramp[2]],
+    [0.72, P.ramp[4]],
+    [1.0, P.ramp[6]],
   ];
 
   for (let i = 0; i < n; i++) {
@@ -151,17 +181,17 @@ function buildWave(n: number): Built {
   return { positions, colors, sizes };
 }
 
-function buildGalaxy(n: number): Built {
+function buildGalaxy(n: number, P: Palette): Built {
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 3);
   const sizes = new Float32Array(n);
 
   const stops: Stop[] = [
-    [0.0, C.white],
-    [0.18, C.rose],
-    [0.42, C.pink],
-    [0.68, C.coral],
-    [1.0, C.orange],
+    [0.0, P.white],
+    [0.18, P.ramp[5]],
+    [0.42, P.ramp[4]],
+    [0.68, P.ramp[2]],
+    [1.0, P.ramp[1]],
   ];
 
   const coreCount = Math.round(n * 0.2);
@@ -209,7 +239,7 @@ function buildGalaxy(n: number): Built {
   return { positions, colors, sizes };
 }
 
-function buildHelix(n: number): Built {
+function buildHelix(n: number, P: Palette): Built {
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 3);
   const sizes = new Float32Array(n);
@@ -218,10 +248,10 @@ function buildHelix(n: number): Built {
   const radius = 0.46;
   const turns = 4.2;
   const stops: Stop[] = [
-    [0.0, C.orange],
-    [0.35, C.coral],
-    [0.6, C.red],
-    [1.0, C.white],
+    [0.0, P.ramp[1]],
+    [0.35, P.ramp[2]],
+    [0.6, P.ramp[3]],
+    [1.0, P.white],
   ];
 
   const strandPts = Math.round(n * 0.38);
@@ -266,17 +296,17 @@ function buildHelix(n: number): Built {
   return { positions, colors, sizes };
 }
 
-function buildVortex(n: number): Built {
+function buildVortex(n: number, P: Palette): Built {
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 3);
   const sizes = new Float32Array(n);
 
   const stops: Stop[] = [
-    [0.0, C.ember],
-    [0.25, C.orange],
-    [0.5, C.coral],
-    [0.75, C.pink],
-    [1.0, C.orchid],
+    [0.0, P.ramp[0]],
+    [0.25, P.ramp[1]],
+    [0.5, P.ramp[2]],
+    [0.75, P.ramp[4]],
+    [1.0, P.ramp[6]],
   ];
 
   const inner = 0.62;
@@ -303,12 +333,293 @@ function buildVortex(n: number): Built {
   return { positions, colors, sizes };
 }
 
-const BUILDERS: Record<SceneVariant, (n: number) => Built> = {
+/* ── Vendor shapes: a supply language rather than the Careers cosmos ── */
+
+const CUBE_CORNERS: Array<[number, number, number]> = [
+  [-1, -1, -1],
+  [1, -1, -1],
+  [1, 1, -1],
+  [-1, 1, -1],
+  [-1, -1, 1],
+  [1, -1, 1],
+  [1, 1, 1],
+  [-1, 1, 1],
+];
+
+const CUBE_EDGES: Array<[number, number]> = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 0],
+  [4, 5],
+  [5, 6],
+  [6, 7],
+  [7, 4],
+  [0, 4],
+  [1, 5],
+  [2, 6],
+  [3, 7],
+];
+
+/**
+ * Nested wireframe cubes — structure and stock, crated up.
+ *
+ * A filled lattice was the first attempt and it failed: spreading the budget
+ * through a solid volume gives no silhouette and no clear centre, so it reads
+ * as haze. Confining every point to the twelve edges of three shells puts the
+ * same count on ~36 lines, which is what makes them read as drawn, and leaves
+ * the middle open for the hero copy the way the Careers ring does.
+ */
+function buildLattice(n: number, P: Palette): Built {
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  const stops: Stop[] = [
+    [0.0, P.ramp[1]],
+    [0.32, P.ramp[3]],
+    [0.66, P.ramp[5]],
+    [1.0, P.ramp[6]],
+  ];
+
+  // Each shell turns a little further, so the frames never line up flat
+  const SHELLS = [
+    { half: 1.5, spin: 0.0 },
+    { half: 1.14, spin: 0.34 },
+    { half: 0.8, spin: 0.68 },
+  ];
+
+  for (let i = 0; i < n; i++) {
+    const shell = SHELLS[i % SHELLS.length];
+    const [a, b] = CUBE_EDGES[Math.floor(Math.random() * CUBE_EDGES.length)];
+    const t = Math.random();
+
+    const ca = CUBE_CORNERS[a];
+    const cb = CUBE_CORNERS[b];
+    const s = shell.half;
+
+    const x0 = (ca[0] + (cb[0] - ca[0]) * t) * s;
+    const y = (ca[1] + (cb[1] - ca[1]) * t) * s;
+    const z0 = (ca[2] + (cb[2] - ca[2]) * t) * s;
+
+    const cs = Math.cos(shell.spin);
+    const sn = Math.sin(shell.spin);
+
+    const jitter = 0.014;
+    positions[i * 3] = x0 * cs - z0 * sn + (Math.random() - 0.5) * jitter;
+    positions[i * 3 + 1] = y + (Math.random() - 0.5) * jitter;
+    positions[i * 3 + 2] = x0 * sn + z0 * cs + (Math.random() - 0.5) * jitter;
+
+    const c = ramp(stops, (y / 1.5 + 1) / 2);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+
+    sizes[i] = 0.5 + Math.random() * 0.7;
+  }
+
+  return { positions, colors, sizes };
+}
+
+/** Parallel supply lanes running to the horizon, each at its own depth. */
+function buildLanes(n: number, P: Palette): Built {
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  const stops: Stop[] = [
+    [0.0, P.ramp[0]],
+    [0.28, P.ramp[2]],
+    [0.66, P.ramp[4]],
+    [1.0, P.ramp[6]],
+  ];
+
+  const LANES = 9;
+  const NEAR_Z = 0.9;
+  const FAR_Z = -5.2;
+
+  for (let i = 0; i < n; i++) {
+    const lane = Math.floor(Math.random() * LANES);
+    const u = Math.random();
+
+    // Lanes fan slightly outward as they approach the camera
+    const spread = 0.24 + (1 - u) * 0.34;
+    const x = (lane - (LANES - 1) / 2) * spread;
+    const z = FAR_Z + u * (NEAR_Z - FAR_Z);
+
+    positions[i * 3] = x + (Math.random() - 0.5) * 0.05;
+    positions[i * 3 + 1] = -0.42 + (Math.random() - 0.5) * 0.06;
+    positions[i * 3 + 2] = z;
+
+    const c = ramp(stops, u);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+
+    sizes[i] = (0.35 + Math.random() * 0.7) * (0.4 + u * 0.6);
+  }
+
+  return { positions, colors, sizes };
+}
+
+/** Concentric orbits — a supplier network circling one floor. */
+function buildOrbit(n: number, P: Palette): Built {
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  const stops: Stop[] = [
+    [0.0, P.white],
+    [0.2, P.ramp[6]],
+    [0.5, P.ramp[4]],
+    [1.0, P.ramp[1]],
+  ];
+
+  const RINGS = 7;
+  const core = Math.floor(n * 0.16);
+
+  for (let i = 0; i < n; i++) {
+    if (i < core) {
+      // Dense core — the factory itself
+      const rr = Math.pow(Math.random(), 2.2) * 0.28;
+      const a = Math.random() * TAU;
+      positions[i * 3] = Math.cos(a) * rr;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 0.06;
+      positions[i * 3 + 2] = Math.sin(a) * rr;
+
+      const c = ramp(stops, (rr / 0.28) * 0.22);
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+      sizes[i] = 0.6 + Math.random() * 0.9;
+      continue;
+    }
+
+    const ring = Math.floor(Math.random() * RINGS);
+    const radius = 0.55 + (ring / (RINGS - 1)) * 1.5;
+    const a = Math.random() * TAU;
+    // Each orbit tilts a little more than the last
+    const tilt = (ring / RINGS) * 0.5;
+    const rr = radius + (Math.random() - 0.5) * 0.045;
+
+    const x = Math.cos(a) * rr;
+    const z = Math.sin(a) * rr;
+    positions[i * 3] = x;
+    positions[i * 3 + 1] = z * Math.sin(tilt) + (Math.random() - 0.5) * 0.03;
+    positions[i * 3 + 2] = z * Math.cos(tilt);
+
+    const c = ramp(stops, 0.24 + (ring / (RINGS - 1)) * 0.76);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+
+    sizes[i] = 0.4 + Math.random() * 0.7;
+  }
+
+  return { positions, colors, sizes };
+}
+
+/** Stacked strata — inventory on the rack, layer over layer. */
+function buildStack(n: number, P: Palette): Built {
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  const stops: Stop[] = [
+    [0.0, P.ramp[1]],
+    [0.4, P.ramp[3]],
+    [0.72, P.ramp[5]],
+    [1.0, P.white],
+  ];
+
+  const LAYERS = 11;
+  // Height is bounded by what the stack camera can frame — see CONFIG.stack
+  const H = 3.2;
+  const half = 1.05;
+
+  for (let i = 0; i < n; i++) {
+    const layer = Math.floor(Math.random() * LAYERS);
+    const u = layer / (LAYERS - 1);
+    // Slabs shrink as they rise, so the stack reads as a tapered column
+    const w = half * (1 - u * 0.42);
+
+    const edge = Math.random();
+    let x: number;
+    let z: number;
+    if (edge < 0.5) {
+      x = (Math.random() - 0.5) * 2 * w;
+      z = (Math.random() < 0.5 ? -1 : 1) * w;
+    } else {
+      x = (Math.random() < 0.5 ? -1 : 1) * w;
+      z = (Math.random() - 0.5) * 2 * w;
+    }
+
+    positions[i * 3] = x + (Math.random() - 0.5) * 0.03;
+    positions[i * 3 + 1] = (u - 0.5) * H + (Math.random() - 0.5) * 0.05;
+    positions[i * 3 + 2] = z + (Math.random() - 0.5) * 0.03;
+
+    const c = ramp(stops, u);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+
+    sizes[i] = 0.4 + Math.random() * 0.65;
+  }
+
+  return { positions, colors, sizes };
+}
+
+/** Many streams drawing into one point — every lane feeds one floor. */
+function buildConverge(n: number, P: Palette): Built {
+  const positions = new Float32Array(n * 3);
+  const colors = new Float32Array(n * 3);
+  const sizes = new Float32Array(n);
+
+  const stops: Stop[] = [
+    [0.0, P.white],
+    [0.22, P.ramp[6]],
+    [0.55, P.ramp[3]],
+    [1.0, P.ramp[0]],
+  ];
+
+  const STREAMS = 12;
+
+  for (let i = 0; i < n; i++) {
+    const stream = Math.floor(Math.random() * STREAMS);
+    const a = (stream / STREAMS) * TAU;
+    // t=0 at the hub, t=1 out at the rim
+    const t = Math.pow(Math.random(), 0.7);
+    const rr = t * 2.9;
+    // Streams curl as they run outward
+    const swirl = a + t * 0.9;
+
+    positions[i * 3] = Math.cos(swirl) * rr + (Math.random() - 0.5) * 0.07 * t;
+    positions[i * 3 + 1] = Math.sin(swirl) * rr * 0.84 + (Math.random() - 0.5) * 0.07 * t;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
+
+    const c = ramp(stops, t);
+    colors[i * 3] = c.r;
+    colors[i * 3 + 1] = c.g;
+    colors[i * 3 + 2] = c.b;
+
+    // Brightest and densest at the hub
+    sizes[i] = (0.4 + Math.random() * 0.7) * (1.05 - t * 0.5);
+  }
+
+  return { positions, colors, sizes };
+}
+
+const BUILDERS: Record<SceneVariant, (n: number, P: Palette) => Built> = {
   ring: buildRing,
   wave: buildWave,
   galaxy: buildGalaxy,
   helix: buildHelix,
   vortex: buildVortex,
+  lattice: buildLattice,
+  lanes: buildLanes,
+  orbit: buildOrbit,
+  stack: buildStack,
+  converge: buildConverge,
 };
 
 const CONFIG: Record<SceneVariant, ShapeConfig> = {
@@ -367,6 +678,72 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     spinZ: -0.05,
     wave: 0,
   },
+
+  /*
+   * Vendor scenes. Slower spins and tighter noise than the Careers set — the
+   * supply language should feel measured and structural rather than cosmic.
+   */
+  lattice: {
+    /*
+     * Distance is set by the nearest corner, not the centre. The outer shell's
+     * front face sits ~2.1 units closer than the origin once rotated, and at
+     * this fov that face is what breaks the frame first.
+     */
+    camera: { x: 0, y: 0, z: 6.8, lookX: 0, lookY: 0, lookZ: 0, fov: 42 },
+    bloom: 1.3,
+    pointScale: 3.2,
+    alpha: 0.62,
+    noiseAmp: 0.005,
+    rotX: -0.2,
+    spinY: 0.05,
+    spinZ: 0,
+    wave: 0,
+  },
+  lanes: {
+    camera: { x: 0, y: 0.3, z: 2.1, lookX: 0, lookY: -0.42, lookZ: -1.6, fov: 58 },
+    bloom: 1.05,
+    pointScale: 2.5,
+    alpha: 0.55,
+    noiseAmp: 0.004,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
+  orbit: {
+    camera: { x: 0, y: 0.9, z: 3.3, lookX: 0, lookY: 0, lookZ: 0, fov: 46 },
+    bloom: 1.25,
+    pointScale: 2.7,
+    alpha: 0.55,
+    noiseAmp: 0.008,
+    rotX: -0.42,
+    spinY: 0.06,
+    spinZ: 0,
+    wave: 0,
+  },
+  stack: {
+    // Frames a 3.2-tall column with margin once the near face is accounted for
+    camera: { x: 0, y: 0, z: 5.2, lookX: 0, lookY: 0, lookZ: 0, fov: 46 },
+    bloom: 1.2,
+    pointScale: 3.0,
+    alpha: 0.6,
+    noiseAmp: 0.006,
+    rotX: 0,
+    spinY: 0.14,
+    spinZ: 0,
+    wave: 0,
+  },
+  converge: {
+    camera: { x: 0, y: 0, z: 3.1, lookX: 0, lookY: 0, lookZ: 0, fov: 50 },
+    bloom: 1.15,
+    pointScale: 2.6,
+    alpha: 0.6,
+    noiseAmp: 0.01,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0.04,
+    wave: 0,
+  },
 };
 
 /*
@@ -415,12 +792,19 @@ function holdEase(u: number): number {
 interface Props {
   /** One variant renders a static scene; several morph across scroll. */
   variants: SceneVariant[];
+  /** Colour identity for this page. */
+  palette?: PaletteName;
   /** CSS selector for the scroll track that drives the morph. */
   scrollTrack?: string;
   className?: string;
 }
 
-export default function CareerParticles({ variants, scrollTrack, className = '' }: Props) {
+export default function CareerParticles({
+  variants,
+  palette = 'careers',
+  scrollTrack,
+  className = '',
+}: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -438,7 +822,8 @@ export default function CareerParticles({ variants, scrollTrack, className = '' 
 
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const shapes = variants.map((v) => BUILDERS[v](N));
+      const P = PALETTES[palette];
+      const shapes = variants.map((v) => BUILDERS[v](N, P));
       const configs = variants.map((v) => CONFIG[v]);
       const multi = shapes.length > 1;
 
@@ -667,7 +1052,7 @@ export default function CareerParticles({ variants, scrollTrack, className = '' 
       cleanup.forEach((fn) => fn());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [variants.join('|'), scrollTrack]);
+  }, [variants.join('|'), palette, scrollTrack]);
 
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }

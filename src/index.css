@@ -439,16 +439,28 @@ h4,
    Careers — particle-driven dark experience
    ═══════════════════════════════════════════ */
 
+/*
+ * Careers and Vendors share this layout system but not its colour. The ground
+ * and accents are driven by custom properties so `.ce-page--vendors` can take
+ * the whole page somewhere else without forking the stylesheet.
+ */
 .ce-page {
-  /*
-   * Warm near-black rather than #000. The site's dark surfaces are wine
-   * (--color-ll-wine) and the ember glow-wash, so a cold black reads as a
-   * different site. Kept this deep so the additive bloom still shows as glow.
-   */
-  --ce-ground: var(--color-ll-ink);
+  --ce-ground: #000;
+  --ce-scrim: 0, 0, 0;
+  --ce-wash: 40, 30, 90;
   background: var(--ce-ground);
   color: #fff;
   overflow-x: clip;
+}
+
+/*
+ * Vendors — a foundry rather than a cosmos. Warm ink ground taken from the
+ * site's wine end, with copper washes instead of the Careers indigo.
+ */
+.ce-page--vendors {
+  --ce-ground: var(--color-ll-ink);
+  --ce-scrim: 21, 9, 7;
+  --ce-wash: 118, 46, 16;
 }
 
 .ce-section {
@@ -520,7 +532,12 @@ h4,
   width: 46rem;
   height: 26rem;
   max-width: 95vw;
-  background: radial-gradient(closest-side, rgba(21, 9, 7, 0.82), rgba(21, 9, 7, 0.45) 55%, transparent 100%);
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--ce-scrim), 0.82),
+    rgba(var(--ce-scrim), 0.45) 55%,
+    transparent 100%
+  );
   z-index: -1;
   pointer-events: none;
 }
@@ -832,12 +849,26 @@ h4,
   margin-bottom: 0.7rem;
 }
 
-.ce-stat-value--amber {
-  color: #ff8958;
+/* Careers accents */
+.ce-stat-value--blue {
+  color: #6b9cff;
 }
 
-.ce-stat-value--orchid {
-  color: #ff9ae7;
+.ce-stat-value--purple {
+  color: #b07cff;
+}
+
+/* Vendors accents, drawn from the foundry ramp */
+.ce-page--vendors .ce-stat-value {
+  color: #f28c1c;
+}
+
+.ce-stat-value--amber {
+  color: #ffb43f;
+}
+
+.ce-stat-value--gold {
+  color: #ffd97a;
 }
 
 .ce-stat-note {
@@ -849,7 +880,8 @@ h4,
 /* ── Open roles ── */
 .ce-roles-section {
   padding: 7rem 0;
-  background: radial-gradient(70% 50% at 50% 0%, rgba(118, 40, 28, 0.3), transparent 65%), var(--ce-ground);
+  background: radial-gradient(70% 50% at 50% 0%, rgba(var(--ce-wash), 0.28), transparent 65%),
+    var(--ce-ground);
 }
 
 .ce-roles-head {
@@ -1124,7 +1156,7 @@ h4,
 .ce-vendor-register {
   padding-top: 2rem;
   background:
-    radial-gradient(60% 40% at 50% 100%, rgba(110, 38, 26, 0.24), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgba(var(--ce-wash), 0.24), transparent 70%),
     var(--ce-ground);
 }
 

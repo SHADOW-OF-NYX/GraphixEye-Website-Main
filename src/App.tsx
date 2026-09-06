@@ -28,7 +28,9 @@ function ScrollToTop() {
 function AppShell() {
   const { pathname } = useLocation();
   const isExpansions = pathname === '/expansions';
-  const isDarkExperience = pathname === '/careers' || pathname === '/vendors';
+  const isCareers = pathname === '/careers';
+  const isVendors = pathname === '/vendors';
+  const isDarkExperience = isCareers || isVendors;
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -38,7 +40,9 @@ function AppShell() {
   return (
     <div
       className={`font-sans min-h-screen ${
-        isDarkExperience ? 'text-ll-white bg-ll-ink' : 'text-black bg-ll-white'
+        isDarkExperience
+          ? `text-ll-white ${isVendors ? 'bg-ll-ink' : 'bg-black'}`
+          : 'text-black bg-ll-white'
       }`}
     >
       <Navbar />
