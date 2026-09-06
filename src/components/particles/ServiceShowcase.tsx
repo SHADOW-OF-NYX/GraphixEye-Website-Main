@@ -97,21 +97,12 @@ export default function ServiceShowcase() {
                 } 50%, rgba(252,248,241,0.94) 0%, rgba(252,248,241,0.72) 45%, rgba(252,248,241,0) 74%)`,
               }}
             />
-            <p
-              className="text-ll-highlight mb-3"
-              style={{ fontSize: 11, letterSpacing: '0.18em' }}
-            >
+            <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-3">
               {s.index} — {s.eyebrow.toUpperCase()}
             </p>
-            <h2
-              className="text-black font-light uppercase leading-tight mb-4"
-              style={{ fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '0.02em' }}
-            >
-              {s.title}
-            </h2>
+            <h2 className="display-md text-black mb-4">{s.title}</h2>
             <p
-              className={`text-black/55 leading-relaxed ${onLeft ? '' : 'ml-auto'}`}
-              style={{ fontSize: 14, letterSpacing: '0.02em', maxWidth: '28rem' }}
+              className={`text-black/55 leading-relaxed text-[15px] max-w-md ${onLeft ? '' : 'ml-auto'}`}
             >
               {s.body}
             </p>

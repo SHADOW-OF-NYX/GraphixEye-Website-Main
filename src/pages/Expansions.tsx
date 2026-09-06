@@ -56,25 +56,16 @@ export default function Expansions() {
       <div id="morph-track" className="relative" style={{ height: '620vh', zIndex: 10 }}>
         <div className="sticky top-0 h-screen overflow-hidden">
           <div ref={introRef} className="absolute inset-0 pointer-events-none select-none">
-            <div className="absolute left-5 md:left-14 top-1/2 -translate-y-1/2 -mt-10 max-w-xl">
-              <p
-                className="uppercase text-ll-highlight mb-4"
-                style={{ fontSize: 11, letterSpacing: '0.2em' }}
-              >
+            <div className="absolute left-6 md:left-14 top-1/2 -translate-y-1/2 -mt-10 max-w-xl">
+              <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-5">
                 Expansions
               </p>
-              <h1
-                className="uppercase font-light text-black leading-none"
-                style={{ fontSize: 'clamp(28px, 4.5vw, 56px)', letterSpacing: '-0.015em' }}
-              >
+              <h1 className="display-xl text-black">
                 Where intent
                 <br />
                 takes form
               </h1>
-              <p
-                className="mt-6 uppercase text-black/45 max-w-xs"
-                style={{ fontSize: 12, letterSpacing: '0.12em' }}
-              >
+              <p className="mt-7 text-[12px] tracking-widest uppercase text-black/40 max-w-xs">
                 AI · AR · VR · MR — scroll to explore
               </p>
             </div>
@@ -90,23 +81,26 @@ export default function Expansions() {
       </div>
 
       {/* Opaque so it closes off the fixed canvas instead of scrolling over the model */}
-      <div className="relative z-10 bg-ll-white flex flex-col items-center justify-center gap-6 py-24 px-5 text-center">
-        <p className="uppercase text-ll-highlight" style={{ fontSize: 11, letterSpacing: '0.2em' }}>
-          Expansions
-        </p>
-        <h2 className="display-md max-w-2xl">
-          Built on the same floor as everything else we make
-        </h2>
-        <p className="text-black/50 max-w-md text-[15px] leading-relaxed">
-          AI, AR, VR, and MR run alongside our presses and finishing lines — one team, one
-          production house in Dammam.
-        </p>
-        <Link
-          to="/contact"
-          className="inline-flex items-center h-[61px] px-8 text-[14px] pill bg-black text-ll-white hover:bg-ll-highlight transition-colors"
+      <div className="relative z-10 bg-ll-white px-4 md:px-8 pt-24 pb-10">
+        <section
+          data-nav-tone="dark"
+          className="max-w-[1600px] mx-auto card-r glow-wash text-ll-white overflow-hidden py-20 px-8 md:px-14 flex flex-col items-center gap-6 text-center"
         >
-          Start a project
-        </Link>
+          <p className="text-[12px] tracking-widest uppercase text-ll-white/55">Expansions</p>
+          <h2 className="display-md max-w-2xl">
+            Built on the same floor as everything else we make
+          </h2>
+          <p className="text-ll-sand/70 max-w-md text-[15px] leading-relaxed">
+            AI, AR, VR, and MR run alongside our presses and finishing lines — one team, one
+            production house in Dammam.
+          </p>
+          <Link
+            to="/contact"
+            className="inline-flex items-center h-[61px] px-8 text-[14px] pill bg-ll-white text-black hover:bg-ll-highlight hover:text-ll-white transition-colors"
+          >
+            Start a project
+          </Link>
+        </section>
       </div>
     </div>
   );

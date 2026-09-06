@@ -7,6 +7,9 @@ import { preloadExpansions } from '../lib/particles/preloadExpansions';
 import { preloadCareers } from '../lib/particles/preloadCareers';
 import { usePageTransition } from './PageTransition';
 
+/** Routes that sit on a dark backdrop directly beneath the nav on first paint. */
+const DARK_BACKDROP_ROUTES = new Set(['/', '/careers', '/vendors']);
+
 /** Routes whose heavy chunks are worth warming the moment a link is hovered. */
 const PRELOADERS: Record<string, () => void> = {
   '/expansions': preloadExpansions,
@@ -22,7 +25,9 @@ export default function Navbar() {
   const [onDark, setOnDark] = useState(location.pathname === '/');
 
   useEffect(() => {
-    onDarkRef.current = location.pathname === '/' || location.pathname === '/expansions';
+    // Seed before the backdrop is measured. Expansions is a cream page, so
+    // listing it here used to flash white nav text over the light background.
+    onDarkRef.current = DARK_BACKDROP_ROUTES.has(location.pathname);
     setOnDark(onDarkRef.current);
 
     let frame = 0;

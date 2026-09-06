@@ -273,7 +273,7 @@ export default function Vendors() {
 
               <div className="ce-stat-card ce-stat-card--right">
                 <p className="ce-stat-label">Supply lanes</p>
-                <p className="ce-stat-value ce-stat-value--blue">{vendorCategories.length}</p>
+                <p className="ce-stat-value ce-stat-value--amber">{vendorCategories.length}</p>
                 <p className="ce-stat-note">
                   Materials, finishing, equipment, logistics, services, and more.
                 </p>
@@ -281,7 +281,7 @@ export default function Vendors() {
 
               <div className="ce-stat-card ce-stat-card--bottom">
                 <p className="ce-stat-label">Why partners stay</p>
-                <p className="ce-stat-value ce-stat-value--purple">1</p>
+                <p className="ce-stat-value ce-stat-value--orchid">1</p>
                 <p className="ce-stat-note">
                   One buyer for the whole floor — clearer specs, fewer handoffs.
                 </p>

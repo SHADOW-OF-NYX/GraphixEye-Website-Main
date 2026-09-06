@@ -38,7 +38,7 @@ function AppShell() {
   return (
     <div
       className={`font-sans min-h-screen ${
-        isDarkExperience ? 'text-ll-white bg-black' : 'text-black bg-ll-white'
+        isDarkExperience ? 'text-ll-white bg-ll-ink' : 'text-black bg-ll-white'
       }`}
     >
       <Navbar />

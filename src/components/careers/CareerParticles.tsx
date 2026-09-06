@@ -15,14 +15,19 @@ const noise3D = createNoise3D();
 /** Fraction of each morph segment held fully formed before easing to the next shape. */
 const MORPH_HOLD = 0.24;
 
+/*
+ * The brand ramp from index.css, ordered ember → blossom. Rendered additively
+ * with bloom on a dark ground, so these keep their authored brightness — that
+ * is what makes them glow. Every shape slices this same spectrum.
+ */
 const C = {
-  red: new THREE.Color('#ff4d3d'),
-  rose: new THREE.Color('#ff5f7a'),
-  magenta: new THREE.Color('#d946ef'),
-  purple: new THREE.Color('#b57cff'),
-  violet: new THREE.Color('#8b7cff'),
-  blue: new THREE.Color('#4d86ff'),
-  deep: new THREE.Color('#2563eb'),
+  ember: new THREE.Color('#a8321a'),
+  orange: new THREE.Color('#f6633c'),
+  coral: new THREE.Color('#ff443a'),
+  red: new THREE.Color('#ff5860'),
+  pink: new THREE.Color('#ff6e8f'),
+  rose: new THREE.Color('#ff93a5'),
+  orchid: new THREE.Color('#ff9ae7'),
   white: new THREE.Color('#ffffff'),
 };
 
@@ -75,12 +80,12 @@ function buildRing(n: number): Built {
   const r = 0.3;
   const BANDS = 46;
   const stops: Stop[] = [
-    [0.0, C.deep],
-    [0.22, C.blue],
-    [0.45, C.violet],
-    [0.62, C.magenta],
+    [0.0, C.ember],
+    [0.22, C.orange],
+    [0.45, C.coral],
+    [0.62, C.pink],
     [0.8, C.rose],
-    [1.0, C.red],
+    [1.0, C.orchid],
   ];
 
   for (let i = 0; i < n; i++) {
@@ -117,11 +122,11 @@ function buildWave(n: number): Built {
   const NEAR_Z = 0.5;
   const FAR_Z = -4.6;
   const stops: Stop[] = [
-    [0.0, C.deep],
-    [0.24, C.blue],
-    [0.5, C.violet],
-    [0.72, C.magenta],
-    [1.0, C.red],
+    [0.0, C.ember],
+    [0.24, C.orange],
+    [0.5, C.coral],
+    [0.72, C.pink],
+    [1.0, C.orchid],
   ];
 
   for (let i = 0; i < n; i++) {
@@ -154,9 +159,9 @@ function buildGalaxy(n: number): Built {
   const stops: Stop[] = [
     [0.0, C.white],
     [0.18, C.rose],
-    [0.42, C.magenta],
-    [0.68, C.violet],
-    [1.0, C.blue],
+    [0.42, C.pink],
+    [0.68, C.coral],
+    [1.0, C.orange],
   ];
 
   const coreCount = Math.round(n * 0.2);
@@ -213,9 +218,9 @@ function buildHelix(n: number): Built {
   const radius = 0.46;
   const turns = 4.2;
   const stops: Stop[] = [
-    [0.0, C.blue],
-    [0.35, C.violet],
-    [0.6, C.purple],
+    [0.0, C.orange],
+    [0.35, C.coral],
+    [0.6, C.red],
     [1.0, C.white],
   ];
 
@@ -267,11 +272,11 @@ function buildVortex(n: number): Built {
   const sizes = new Float32Array(n);
 
   const stops: Stop[] = [
-    [0.0, C.deep],
-    [0.25, C.blue],
-    [0.5, C.violet],
-    [0.75, C.magenta],
-    [1.0, C.red],
+    [0.0, C.ember],
+    [0.25, C.orange],
+    [0.5, C.coral],
+    [0.75, C.pink],
+    [1.0, C.orchid],
   ];
 
   const inner = 0.62;

@@ -7,11 +7,11 @@ type Origin = { x: number; y: number };
 /**
  * Backdrop each route settles on. The veil is painted in the destination's
  * colour so that lifting it reveals the new page rather than announcing it —
- * on Careers the black veil fades over an already-black page and all you see
- * is the content arriving.
+ * on the dark pages the ink veil fades over an already-ink page and all you see
+ * is the content arriving. Values track --color-ll-ink / --color-ll-white.
  */
 const DARK_ROUTES = new Set(['/careers', '/vendors']);
-const VEIL_DARK = '#000000';
+const VEIL_DARK = '#150907';
 const VEIL_LIGHT = '#fcf8f1';
 
 const veilColorFor = (path: string) => (DARK_ROUTES.has(path) ? VEIL_DARK : VEIL_LIGHT);

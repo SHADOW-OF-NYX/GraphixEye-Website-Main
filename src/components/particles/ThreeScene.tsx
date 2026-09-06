@@ -116,23 +116,24 @@ const INK_INDIGO = new THREE.Color('#1f2a6b')
 type Stop = [number, THREE.Color]
 
 /*
- * Careers palette, referenced verbatim — the same deep-blue → violet → magenta
- * → rose → red spectrum every shape on that page sweeps through.
+ * The brand ramp from index.css, in order — wine anchors the dark end, then the
+ * --color-ll-br* steps run orange → coral → pink → orchid. This is the same
+ * warm spectrum the rest of the site is built from, so the models read as part
+ * of the brand rather than as a separate cool-toned system.
  *
- * Those values are authored for additive blending and bloom on black, where
- * near-white brightness is what makes them glow. Expansions renders with normal
- * blending and no bloom over cream, so carrying the hex codes across directly
- * would leave a pale wash. Hue and saturation transfer intact; only lightness is
- * pulled into a band that holds against a light background.
+ * These are authored as UI colours on cream. Particles render with normal
+ * blending and no bloom, so the lighter steps would dissolve into the
+ * background at full lightness. Hue and saturation transfer intact; only
+ * lightness is pulled into a band that holds against a light backdrop.
  */
-const CAREERS_HEX = {
-  deep: '#2563eb',
-  blue: '#4d86ff',
-  violet: '#8b7cff',
-  purple: '#b57cff',
-  magenta: '#d946ef',
-  rose: '#ff5f7a',
-  red: '#ff4d3d',
+const BRAND_HEX = {
+  wine: '#431616',
+  orange: '#f6633c',
+  coral: '#ff443a',
+  red: '#ff5860',
+  pink: '#ff6e8f',
+  rose: '#ff93a5',
+  orchid: '#ff9ae7',
 } as const
 
 function forCream(hex: string, lightness: number): THREE.Color {
@@ -143,48 +144,53 @@ function forCream(hex: string, lightness: number): THREE.Color {
 }
 
 const SPECTRUM = {
-  deep: forCream(CAREERS_HEX.deep, 0.25),
-  blue: forCream(CAREERS_HEX.blue, 0.31),
-  violet: forCream(CAREERS_HEX.violet, 0.35),
-  purple: forCream(CAREERS_HEX.purple, 0.35),
-  magenta: forCream(CAREERS_HEX.magenta, 0.36),
-  rose: forCream(CAREERS_HEX.rose, 0.38),
-  red: forCream(CAREERS_HEX.red, 0.36),
+  wine: forCream(BRAND_HEX.wine, 0.15),
+  orange: forCream(BRAND_HEX.orange, 0.32),
+  coral: forCream(BRAND_HEX.coral, 0.35),
+  red: forCream(BRAND_HEX.red, 0.37),
+  pink: forCream(BRAND_HEX.pink, 0.39),
+  rose: forCream(BRAND_HEX.rose, 0.4),
+  orchid: forCream(BRAND_HEX.orchid, 0.42),
 }
 
-// AI — the full cool-to-warm sweep, as on the Careers ring
+/*
+ * Each model takes a different slice of the ramp, the way the Careers shapes do.
+ * The slices lean on wine / orange / coral / orchid because the intermediate
+ * brand steps converge on the same crimson once darkened for cream — spacing the
+ * stops across the distinct anchors is what keeps these reading as gradients.
+ */
+
+// AI — ember base burning up to crimson, stopping short of the blossom end
 const RAMP_FACE: Stop[] = [
-  [0.0, SPECTRUM.deep],
-  [0.24, SPECTRUM.blue],
-  [0.48, SPECTRUM.violet],
-  [0.72, SPECTRUM.magenta],
-  [1.0, SPECTRUM.rose],
+  [0.0, SPECTRUM.wine],
+  [0.32, SPECTRUM.orange],
+  [0.7, SPECTRUM.coral],
+  [1.0, SPECTRUM.pink],
 ]
 
-// AR — warm-weighted, echoing the far end of the Careers wave
+// AR — ember at the feet lifting to orchid at the crown
 const RAMP_HOLO: Stop[] = [
-  [0.0, SPECTRUM.blue],
-  [0.34, SPECTRUM.violet],
-  [0.64, SPECTRUM.magenta],
-  [0.84, SPECTRUM.rose],
-  [1.0, SPECTRUM.red],
+  [0.0, SPECTRUM.wine],
+  [0.3, SPECTRUM.coral],
+  [0.68, SPECTRUM.rose],
+  [1.0, SPECTRUM.orchid],
 ]
 
-// VR — cool-weighted, vivid end first: the headset's far side sits behind the copy panel
+// VR — vivid end first: the headset's far side sits behind the copy panel
 const RAMP_QUEST: Stop[] = [
-  [0.0, SPECTRUM.magenta],
-  [0.32, SPECTRUM.purple],
-  [0.66, SPECTRUM.blue],
-  [1.0, SPECTRUM.deep],
+  [0.0, SPECTRUM.orchid],
+  [0.32, SPECTRUM.red],
+  [0.66, SPECTRUM.coral],
+  [1.0, SPECTRUM.wine],
 ]
 
-// MR — deep trunk opening through violet into a warm canopy
+// MR — wine trunk opening through coral into a blossom canopy
 const RAMP_BONSAI: Stop[] = [
-  [0.0, SPECTRUM.deep],
-  [0.3, SPECTRUM.violet],
-  [0.56, SPECTRUM.magenta],
-  [0.8, SPECTRUM.rose],
-  [1.0, SPECTRUM.red],
+  [0.0, SPECTRUM.wine],
+  [0.28, SPECTRUM.orange],
+  [0.55, SPECTRUM.coral],
+  [0.8, SPECTRUM.pink],
+  [1.0, SPECTRUM.orchid],
 ]
 
 const SERVICE_RAMPS: Record<Exclude<ShapeName, 'eye'>, { stops: Stop[]; axis: 'x' | 'y' }> = {
@@ -515,14 +521,15 @@ export default function ThreeScene() {
       const gridExtra = new THREE.BufferGeometry()
       gridExtra.setAttribute('position', new THREE.BufferAttribute(new Float32Array(gridLines), 3))
 
-      // Deep tints — the pale purple/blue of the dark theme vanishes on cream
+      // Wine and a warmer stroke, so the scaffolding sits in the brand's
+      // temperature instead of reading as a cool grid over warm models
       const cageMat = new THREE.LineBasicMaterial({
-        color: 0x5b3f7a,
+        color: 0x431616,
         transparent: true,
         opacity: SHAPES[0].cageOpa * 1.35,
       })
       const gridMat = new THREE.LineBasicMaterial({
-        color: 0x3d5c85,
+        color: 0x7a4038,
         transparent: true,
         opacity: SHAPES[0].cageOpa * 0.68,
       })

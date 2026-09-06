@@ -8,6 +8,9 @@
   --color-ll-muted: #00000080;
   --color-ll-highlight: #ff443a;
   --color-ll-wine: #431616;
+  /* Ground for the dark experience pages — wine taken almost to black, so they
+     read as the deep end of the brand rather than as a neutral black theme */
+  --color-ll-ink: #150907;
   --color-ll-stroke: #ddd9d9;
   --color-ll-br1: #ff443a;
   --color-ll-br2: #ff5860;
@@ -155,9 +158,9 @@ h4,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(65% 50% at 50% 0%, rgba(55, 40, 160, 0.35), transparent 55%),
-    radial-gradient(50% 35% at 10% 90%, rgba(255, 50, 40, 0.08), transparent 60%),
-    radial-gradient(40% 28% at 92% 80%, rgba(100, 60, 220, 0.07), transparent 55%);
+    radial-gradient(65% 50% at 50% 0%, rgba(140, 40, 26, 0.34), transparent 55%),
+    radial-gradient(50% 35% at 10% 90%, rgba(255, 68, 58, 0.1), transparent 60%),
+    radial-gradient(40% 28% at 92% 80%, rgba(255, 154, 231, 0.08), transparent 55%);
   z-index: 0;
 }
 
@@ -273,7 +276,8 @@ h4,
 
 .mirror-hall-panel {
   border-radius: 0.85rem;
-  background: #0d0b18;
+  /* Wine-black, matching the site's dark surfaces rather than a cold blue-black */
+  background: #180a09;
   box-shadow:
     0 32px 70px rgba(0, 0, 0, 0.65),
     0 0 0 1px rgba(255, 255, 255, 0.07),
@@ -436,7 +440,13 @@ h4,
    ═══════════════════════════════════════════ */
 
 .ce-page {
-  background: #000;
+  /*
+   * Warm near-black rather than #000. The site's dark surfaces are wine
+   * (--color-ll-wine) and the ember glow-wash, so a cold black reads as a
+   * different site. Kept this deep so the additive bloom still shows as glow.
+   */
+  --ce-ground: var(--color-ll-ink);
+  background: var(--ce-ground);
   color: #fff;
   overflow-x: clip;
 }
@@ -450,7 +460,7 @@ h4,
 .ce-cta-section,
 .ce-roles-section {
   overflow: hidden;
-  background: #000;
+  background: var(--ce-ground);
 }
 
 /* Particle canvas fills its host */
@@ -468,7 +478,7 @@ h4,
  */
 .ce-morph-track {
   position: relative;
-  background: #000;
+  background: var(--ce-ground);
 }
 
 .ce-morph-canvas {
@@ -510,7 +520,7 @@ h4,
   width: 46rem;
   height: 26rem;
   max-width: 95vw;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.45) 55%, transparent 100%);
+  background: radial-gradient(closest-side, rgba(21, 9, 7, 0.82), rgba(21, 9, 7, 0.45) 55%, transparent 100%);
   z-index: -1;
   pointer-events: none;
 }
@@ -822,12 +832,12 @@ h4,
   margin-bottom: 0.7rem;
 }
 
-.ce-stat-value--blue {
-  color: #6b9cff;
+.ce-stat-value--amber {
+  color: #ff8958;
 }
 
-.ce-stat-value--purple {
-  color: #b07cff;
+.ce-stat-value--orchid {
+  color: #ff9ae7;
 }
 
 .ce-stat-note {
@@ -839,7 +849,7 @@ h4,
 /* ── Open roles ── */
 .ce-roles-section {
   padding: 7rem 0;
-  background: radial-gradient(70% 50% at 50% 0%, rgba(40, 30, 90, 0.28), transparent 65%), #000;
+  background: radial-gradient(70% 50% at 50% 0%, rgba(118, 40, 28, 0.3), transparent 65%), var(--ce-ground);
 }
 
 .ce-roles-head {
@@ -1114,8 +1124,8 @@ h4,
 .ce-vendor-register {
   padding-top: 2rem;
   background:
-    radial-gradient(60% 40% at 50% 100%, rgba(60, 30, 70, 0.22), transparent 70%),
-    #000;
+    radial-gradient(60% 40% at 50% 100%, rgba(110, 38, 26, 0.24), transparent 70%),
+    var(--ce-ground);
 }
 
 .ce-vendor-form {

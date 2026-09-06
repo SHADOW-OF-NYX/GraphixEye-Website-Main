@@ -229,7 +229,7 @@ export default function Careers() {
 
           <div className="ce-stat-card ce-stat-card--right">
             <p className="ce-stat-label">Disciplines under one roof</p>
-            <p className="ce-stat-value ce-stat-value--blue">8</p>
+            <p className="ce-stat-value ce-stat-value--amber">8</p>
             <p className="ce-stat-note">
               Design through finishing — no handoffs to outside vendors.
             </p>
@@ -237,7 +237,7 @@ export default function Careers() {
 
           <div className="ce-stat-card ce-stat-card--bottom">
             <p className="ce-stat-label">Open positions</p>
-            <p className="ce-stat-value ce-stat-value--purple">{jobs.length}</p>
+            <p className="ce-stat-value ce-stat-value--orchid">{jobs.length}</p>
             <p className="ce-stat-note">Across finance, sales, design, production, and immersive.</p>
           </div>
         </div>
