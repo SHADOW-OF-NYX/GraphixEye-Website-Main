@@ -53,9 +53,24 @@ export default function ServiceShowcase() {
       },
     })
 
+    const track = document.getElementById('morph-track')
+
     let raf = 0
     const tickTitles = () => {
       raf = requestAnimationFrame(tickTitles)
+
+      /*
+       * These panels sit in a fixed layer, so they keep painting over whatever
+       * scrolls up beneath them once the track is gone. Per-panel opacity does
+       * reach zero on its own, but the damped progress lags a fast scroll far
+       * enough for the last panel to land on top of the content below.
+       */
+      if (track) {
+        const past = track.getBoundingClientRect().bottom <= window.innerHeight
+        root.style.visibility = past ? 'hidden' : 'visible'
+        if (past) return
+      }
+
       const damped = (window as unknown as { __morphProgress?: number }).__morphProgress
       if (typeof damped === 'number') applyTitleOpacity(panels, damped)
     }
