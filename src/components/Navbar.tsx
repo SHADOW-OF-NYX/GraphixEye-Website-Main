@@ -11,6 +11,7 @@ import { usePageTransition } from './PageTransition';
 const PRELOADERS: Record<string, () => void> = {
   '/expansions': preloadExpansions,
   '/careers': preloadCareers,
+  '/vendors': preloadCareers,
 };
 
 export default function Navbar() {
@@ -91,7 +92,7 @@ export default function Navbar() {
           <BrandLogo className="h-12 md:h-14" onDark={onDark} />
         </Link>
 
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-0.5 lg:gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -99,10 +100,11 @@ export default function Navbar() {
               onMouseEnter={PRELOADERS[link.path]}
               onFocus={PRELOADERS[link.path]}
               onClick={(e) => handleNav(e, link.path)}
-              className={`h-[42px] px-4 inline-flex items-center text-[16px] transition-colors ${
+              className={`h-[42px] px-2.5 lg:px-4 inline-flex items-center text-[14px] lg:text-[16px] whitespace-nowrap transition-colors ${
                 location.pathname === link.path ||
                 (link.path === '/services' && location.pathname.startsWith('/services')) ||
-                (link.path === '/expansions' && location.pathname.startsWith('/expansions'))
+                (link.path === '/expansions' && location.pathname.startsWith('/expansions')) ||
+                (link.path === '/vendors' && location.pathname.startsWith('/vendors'))
                   ? ''
                   : 'opacity-90 hover:opacity-100'
               }`}

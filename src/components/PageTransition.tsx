@@ -10,7 +10,7 @@ type Origin = { x: number; y: number };
  * on Careers the black veil fades over an already-black page and all you see
  * is the content arriving.
  */
-const DARK_ROUTES = new Set(['/careers']);
+const DARK_ROUTES = new Set(['/careers', '/vendors']);
 const VEIL_DARK = '#000000';
 const VEIL_LIGHT = '#fcf8f1';
 

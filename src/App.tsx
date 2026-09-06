@@ -11,6 +11,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Careers from './pages/Careers';
+import Vendors from './pages/Vendors';
 import Expansions from './pages/Expansions';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 
@@ -27,7 +28,7 @@ function ScrollToTop() {
 function AppShell() {
   const { pathname } = useLocation();
   const isExpansions = pathname === '/expansions';
-  const isCareers = pathname === '/careers';
+  const isDarkExperience = pathname === '/careers' || pathname === '/vendors';
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -37,7 +38,7 @@ function AppShell() {
   return (
     <div
       className={`font-sans min-h-screen ${
-        isCareers ? 'text-ll-white bg-black' : 'text-black bg-ll-white'
+        isDarkExperience ? 'text-ll-white bg-black' : 'text-black bg-ll-white'
       }`}
     >
       <Navbar />
@@ -53,9 +54,10 @@ function AppShell() {
           <Route path="/experience" element={<Experience />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
+          <Route path="/vendors" element={<Vendors />} />
         </Routes>
       </main>
-      {!isCareers && <Footer />}
+      {!isDarkExperience && <Footer />}
     </div>
   );
 }

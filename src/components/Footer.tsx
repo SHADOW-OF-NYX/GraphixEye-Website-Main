@@ -17,6 +17,8 @@ export default function Footer() {
             <Link to="/services" className="hover:text-ll-highlight transition-colors">Services</Link>
             <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
             <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
+            <Link to="/careers" className="hover:text-ll-highlight transition-colors">Careers</Link>
+            <Link to="/vendors" className="hover:text-ll-highlight transition-colors">Vendor Registration</Link>
             <Link to="/contact" className="hover:text-ll-highlight transition-colors">Contact</Link>
             <a href={`mailto:${site.email}`} className="hover:text-ll-highlight transition-colors">Email</a>
             <span className="text-black/50">Privacy Policy</span>

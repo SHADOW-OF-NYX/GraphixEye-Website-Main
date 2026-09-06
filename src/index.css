@@ -1088,6 +1088,148 @@ h4,
   }
 }
 
+/* ── Vendor registration form ── */
+.ce-vendor-benefits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 62rem;
+  margin: 2.5rem auto 0;
+}
+
+.ce-vendor-benefit {
+  padding: 1.25rem 1.35rem;
+  border-radius: 1rem;
+  background: rgba(14, 14, 18, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.ce-vendor-benefit-body {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ce-vendor-register {
+  padding-top: 2rem;
+  background:
+    radial-gradient(60% 40% at 50% 100%, rgba(60, 30, 70, 0.22), transparent 70%),
+    #000;
+}
+
+.ce-vendor-form {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.75rem;
+  border-radius: 1.25rem;
+  background: rgba(14, 14, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+}
+
+.ce-vendor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.15rem 1.25rem;
+}
+
+.ce-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ce-field--full {
+  margin-top: 1.15rem;
+}
+
+.ce-field-label {
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.ce-input {
+  width: 100%;
+  height: 3rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 160ms, background 160ms;
+}
+
+.ce-input::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.ce-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.ce-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.45)' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.95rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.ce-select option {
+  background: #121218;
+  color: #fff;
+}
+
+.ce-textarea {
+  height: auto;
+  min-height: 8.5rem;
+  padding: 1rem 1.15rem;
+  border-radius: 1.25rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.ce-vendor-form-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ce-vendor-form-note {
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.4);
+  max-width: 28rem;
+}
+
+.ce-vendor-form button.ce-btn {
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .ce-vendor-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .ce-vendor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .ce-job-head {
     flex-direction: column;
@@ -1105,5 +1247,18 @@ h4,
 
   .ce-hero {
     padding-top: 6.5rem;
+  }
+
+  .ce-vendor-form {
+    padding: 1.25rem;
+  }
+
+  .ce-vendor-form-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ce-vendor-form-foot .ce-btn {
+    justify-content: center;
   }
 }
