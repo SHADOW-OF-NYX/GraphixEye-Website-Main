@@ -1,22 +1,61 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { BrandLogo } from './ui';
+import { onHeroReady, markHeroReady } from '../lib/heroReady';
+
+const MIN_MS = 900;
+const MAX_MS = 12000;
+const FADE_MS = 700;
 
 export default function Preloader() {
+  const { pathname } = useLocation();
   const [gone, setGone] = useState(false);
   const [hide, setHide] = useState(false);
+  const [barDone, setBarDone] = useState(false);
 
   useEffect(() => {
-    const t1 = window.setTimeout(() => setHide(true), 1700);
-    const t2 = window.setTimeout(() => {
-      setGone(true);
-      ScrollTrigger.refresh();
-    }, 2300);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
+    let hideTimer = 0;
+    let goneTimer = 0;
+    let finished = false;
+    const start = performance.now();
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      setBarDone(true);
+      const wait = Math.max(0, MIN_MS - (performance.now() - start));
+      hideTimer = window.setTimeout(() => {
+        setHide(true);
+        goneTimer = window.setTimeout(() => {
+          setGone(true);
+          ScrollTrigger.refresh();
+        }, FADE_MS);
+      }, wait);
     };
-  }, []);
+
+    // Only the home hero video gates the preloader
+    const needsHero = pathname === '/';
+    let unsub = () => undefined;
+    let maxTimer = 0;
+
+    if (needsHero) {
+      unsub = onHeroReady(finish);
+      maxTimer = window.setTimeout(() => {
+        markHeroReady();
+        finish();
+      }, MAX_MS);
+    } else {
+      maxTimer = window.setTimeout(finish, MIN_MS);
+    }
+
+    return () => {
+      unsub();
+      window.clearTimeout(maxTimer);
+      window.clearTimeout(hideTimer);
+      window.clearTimeout(goneTimer);
+    };
+  }, [pathname]);
 
   if (gone) return null;
 
@@ -28,7 +67,9 @@ export default function Preloader() {
         <BrandLogo className="h-24" />
       </div>
       <div className="w-40 h-[2px] bg-ll-sand overflow-hidden">
-        <div className="preloader-bar h-full origin-left bg-ll-highlight" />
+        <div
+          className={`preloader-bar h-full origin-left bg-ll-highlight ${barDone ? 'preloader-bar--done' : ''}`}
+        />
       </div>
     </div>
   );

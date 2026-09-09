@@ -1,4 +1,5 @@
 import React from 'react';
+import { markHeroReady } from '../lib/heroReady';
 
 export function BrandLogo({
   className = 'h-10',
@@ -117,12 +118,32 @@ export function HeroVideo({
     const el = ref.current;
     if (!el) return;
     el.muted = true;
+
     const play = () => {
       void el.play().catch(() => undefined);
     };
+
+    const onReady = () => {
+      play();
+      markHeroReady();
+    };
+
+    // HAVE_FUTURE_DATA — enough buffered to start playback
+    if (el.readyState >= 3) {
+      onReady();
+    } else {
+      el.addEventListener('canplay', onReady);
+      el.addEventListener('loadeddata', onReady);
+    }
+    el.addEventListener('error', markHeroReady);
+
     play();
-    el.addEventListener('canplay', play);
-    return () => el.removeEventListener('canplay', play);
+
+    return () => {
+      el.removeEventListener('canplay', onReady);
+      el.removeEventListener('loadeddata', onReady);
+      el.removeEventListener('error', markHeroReady);
+    };
   }, [src]);
 
   return (

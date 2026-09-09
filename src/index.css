@@ -101,11 +101,20 @@ h4,
 }
 
 .preloader-bar {
-  animation: loadbar 1.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  transform: scaleX(0);
+  animation: loadbar-wait 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-@keyframes loadbar {
+.preloader-bar--done {
+  animation: loadbar-done 0.5s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes loadbar-wait {
   from { transform: scaleX(0); }
+  to { transform: scaleX(0.78); }
+}
+
+@keyframes loadbar-done {
   to { transform: scaleX(1); }
 }
 
