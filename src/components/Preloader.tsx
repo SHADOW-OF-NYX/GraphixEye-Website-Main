@@ -4,8 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { BrandLogo } from './ui';
 import { onHeroReady, markHeroReady } from '../lib/heroReady';
 
-const MIN_MS = 900;
-const MAX_MS = 12000;
+const MIN_MS = 700;
+const MAX_MS = 2800;
 const FADE_MS = 700;
 
 export default function Preloader() {

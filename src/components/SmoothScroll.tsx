@@ -2,14 +2,9 @@ import { useEffect } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { isCoarsePointer, isNarrowViewport } from '../lib/device';
+import { onMediaQueryChange, shouldUseNativeScroll } from '../lib/device';
 
 gsap.registerPlugin(ScrollTrigger);
-
-/** Prefer native scroll on phones/tablets — Lenis fights touch + GSAP pins. */
-function shouldUseNativeScroll() {
-  return isCoarsePointer() || isNarrowViewport(900);
-}
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -32,6 +27,7 @@ export default function SmoothScroll() {
         lenis.destroy();
         lenis = null;
       }
+      document.documentElement.classList.remove('lenis', 'lenis-smooth');
     };
 
     const setup = () => {
@@ -43,6 +39,7 @@ export default function SmoothScroll() {
         window.addEventListener('scroll', onNativeScroll, { passive: true });
         gsap.ticker.lagSmoothing(500, 33);
         onNativeScroll();
+        ScrollTrigger.refresh();
         return;
       }
 
@@ -66,13 +63,12 @@ export default function SmoothScroll() {
     setup();
     window.addEventListener('resize', onResize);
     const mq = window.matchMedia('(pointer: coarse), (max-width: 900px)');
-    const onMq = () => setup();
-    mq.addEventListener('change', onMq);
+    const offMq = onMediaQueryChange(mq, setup);
 
     return () => {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('scroll', onNativeScroll);
-      mq.removeEventListener('change', onMq);
+      offMq();
       teardownLenis();
     };
   }, []);

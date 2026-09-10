@@ -77,7 +77,7 @@ export default function Expansions() {
       <ServiceShowcase />
 
       <div id="morph-track" className="relative" style={{ height: '620vh', zIndex: 10 }}>
-        <div className="sticky top-0 h-[100dvh] overflow-hidden">
+        <div className="sticky top-0 h-app-screen overflow-hidden">
           <div ref={introRef} className="absolute inset-0 pointer-events-none select-none">
             <div className="absolute left-6 md:left-14 top-1/2 -translate-y-1/2 -mt-10 max-w-xl">
               <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-5">

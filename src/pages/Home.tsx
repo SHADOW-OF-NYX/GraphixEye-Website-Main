@@ -108,7 +108,7 @@ export default function Home() {
       <Seo page={getPageSeo('/')!} includeLocalBusiness jsonLd={faqPageJsonLd(homeFaqs)} />
       {/* HERO */}
       <section ref={heroWrap} className="relative h-[200vh] md:h-[280vh] bg-ll-white">
-        <div className="sticky top-0 h-[100dvh] overflow-hidden flex items-center justify-center bg-ll-white">
+        <div className="sticky top-0 h-app-screen overflow-hidden flex items-center justify-center bg-ll-white">
           <div ref={heroFrame} data-nav-tone="dark" className="absolute inset-0 overflow-hidden will-change-transform bg-black">
             <HeroVideo src={heroVideo} poster={photos.hero} />
             <div ref={heroDim} className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0.12 }} />
@@ -176,7 +176,7 @@ export default function Home() {
 
       {/* DEVICE / STUDIO */}
       <section className="px-4 md:px-8 py-10 md:py-16">
-        <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-[70dvh] md:min-h-[78vh] relative text-ll-white">
+        <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-app-70 md:min-h-[78vh] relative text-ll-white">
           <div className="absolute inset-0">
             <Placeholder
               src={photos.studio}
@@ -185,7 +185,7 @@ export default function Home() {
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/15" />
-          <div className="relative z-10 flex flex-col justify-between min-h-[70dvh] md:min-h-[78vh] p-6 sm:p-8 md:p-12">
+          <div className="relative z-10 flex flex-col justify-between min-h-app-70 md:min-h-[78vh] p-6 sm:p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 md:gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
               <p className="max-w-sm text-[14px] leading-relaxed text-ll-white/85">

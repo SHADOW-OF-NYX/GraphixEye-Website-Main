@@ -33,13 +33,29 @@ body,
 
 html {
   /* Prefer dynamic viewport on mobile browsers (URL bar show/hide). */
-  --app-vh: 100dvh;
+  --app-vh: 100vh;
 }
 
-@supports not (height: 100dvh) {
+@supports (height: 100dvh) {
   html {
-    --app-vh: 100vh;
+    --app-vh: 100dvh;
   }
+}
+
+/* Full-viewport surfaces — cascade keeps Safari that lacks dvh working */
+.h-app-screen {
+  height: 100vh;
+  height: var(--app-vh);
+}
+
+.min-h-app-screen {
+  min-height: 100vh;
+  min-height: var(--app-vh);
+}
+
+.min-h-app-70 {
+  min-height: 70vh;
+  min-height: calc(var(--app-vh) * 0.7);
 }
 
 body {
@@ -180,6 +196,7 @@ h4,
 
 /* ─── Mirror Hall page shell ─── */
 .mh-page {
+  min-height: 100vh;
   min-height: var(--app-vh);
   background: #05040d;
 }
@@ -187,6 +204,7 @@ h4,
 /* Mirror Hall — full-bleed section */
 .mirror-hall {
   position: relative;
+  min-height: 100vh;
   min-height: var(--app-vh);
   background: #05040d;
   color: #fff;

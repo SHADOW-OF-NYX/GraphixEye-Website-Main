@@ -118,31 +118,53 @@ export function HeroVideo({
     const el = ref.current;
     if (!el) return;
     el.muted = true;
+    el.defaultMuted = true;
+    el.setAttribute('muted', '');
+    el.setAttribute('playsinline', '');
+    el.setAttribute('webkit-playsinline', '');
+
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      markHeroReady();
+    };
 
     const play = () => {
-      void el.play().catch(() => undefined);
+      const attempt = el.play();
+      if (attempt && typeof attempt.then === 'function') {
+        attempt.then(settle).catch(() => {
+          // Autoplay blocked — still lift the preloader; poster is enough.
+          settle();
+        });
+      }
     };
 
     const onReady = () => {
       play();
-      markHeroReady();
+      settle();
     };
 
-    // HAVE_FUTURE_DATA — enough buffered to start playback
-    if (el.readyState >= 3) {
+    // HAVE_CURRENT_DATA+ is enough to show a frame on Safari
+    if (el.readyState >= 2) {
       onReady();
     } else {
+      el.addEventListener('loadedmetadata', onReady);
       el.addEventListener('canplay', onReady);
       el.addEventListener('loadeddata', onReady);
     }
-    el.addEventListener('error', markHeroReady);
+    el.addEventListener('error', settle);
 
     play();
+    // Hard fallback — never leave Safari stuck behind the preloader
+    const failsafe = window.setTimeout(settle, 2200);
 
     return () => {
+      window.clearTimeout(failsafe);
+      el.removeEventListener('loadedmetadata', onReady);
       el.removeEventListener('canplay', onReady);
       el.removeEventListener('loadeddata', onReady);
-      el.removeEventListener('error', markHeroReady);
+      el.removeEventListener('error', settle);
     };
   }, [src]);
 
@@ -156,7 +178,7 @@ export function HeroVideo({
       muted
       loop
       playsInline
-      preload="auto"
+      preload="metadata"
       aria-label="GraphixEye factory"
     />
   );

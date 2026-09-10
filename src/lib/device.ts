@@ -11,6 +11,25 @@ export function isNarrowViewport(maxWidth = 768): boolean {
 }
 
 /**
+ * Safari / iOS WebKit — Lenis + GSAP pins fight native scroll here.
+ * Includes iPadOS "desktop" mode (fine pointer, still WebKit).
+ */
+export function isSafariOrIOS(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const iOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const desktopSafari = /Safari/i.test(ua) && !/Chrome|Chromium|Edg|Android/i.test(ua);
+  return iOS || desktopSafari;
+}
+
+/** Prefer native scroll whenever Lenis is likely to break (touch, narrow, Safari). */
+export function shouldUseNativeScroll(): boolean {
+  return isSafariOrIOS() || isCoarsePointer() || isNarrowViewport(900);
+}
+
+/**
  * Particle / WebGL budget for the current device.
  * Phones get fewer points and a lower DPR; tablets sit in between.
  */
@@ -22,22 +41,23 @@ export function getParticleBudget() {
   const coarse = isCoarsePointer();
   const narrow = isNarrowViewport(768);
   const mid = isNarrowViewport(1024);
+  const safari = isSafariOrIOS();
   const cores = navigator.hardwareConcurrency || 4;
-  const lowPower = cores <= 4 || coarse;
+  const lowPower = cores <= 4 || coarse || safari;
 
-  if (narrow || (coarse && mid)) {
+  if (narrow || (coarse && mid) || (safari && mid)) {
     return {
       countScale: lowPower ? 0.35 : 0.45,
-      maxDpr: 1.25,
+      maxDpr: safari ? 1 : 1.25,
       reduceBloom: true,
     };
   }
 
-  if (mid || coarse) {
+  if (mid || coarse || safari) {
     return {
-      countScale: 0.65,
-      maxDpr: 1.5,
-      reduceBloom: false,
+      countScale: safari ? 0.55 : 0.65,
+      maxDpr: safari ? 1.25 : 1.5,
+      reduceBloom: safari,
     };
   }
 
@@ -70,4 +90,14 @@ export function subsampleScalar(src: Float32Array, targetCount: number): Float32
     out[i] = src[Math.floor((i / targetCount) * src.length)];
   }
   return out;
+}
+
+/** MediaQueryList.change — older Safari only had addListener/removeListener. */
+export function onMediaQueryChange(mq: MediaQueryList, handler: () => void): () => void {
+  if (typeof mq.addEventListener === 'function') {
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }
+  mq.addListener(handler);
+  return () => mq.removeListener(handler);
 }
