@@ -391,67 +391,79 @@ async function bakeOffice() {
   console.log('\n— office (desk setup) from', OFFICE)
   const gltf = await loadGltf(OFFICE)
   /*
-   * Match reference: chair left-foreground, looking across the desk toward
-   * monitor / Thinker. Furniture only — no room shell — so the silhouette
-   * reads like the product shot on empty ground.
+   * Chair-left 3/4. Fixed particle budgets per object — triangle-weighted
+   * sampling was dumping almost everything onto tiny phone/glass meshes
+   * (Rounding_2), which bloomed white and starved the actual desk (Cube013)
+   * and CPU tower (Cube054).
    */
   gltf.scene.rotation.set(-0.14, -2.48, 0.02)
   gltf.scene.updateMatrixWorld(true)
 
-  const FURNITURE =
-    /Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cube013|Cilindro|10105/i
   const all = collectMeshes(gltf.scene)
-  const meshes = all.filter((m) =>
-    FURNITURE.test(`${m.name || ''}|${m.parent?.name || ''}`),
-  )
-  console.log('  furniture meshes', meshes.length, '/', all.length)
+  const by = (re) =>
+    all.filter((m) => re.test(`${m.name || ''}|${m.parent?.name || ''}`))
 
-  const weights = meshes.map((mesh) => {
-    let w = meshWeight(mesh)
-    const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    // Screen / desk / CPU get the densest brightest sample
-    if (/Monitor/i.test(n)) w *= 6.5
-    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 5.2
-    else if (/GOMA|Cilindro/i.test(n)) w *= 5.5
-    else if (/Keyboard|Thinker|10105/i.test(n)) w *= 3.2
-    else if (/Kastel/i.test(n)) w *= 2.4
-    return Math.max(w, 1)
-  })
+  const groups = [
+    { name: 'desk', meshes: by(/Cube013|Cube031/i), share: 0.34, boost: 1.2, tone: 0.5 },
+    { name: 'cpu', meshes: by(/Cube054/i), share: 0.2, boost: 1.25, tone: 0.55 },
+    { name: 'monitor', meshes: by(/Monitor/i), share: 0.16, boost: 1.3, tone: 0.65 },
+    { name: 'chair', meshes: by(/Kastel/i), share: 0.18, boost: 1.1, tone: 0.4 },
+    { name: 'keys', meshes: by(/Keyboard|10105/i), share: 0.07, boost: 1.15, tone: 0.55 },
+    { name: 'props', meshes: by(/Thinker|LODEX|Mat3/i), share: 0.05, boost: 1.1, tone: 0.45 },
+  ].filter((g) => g.meshes.length > 0)
 
   const positions = new Float32Array(N * 3)
   const colors = new Float32Array(N * 3)
-  const total = weights.reduce((a, b) => a + b, 0) || 1
+  const sizes = new Float32Array(N)
   let offset = 0
   const tmp = new THREE.Vector3()
   const normal = new THREE.Vector3()
   const color = new THREE.Color()
 
-  for (let m = 0; m < meshes.length; m++) {
-    const mesh = meshes[m]
-    const share =
-      m === meshes.length - 1
+  const shareSum = groups.reduce((a, g) => a + g.share, 0) || 1
+
+  for (let gi = 0; gi < groups.length; gi++) {
+    const g = groups[gi]
+    const count =
+      gi === groups.length - 1
         ? N - offset
-        : Math.max(1, Math.round((weights[m] / total) * N))
-    if (share <= 0 || !mesh.geometry?.attributes?.position) continue
-    const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
-    const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    const hero = /Monitor|Rounding|Cube031|Cube013|GOMA|Cilindro/i.test(n)
-    for (let i = 0; i < share && offset + i < N; i++) {
-      sampler.sample(tmp, normal)
-      tmp.applyMatrix4(mesh.matrixWorld)
-      const i3 = (offset + i) * 3
-      positions[i3] = tmp.x
-      positions[i3 + 1] = tmp.y
-      positions[i3 + 2] = tmp.z
-      const t = Math.min(1, Math.max(0, (tmp.y + 1) / 6))
-      brassColor(color, hero ? 0.7 + t * 0.3 : 0.35 + t * 0.45)
-      const boost = hero ? 1.75 : 1.15
-      colors[i3] = Math.min(1, color.r * boost)
-      colors[i3 + 1] = Math.min(1, color.g * boost)
-      colors[i3 + 2] = Math.min(1, color.b * boost)
+        : Math.max(1, Math.round((g.share / shareSum) * N))
+    console.log(`  ${g.name}`, g.meshes.length, 'meshes →', count, 'pts')
+
+    const weights = g.meshes.map((m) => Math.max(meshWeight(m), 1))
+    const total = weights.reduce((a, b) => a + b, 0) || 1
+    let written = 0
+
+    for (let m = 0; m < g.meshes.length; m++) {
+      const mesh = g.meshes[m]
+      const nShare =
+        m === g.meshes.length - 1
+          ? count - written
+          : Math.max(1, Math.round((weights[m] / total) * count))
+      if (nShare <= 0 || !mesh.geometry?.attributes?.position) continue
+      const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
+      const lo = g.name === 'chair' || g.name === 'props' ? 0.75 : 1.05
+      const hi = g.name === 'chair' || g.name === 'props' ? 1.35 : 1.75
+      for (let i = 0; i < nShare && offset + written + i < N; i++) {
+        sampler.sample(tmp, normal)
+        tmp.applyMatrix4(mesh.matrixWorld)
+        const idx = offset + written + i
+        const i3 = idx * 3
+        positions[i3] = tmp.x
+        positions[i3 + 1] = tmp.y
+        positions[i3 + 2] = tmp.z
+        const t = Math.min(1, Math.max(0, (tmp.y + 1) / 6))
+        brassColor(color, g.tone + t * 0.35)
+        colors[i3] = Math.min(1, color.r * g.boost)
+        colors[i3 + 1] = Math.min(1, color.g * g.boost)
+        colors[i3 + 2] = Math.min(1, color.b * g.boost)
+        sizes[idx] = lo + Math.random() * (hi - lo)
+      }
+      written += nShare
     }
-    offset += share
+    offset += count
   }
+
   while (offset < N) {
     const src = (offset % Math.max(1, offset)) * 3
     positions[offset * 3] = positions[src]
@@ -460,13 +472,14 @@ async function bakeOffice() {
     colors[offset * 3] = colors[src]
     colors[offset * 3 + 1] = colors[src + 1]
     colors[offset * 3 + 2] = colors[src + 2]
+    sizes[offset] = sizes[offset % Math.max(1, offset)] || 1.1
     offset++
   }
 
   normalizePositions(positions, 2.2)
   writeBin('office.bin', positions)
   writeBin('office_colors.bin', colors)
-  writeBin('office_sizes.bin', defaultSizes(N, 1.05, 1.9))
+  writeBin('office_sizes.bin', sizes)
 }
 
 const only = process.argv[2]
