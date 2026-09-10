@@ -29,7 +29,7 @@ globalThis.createImageBitmap = async () => ({ width: 1, height: 1, close() {} })
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const OUT = path.join(ROOT, 'public', 'particle-targets', 'experience')
-const WAREHOUSE = 'c:/Users/gauth/Downloads/warehouses.glb'
+const WAREHOUSE = 'c:/Users/gauth/Downloads/sample_warehouse_-_revit.glb'
 const HAAS = 'c:/Users/gauth/Downloads/the_haas-galinha_press.glb'
 
 /** Must match FEELS.experience.count in CareerParticles.tsx */
@@ -240,23 +240,27 @@ async function bakeWarehouse() {
   console.log('\n— warehouse from', WAREHOUSE)
   const gltf = await loadGltf(WAREHOUSE)
   /*
-   * Long shed with sawtooth roofs. Elevated front-left 3/4 so the floor volume
-   * and roof peaks read together — not a flat side elevation.
+   * Revit sample shed — longest in Z. Elevated front-left 3/4 so facade depth
+   * and roof volume read together (not a flat side strip).
    */
-  gltf.scene.rotation.set(-0.4, 1.02, 0.03)
+  gltf.scene.rotation.set(-0.38, 1.05, 0.03)
   gltf.scene.updateMatrixWorld(true)
 
   const meshes = collectMeshes(gltf.scene)
   const positions = new Float32Array(N * 3)
   const colors = sampleMeshes(meshes, N, positions, (color, p) => {
-    const t = Math.min(1, Math.max(0, (p.y + 20) / 60))
-    brassColor(color, t)
+    const t = Math.min(1, Math.max(0, (p.y + 2) / 10))
+    brassColor(color, 0.25 + t * 0.7)
+    const boost = 1.15
+    color.r = Math.min(1, color.r * boost)
+    color.g = Math.min(1, color.g * boost)
+    color.b = Math.min(1, color.b * boost)
   })
 
-  normalizePositions(positions, 2.35)
+  normalizePositions(positions, 2.4)
   writeBin('warehouse.bin', positions)
   writeBin('warehouse_colors.bin', colors)
-  writeBin('warehouse_sizes.bin', defaultSizes(N, 0.6, 1.35))
+  writeBin('warehouse_sizes.bin', defaultSizes(N, 0.7, 1.45))
 }
 
 async function bakeHaasPress() {
