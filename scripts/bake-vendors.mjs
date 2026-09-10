@@ -220,8 +220,8 @@ function sampleWorldMeshes(entries, count, positions, colorFn) {
   return colors
 }
 
-function captureLocalSamples(meshes, count) {
-  const weights = meshes.map(meshWeight)
+function captureLocalSamples(meshes, count, weightFn) {
+  const weights = meshes.map((mesh, i) => (weightFn ? weightFn(mesh, i) : meshWeight(mesh)))
   const total = weights.reduce((a, b) => a + b, 0) || 1
   const samples = []
   const tmp = new THREE.Vector3()
@@ -320,11 +320,10 @@ async function bakeForklift() {
   if (!clip) throw new Error('Forklift has no animation clips')
 
   /*
-   * Designer framing: the GLB is long in X (forks at −X), thin in Z — so a
-   * default +Z camera is a flat side silhouette. Bring the forks toward the
-   * camera with a classic elevated 3/4 (≈58° off front), not a rear/side view.
+   * Keep the GLB in model space (forks at −X). The runtime camera sits on an
+   * elevated front-left 3/4 so the L-silhouette (mast + forks) reads clearly.
+   * Oversample the fork/mast zone so those thin parts aren't lost in the cloud.
    */
-  gltf.scene.rotation.set(-0.45, Math.PI * 0.5 - 0.38, 0.02)
   gltf.scene.updateMatrixWorld(true)
 
   const mixer = new THREE.AnimationMixer(gltf.scene)
@@ -333,32 +332,71 @@ async function bakeForklift() {
   action.paused = true
 
   const meshes = collectMeshes(gltf.scene)
-  action.time = 0
+  // Pose with forks extended before classifying mesh zones
+  action.time = clip.duration * 0.5
   mixer.update(0)
   gltf.scene.updateMatrixWorld(true)
-  const samples = captureLocalSamples(meshes, N)
+
+  const worldBox = new THREE.Box3().setFromObject(gltf.scene)
+  const minX = worldBox.min.x
+  const spanX = worldBox.max.x - worldBox.min.x || 1
+  const forkCut = minX + spanX * 0.26
+  const mastCut = minX + spanX * 0.48
+  const groundY = worldBox.min.y + (worldBox.max.y - worldBox.min.y) * 0.28
+
+  const samples = captureLocalSamples(meshes, N, (mesh) => {
+    let w = meshWeight(mesh)
+    const box = new THREE.Box3().setFromObject(mesh)
+    const cx = (box.min.x + box.max.x) / 2
+    if (cx < forkCut) w *= 4.2
+    else if (cx < mastCut) w *= 2.2
+    // Wheels are dense discs — they steal the silhouette if over-sampled
+    if (box.max.y < groundY && box.max.x - box.min.x < spanX * 0.22) w *= 0.5
+    return Math.max(w, 1)
+  })
+
+  // Tag fork-region particles from first evaluate (stable across frames)
+  const tagPos = new Float32Array(N * 3)
+  evaluateLocalSamples(samples, tagPos)
+  const isFork = new Uint8Array(N)
+  for (let i = 0; i < N; i++) {
+    isFork[i] = tagPos[i * 3] < forkCut ? 1 : 0
+  }
 
   const framePositions = []
   let colors = null
+  let sizes = null
   let norm = null
+  // Start loop mid-clip so the held morph pose already shows forks extended
+  const phase = clip.duration * 0.45
 
   for (let f = 0; f < FORKLIFT_FRAMES; f++) {
-    action.time = (f / FORKLIFT_FRAMES) * clip.duration
+    action.time = (phase + (f / FORKLIFT_FRAMES) * clip.duration) % clip.duration
     mixer.update(0)
     gltf.scene.updateMatrixWorld(true)
     const positions = new Float32Array(N * 3)
     evaluateLocalSamples(samples, positions)
 
     if (!norm) {
-      norm = computeNorm(positions, 2.35)
+      norm = computeNorm(positions, 2.5)
       colors = new Float32Array(N * 3)
+      sizes = new Float32Array(N)
       for (let i = 0; i < N; i++) {
         const y = (positions[i * 3 + 1] - norm.cy) * norm.s
         const tt = Math.min(1, Math.max(0, (y + 1.0) / 2.0))
-        // Hot foundry read — brighter than the first bake
-        colors[i * 3] = 0.85 + tt * 0.15
-        colors[i * 3 + 1] = 0.35 + tt * 0.5
-        colors[i * 3 + 2] = 0.06 + tt * 0.25
+        if (isFork[i]) {
+          // Hot, bright forks — the recognition cue
+          colors[i * 3] = 1.0
+          colors[i * 3 + 1] = 0.78 + tt * 0.18
+          colors[i * 3 + 2] = 0.28 + tt * 0.25
+          sizes[i] = 1.2 + Math.random() * 0.55
+        } else {
+          // Body must stay readable, not a ghost behind hot wheels
+          colors[i * 3] = 0.95 + tt * 0.05
+          colors[i * 3 + 1] = 0.48 + tt * 0.4
+          colors[i * 3 + 2] = 0.1 + tt * 0.28
+          sizes[i] = 0.72 + Math.random() * 0.55
+        }
       }
     }
     applyNorm(positions, norm)
@@ -372,7 +410,7 @@ async function bakeForklift() {
   for (let f = 0; f < FORKLIFT_FRAMES; f++) anim.set(framePositions[f], f * N * 3)
   writeBin('forklift_anim.bin', anim)
   writeBin('forklift_colors.bin', colors)
-  writeBin('forklift_sizes.bin', defaultSizes(N, 0.6, 1.25))
+  writeBin('forklift_sizes.bin', sizes)
   fs.writeFileSync(
     path.join(OUT, 'forklift_meta.json'),
     JSON.stringify({ frames: FORKLIFT_FRAMES, count: N, duration: clip.duration, clip: clip.name }),

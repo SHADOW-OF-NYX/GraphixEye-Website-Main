@@ -1197,11 +1197,12 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     wave: 0,
   },
   forklift: {
-    camera: { x: 0.35, y: 0.55, z: 4.4, lookX: 0, lookY: -0.08, lookZ: 0, fov: 36 },
-    bloom: 1.35,
-    pointScale: 3.6,
-    alpha: 0.78,
-    noiseAmp: 0.0018,
+    // Classic product 3/4: slightly elevated front-left, L-silhouette clear
+    camera: { x: -2.15, y: 1.3, z: 3.45, lookX: 0.0, lookY: -0.12, lookZ: 0, fov: 36 },
+    bloom: 1.25,
+    pointScale: 4.5,
+    alpha: 0.92,
+    noiseAmp: 0.0008,
     rotX: 0,
     spinY: 0,
     spinZ: 0,

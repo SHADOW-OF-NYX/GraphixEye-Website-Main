@@ -31,7 +31,7 @@ export async function loadVendorBaked(id: VendorBakedId): Promise<VendorBakedSha
 
   // Cache-bust when bins are rebaked (in-memory cache still needs a remount/hard reload).
   const base = `/particle-targets/vendors/${id}`;
-  const v = 'v=20260910d';
+  const v = 'v=20260910fork2';
   const [positions, colors, sizes] = await Promise.all([
     loadBin(`${base}.bin?${v}`),
     loadBin(`${base}_colors.bin?${v}`),
