@@ -1333,8 +1333,8 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     wave: 0,
   },
   office: {
-    // Chair left, desk readable — restrained bloom so surfaces don't blow out
-    camera: { x: -0.15, y: 0.72, z: 3.55, lookX: 0.08, lookY: -0.22, lookZ: 0, fov: 36 },
+    // Higher vantage looking down so the desk sits mid-frame, not high up
+    camera: { x: -0.1, y: 1.45, z: 3.8, lookX: 0.05, lookY: -0.35, lookZ: 0, fov: 34 },
     bloom: 0.95,
     pointScale: 3.8,
     alpha: 0.88,
