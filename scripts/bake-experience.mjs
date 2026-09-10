@@ -390,8 +390,11 @@ async function bakeHaasPress() {
 async function bakeOffice() {
   console.log('\n— office (interior) from', OFFICE)
   const gltf = await loadGltf(OFFICE)
-  // Upright room — camera sits inside at runtime
-  gltf.scene.rotation.set(0, 0, 0)
+  /*
+   * Elevated 3/4 of the studio — desks / chairs / monitors read as one room.
+   * Heavy furniture weighting so walls don't wash out the silhouette.
+   */
+  gltf.scene.rotation.set(-0.28, 0.82, 0.04)
   gltf.scene.updateMatrixWorld(true)
 
   const meshes = collectMeshes(gltf.scene)
@@ -400,9 +403,10 @@ async function bakeOffice() {
   const weights = meshes.map((mesh) => {
     let w = meshWeight(mesh)
     const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    // Favour desks / chairs / screens over large wall / floor planes
-    if (/Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cilindro/i.test(n)) w *= 2.8
-    else if (/Mat3|Mat001|Mat1|schwarz_glass|Metallic/i.test(n)) w *= 0.45
+    if (/Monitor|Keyboard|Kastel|GOMA|Thinker|Cilindro|10105/i.test(n)) w *= 4.2
+    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 3.0
+    else if (/schwarz_glass|Metallic001|Mat3|Mat001|Mat1|Mat004|Mat003|Mat4|Mat5|Mat7|Mat8/i.test(n))
+      w *= 0.28
     return Math.max(w, 1)
   })
 
@@ -422,6 +426,9 @@ async function bakeOffice() {
         : Math.max(1, Math.round((weights[m] / total) * N))
     if (share <= 0 || !mesh.geometry?.attributes?.position) continue
     const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
+    const furniture = /Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cilindro|10105/i.test(
+      `${mesh.name || ''}|${mesh.parent?.name || ''}`,
+    )
     for (let i = 0; i < share && offset + i < N; i++) {
       sampler.sample(tmp, normal)
       tmp.applyMatrix4(mesh.matrixWorld)
@@ -429,9 +436,9 @@ async function bakeOffice() {
       positions[i3] = tmp.x
       positions[i3 + 1] = tmp.y
       positions[i3 + 2] = tmp.z
-      const t = Math.min(1, Math.max(0, (tmp.y + 1) / 7))
-      brassColor(color, 0.35 + t * 0.65)
-      const boost = 1.25
+      const t = Math.min(1, Math.max(0, (tmp.y + 2) / 8))
+      brassColor(color, furniture ? 0.55 + t * 0.45 : 0.28 + t * 0.5)
+      const boost = furniture ? 1.45 : 1.15
       colors[i3] = Math.min(1, color.r * boost)
       colors[i3 + 1] = Math.min(1, color.g * boost)
       colors[i3 + 2] = Math.min(1, color.b * boost)
@@ -449,10 +456,11 @@ async function bakeOffice() {
     offset++
   }
 
-  normalizePositions(positions, 2.4)
+  normalizePositions(positions, 2.35)
   writeBin('office.bin', positions)
   writeBin('office_colors.bin', colors)
-  writeBin('office_sizes.bin', defaultSizes(N, 0.7, 1.45))
+  // Larger cores so chairs / monitors hold a hard edge
+  writeBin('office_sizes.bin', defaultSizes(N, 0.95, 1.7))
 }
 
 const only = process.argv[2]
