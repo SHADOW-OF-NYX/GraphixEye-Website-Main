@@ -1306,12 +1306,12 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     wave: 0,
   },
   haasPress: {
-    // Full machine product shot — bed, frame, and lever all in frame
+    // Full machine product shot — denser/brighter so the frame reads as steel
     camera: { x: 0.35, y: 0.75, z: 5.3, lookX: 0, lookY: 0.05, lookZ: 0, fov: 34 },
-    bloom: 1.2,
-    pointScale: 3.0,
-    alpha: 0.78,
-    noiseAmp: 0.001,
+    bloom: 1.55,
+    pointScale: 4.4,
+    alpha: 0.95,
+    noiseAmp: 0.0004,
     rotX: 0,
     spinY: 0,
     spinZ: 0,

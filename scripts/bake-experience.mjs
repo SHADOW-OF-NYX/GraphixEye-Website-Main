@@ -301,10 +301,11 @@ async function bakeHaasPress() {
       for (let i = 0; i < N; i++) {
         const y = (positions[i * 3 + 1] - norm.cy) * norm.s
         const t = Math.min(1, Math.max(0, (y + 1.1) / 2.2))
-        brassColor(c, t)
-        colors[i * 3] = c.r
-        colors[i * 3 + 1] = c.g
-        colors[i * 3 + 2] = c.b
+        brassColor(c, 0.35 + t * 0.65) // bias hot so the frame reads on black
+        const boost = 1.28
+        colors[i * 3] = Math.min(1, c.r * boost)
+        colors[i * 3 + 1] = Math.min(1, c.g * boost)
+        colors[i * 3 + 2] = Math.min(1, c.b * boost)
       }
     }
     applyNorm(positions, norm)
@@ -318,7 +319,8 @@ async function bakeHaasPress() {
   for (let f = 0; f < HAAS_FRAMES; f++) anim.set(framePositions[f], f * N * 3)
   writeBin('haasPress_anim.bin', anim)
   writeBin('haasPress_colors.bin', colors)
-  writeBin('haasPress_sizes.bin', defaultSizes(N, 0.55, 1.3))
+  // Larger cores so thin levers / bed rails don't dissolve into grain
+  writeBin('haasPress_sizes.bin', defaultSizes(N, 0.95, 1.75))
   fs.writeFileSync(
     path.join(OUT, 'haasPress_meta.json'),
     JSON.stringify({ frames: HAAS_FRAMES, count: N, duration: clip.duration, clip: clip.name }),
