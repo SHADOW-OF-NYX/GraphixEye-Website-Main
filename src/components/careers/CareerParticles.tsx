@@ -1310,7 +1310,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
 
   /*
    * Baked Experience models. Warehouse: eye-level interior looking down the
-   * conveyor bay; slow pitch on X only (no Y turntable).
+   * conveyor bay; slow side-to-side yaw (Y), no pitch.
    */
   warehouse: {
     // Inside the bay — conveyor in the foreground, looking toward the far wall
@@ -1320,8 +1320,8 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.88,
     noiseAmp: 0.0008,
     rotX: 0,
-    spinX: 0.04,
-    spinY: 0,
+    spinX: 0,
+    spinY: 0.04,
     spinZ: 0,
     wave: 0,
   },
