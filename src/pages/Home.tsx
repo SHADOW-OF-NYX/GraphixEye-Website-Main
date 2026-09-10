@@ -20,6 +20,8 @@ import {
 } from '../data/site';
 import { horizontalScrollWorks } from '../data/works';
 import ReviewSection from '../components/ReviewSection';
+import Seo from '../components/Seo';
+import { getPageSeo } from '../data/seo';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -96,6 +98,7 @@ export default function Home() {
 
   return (
     <div className="bg-ll-white text-black">
+      <Seo page={getPageSeo('/')!} includeLocalBusiness />
       {/* HERO */}
       <section ref={heroWrap} className="relative h-[280vh] bg-ll-white">
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-ll-white">

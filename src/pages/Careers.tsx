@@ -2,6 +2,8 @@ import React, { Suspense, lazy, useMemo, useState } from 'react';
 import type { SceneVariant } from '../components/careers/CareerParticles';
 import { jobFilters, jobs, type Job, type JobFilter } from '../data/jobs';
 import { site } from '../data/site';
+import Seo from '../components/Seo';
+import { getPageSeo } from '../data/seo';
 
 const CareerParticles = lazy(() => import('../components/careers/CareerParticles'));
 
@@ -132,6 +134,7 @@ export default function Careers() {
 
   return (
     <div className="ce-page" data-nav-tone="dark">
+      <Seo page={getPageSeo('/careers')!} />
       {/*
         Morph track: one sticky canvas behind four scrolling sections.
         Particles morph ring → wave → galaxy → helix as the track scrolls.

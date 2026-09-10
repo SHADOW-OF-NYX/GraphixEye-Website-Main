@@ -15,14 +15,20 @@ export default function Footer() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-16 gap-y-4 text-[15px]">
             <Link to="/services" className="hover:text-ll-highlight transition-colors">Services</Link>
-            <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
+            <Link to="/services/printing" className="hover:text-ll-highlight transition-colors">Printing</Link>
+            <Link to="/services/signage" className="hover:text-ll-highlight transition-colors">Signage</Link>
+            <Link to="/services/packaging" className="hover:text-ll-highlight transition-colors">Packaging</Link>
+            <Link to="/services/design" className="hover:text-ll-highlight transition-colors">Design</Link>
+            <Link to="/services/gifting" className="hover:text-ll-highlight transition-colors">Gifting</Link>
+            <Link to="/services/ar-vr" className="hover:text-ll-highlight transition-colors">AR / VR</Link>
+            <Link to="/services/ai" className="hover:text-ll-highlight transition-colors">AI</Link>
             <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
+            <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
+            <Link to="/about" className="hover:text-ll-highlight transition-colors">About</Link>
             <Link to="/careers" className="hover:text-ll-highlight transition-colors">Careers</Link>
             <Link to="/vendors" className="hover:text-ll-highlight transition-colors">Vendor Registration</Link>
             <Link to="/contact" className="hover:text-ll-highlight transition-colors">Contact</Link>
             <a href={`mailto:${site.email}`} className="hover:text-ll-highlight transition-colors">Email</a>
-            <span className="text-black/50">Privacy Policy</span>
-            <span className="text-black/50">Press kit</span>
           </div>
         </div>
 

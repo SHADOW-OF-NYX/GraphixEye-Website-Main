@@ -7,12 +7,14 @@ import SmoothScroll from './components/SmoothScroll';
 import { PageTransitionProvider } from './components/PageTransition';
 import Home from './pages/Home';
 import Showcase from './pages/Showcase';
-import ServiceDetail from './pages/ServiceDetail';
+import ServicePage from './pages/ServicePage';
 import Experience from './pages/Experience';
 import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import Vendors from './pages/Vendors';
 import Expansions from './pages/Expansions';
+import About from './pages/About';
+import { DefaultSiteSeo } from './components/Seo';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 
 function ScrollToTop() {
@@ -30,7 +32,8 @@ function AppShell() {
   const isExpansions = pathname === '/expansions';
   const isCareers = pathname === '/careers';
   const isVendors = pathname === '/vendors';
-  const isDarkExperience = isCareers || isVendors;
+  const isExperience = pathname === '/experience';
+  const isDarkExperience = isCareers || isVendors || isExperience;
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -41,21 +44,25 @@ function AppShell() {
     <div
       className={`font-sans min-h-screen ${
         isDarkExperience
-          ? `text-ll-white ${isVendors ? 'bg-ll-ink' : 'bg-black'}`
+          ? `text-ll-white ${
+              isVendors ? 'bg-ll-ink' : isExperience ? 'bg-[#0c100e]' : 'bg-black'
+            }`
           : 'text-black bg-ll-white'
       }`}
     >
+      <DefaultSiteSeo />
       <Navbar />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<Showcase />} />
-          <Route path="/services/:slug" element={<ServiceDetail />} />
+          <Route path="/services/:slug" element={<ServicePage />} />
           <Route path="/showcase" element={<Navigate to="/services" replace />} />
           <Route path="/works" element={<Navigate to="/services" replace />} />
           <Route path="/works/:slug" element={<Navigate to="/services" replace />} />
           <Route path="/expansions" element={<Expansions />} />
           <Route path="/experience" element={<Experience />} />
+          <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/vendors" element={<Vendors />} />

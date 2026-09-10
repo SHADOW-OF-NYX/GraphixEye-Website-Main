@@ -8,13 +8,14 @@ import { preloadCareers } from '../lib/particles/preloadCareers';
 import { usePageTransition } from './PageTransition';
 
 /** Routes that sit on a dark backdrop directly beneath the nav on first paint. */
-const DARK_BACKDROP_ROUTES = new Set(['/', '/careers', '/vendors']);
+const DARK_BACKDROP_ROUTES = new Set(['/', '/careers', '/vendors', '/experience']);
 
 /** Routes whose heavy chunks are worth warming the moment a link is hovered. */
 const PRELOADERS: Record<string, () => void> = {
   '/expansions': preloadExpansions,
   '/careers': preloadCareers,
   '/vendors': preloadCareers,
+  '/experience': preloadCareers,
 };
 
 export default function Navbar() {

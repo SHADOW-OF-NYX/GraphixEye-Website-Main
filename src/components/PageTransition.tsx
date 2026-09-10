@@ -14,6 +14,7 @@ const VEIL_LIGHT = '#fcf8f1';
 const VEIL_BY_ROUTE: Record<string, string> = {
   '/careers': '#000000',
   '/vendors': '#150907', // --color-ll-ink, the vendor foundry ground
+  '/experience': '#0c100e', // olive charcoal workshop ground
 };
 
 const veilColorFor = (path: string) => VEIL_BY_ROUTE[path] ?? VEIL_LIGHT;

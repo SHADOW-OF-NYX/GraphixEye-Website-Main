@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Placeholder } from '../components/ui';
+import Seo from '../components/Seo';
+import { getPageSeo } from '../data/seo';
+import { serviceHubs } from '../data/serviceHubs';
 import { bannerCropSlugs, workFilters, works, type WorkCategory } from '../data/works';
 
 const CARD_GAP = 20;
@@ -166,6 +169,7 @@ export default function Showcase() {
 
   return (
     <div className="mh-page">
+      <Seo page={getPageSeo('/services')!} />
       {/* Shared watery displacement filter for reflections */}
       <svg width="0" height="0" aria-hidden="true" className="absolute">
         <defs>
@@ -197,6 +201,18 @@ export default function Showcase() {
           <p className="mh-eyebrow">GraphixEye · Services</p>
           <h1 className="mh-title">Mirror Hall</h1>
           <p className="mh-subtitle">Every service, framed and reflected.</p>
+
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 mb-2 px-4">
+            {serviceHubs.map((hub) => (
+              <Link
+                key={hub.slug}
+                to={`/services/${hub.slug}`}
+                className="text-[12px] tracking-[0.14em] uppercase text-white/55 hover:text-white transition-colors"
+              >
+                {hub.slug}
+              </Link>
+            ))}
+          </div>
 
           {/* Filter bar inside header */}
           <div className="mh-filter-bar">

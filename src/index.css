@@ -449,9 +449,9 @@ h4,
    ═══════════════════════════════════════════ */
 
 /*
- * Careers and Vendors share this layout system but not its colour. The ground
- * and accents are driven by custom properties so `.ce-page--vendors` can take
- * the whole page somewhere else without forking the stylesheet.
+ * Careers, Vendors, and Experience share this layout system but not its colour.
+ * The ground and accents are driven by custom properties so each page can take
+ * a different identity without forking the stylesheet.
  */
 .ce-page {
   --ce-ground: #000;
@@ -470,6 +470,17 @@ h4,
   --ce-ground: var(--color-ll-ink);
   --ce-scrim: 21, 9, 7;
   --ce-wash: 118, 46, 16;
+}
+
+/*
+ * Experience — a workshop walkthrough. Olive charcoal ground with brass
+ * washes, sitting between Careers black and Vendors wine-ink without
+ * borrowing either page's accent family.
+ */
+.ce-page--experience {
+  --ce-ground: #0c100e;
+  --ce-scrim: 12, 16, 14;
+  --ce-wash: 90, 110, 48;
 }
 
 .ce-section {
@@ -878,6 +889,82 @@ h4,
 
 .ce-stat-value--gold {
   color: #ffd97a;
+}
+
+/* Experience accents — brass and cream from the workshop ramp */
+.ce-page--experience .ce-stat-value {
+  color: #cbb05e;
+}
+
+.ce-stat-value--brass {
+  color: #d4b87a;
+}
+
+.ce-stat-value--cream {
+  color: #e8d9a8;
+}
+
+.ce-experience-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.ce-experience-step {
+  padding: 1.4rem 1.25rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ce-experience-step-title {
+  font-size: 1.05rem;
+  margin: 0.55rem 0 0.65rem;
+  letter-spacing: -0.01em;
+}
+
+.ce-experience-journey {
+  padding-top: 2rem;
+  background:
+    radial-gradient(60% 40% at 50% 100%, rgba(var(--ce-wash), 0.22), transparent 70%),
+    var(--ce-ground);
+}
+
+.ce-experience-session {
+  margin-top: 2.75rem;
+  padding: 1.75rem 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ce-experience-session-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.25rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: visit;
+}
+
+.ce-experience-session-list li {
+  position: relative;
+  padding-left: 1.6rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.7);
+  counter-increment: visit;
+}
+
+.ce-experience-session-list li::before {
+  content: counter(visit);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: #cbb05e;
 }
 
 .ce-stat-note {

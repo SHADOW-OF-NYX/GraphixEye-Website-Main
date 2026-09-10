@@ -7,6 +7,8 @@ import {
   type VendorCategory,
 } from '../data/vendors';
 import { site } from '../data/site';
+import Seo from '../components/Seo';
+import { getPageSeo } from '../data/seo';
 
 const CareerParticles = lazy(() => import('../components/careers/CareerParticles'));
 
@@ -185,6 +187,7 @@ export default function Vendors() {
 
   return (
     <div className="ce-page ce-page--vendors" data-nav-tone="dark">
+      <Seo page={getPageSeo('/vendors')!} />
       <div className="ce-morph-track">
         <div className="ce-morph-canvas">
           <Suspense fallback={null}>

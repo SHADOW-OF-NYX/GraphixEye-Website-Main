@@ -4,6 +4,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ThreeSceneLoader from '../components/particles/ThreeSceneLoader';
 import ServiceShowcase from '../components/particles/ServiceShowcase';
+import Seo from '../components/Seo';
+import { getPageSeo } from '../data/seo';
 import { immersiveServices } from '../lib/particles/services';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -58,6 +60,7 @@ export default function Expansions() {
 
   return (
     <div className="relative bg-ll-white text-black min-h-screen">
+      <Seo page={getPageSeo('/expansions')!} />
       <ThreeSceneLoader />
 
       {/* Cream wash lifted toward white behind the stage, sand at the edges */}
