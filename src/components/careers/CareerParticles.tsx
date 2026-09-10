@@ -1313,8 +1313,8 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
    * conveyor bay; slow side-to-side yaw (Y), no pitch.
    */
   warehouse: {
-    // Inside the bay — conveyor in the foreground, looking toward the far wall
-    camera: { x: 0.52, y: -0.06, z: 1.08, lookX: -0.08, lookY: -0.2, lookZ: -0.28, fov: 56 },
+    // Deeper inside the bay — tighter FOV so Y spin stays in the interior
+    camera: { x: 0.12, y: -0.1, z: 0.55, lookX: 0, lookY: -0.16, lookZ: -0.55, fov: 40 },
     bloom: 1.3,
     pointScale: 3.6,
     alpha: 0.88,
