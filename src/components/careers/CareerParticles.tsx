@@ -247,6 +247,11 @@ interface ShapeConfig {
   spinX: number;
   spinY: number;
   spinZ: number;
+  /**
+   * If set (>0), Y rotation oscillates within ±amp instead of continuous spin.
+   * `spinY` is then the oscillation frequency (rad/sec of the sine phase).
+   */
+  spinYAmp?: number;
   /** 1 enables the rolling terrain motion used by the wave */
   wave: number;
 }
@@ -1313,15 +1318,16 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
    * conveyor bay; slow side-to-side yaw (Y), no pitch.
    */
   warehouse: {
-    // Deeper inside the bay — tighter FOV so Y spin stays in the interior
-    camera: { x: 0.12, y: -0.1, z: 0.55, lookX: 0, lookY: -0.16, lookZ: -0.55, fov: 40 },
+    // Slightly wider interior — yaw sways in place so the view never leaves the bay
+    camera: { x: 0.18, y: -0.08, z: 0.78, lookX: 0, lookY: -0.18, lookZ: -0.42, fov: 48 },
     bloom: 1.3,
     pointScale: 3.6,
     alpha: 0.88,
     noiseAmp: 0.0008,
     rotX: 0,
     spinX: 0,
-    spinY: 0.04,
+    spinY: 0.32,
+    spinYAmp: 0.28,
     spinZ: 0,
     wave: 0,
   },
@@ -1695,12 +1701,16 @@ export default function CareerParticles({
         const rateX = lerp(ca.spinX, cb.spinX, u);
         const rateY = lerp(ca.spinY, cb.spinY, u);
         const rateZ = lerp(ca.spinZ, cb.spinZ, u);
+        const ampY = lerp(ca.spinYAmp ?? 0, cb.spinYAmp ?? 0, u);
         if (Math.abs(rateX) < 1e-5) {
           spinX += (0 - spinX) * Math.min(1, delta * 5);
         } else {
           spinX += rateX * delta;
         }
-        if (Math.abs(rateY) < 1e-5) {
+        if (ampY > 1e-5) {
+          // Bounded side-to-side sway — never turns far enough to leave the bay
+          spinY = Math.sin(t * rateY) * ampY;
+        } else if (Math.abs(rateY) < 1e-5) {
           spinY += (0 - spinY) * Math.min(1, delta * 5);
         } else {
           spinY += rateY * delta;
