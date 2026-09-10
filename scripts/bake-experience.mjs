@@ -388,25 +388,31 @@ async function bakeHaasPress() {
 }
 
 async function bakeOffice() {
-  console.log('\n— office (interior) from', OFFICE)
+  console.log('\n— office (desk setup) from', OFFICE)
   const gltf = await loadGltf(OFFICE)
   /*
-   * Elevated 3/4 of the studio — desks / chairs / monitors read as one room.
-   * Heavy furniture weighting so walls don't wash out the silhouette.
+   * Match reference: chair left-foreground, looking across the desk toward
+   * monitor / Thinker. Furniture only — no room shell — so the silhouette
+   * reads like the product shot on empty ground.
    */
-  gltf.scene.rotation.set(-0.28, 0.82, 0.04)
+  gltf.scene.rotation.set(-0.14, -2.48, 0.02)
   gltf.scene.updateMatrixWorld(true)
 
-  const meshes = collectMeshes(gltf.scene)
-  console.log('  meshes', meshes.length)
+  const FURNITURE =
+    /Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cube013|Cilindro|10105/i
+  const all = collectMeshes(gltf.scene)
+  const meshes = all.filter((m) =>
+    FURNITURE.test(`${m.name || ''}|${m.parent?.name || ''}`),
+  )
+  console.log('  furniture meshes', meshes.length, '/', all.length)
 
   const weights = meshes.map((mesh) => {
     let w = meshWeight(mesh)
     const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    if (/Monitor|Keyboard|Kastel|GOMA|Thinker|Cilindro|10105/i.test(n)) w *= 4.2
-    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 3.0
-    else if (/schwarz_glass|Metallic001|Mat3|Mat001|Mat1|Mat004|Mat003|Mat4|Mat5|Mat7|Mat8/i.test(n))
-      w *= 0.28
+    if (/Monitor|Keyboard|Thinker|10105/i.test(n)) w *= 4.5
+    else if (/Kastel/i.test(n)) w *= 3.6
+    else if (/GOMA|Cilindro/i.test(n)) w *= 3.2
+    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 2.4
     return Math.max(w, 1)
   })
 
@@ -426,7 +432,7 @@ async function bakeOffice() {
         : Math.max(1, Math.round((weights[m] / total) * N))
     if (share <= 0 || !mesh.geometry?.attributes?.position) continue
     const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
-    const furniture = /Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cilindro|10105/i.test(
+    const hot = /Monitor|Keyboard|Thinker|Kastel|GOMA/i.test(
       `${mesh.name || ''}|${mesh.parent?.name || ''}`,
     )
     for (let i = 0; i < share && offset + i < N; i++) {
@@ -436,9 +442,9 @@ async function bakeOffice() {
       positions[i3] = tmp.x
       positions[i3 + 1] = tmp.y
       positions[i3 + 2] = tmp.z
-      const t = Math.min(1, Math.max(0, (tmp.y + 2) / 8))
-      brassColor(color, furniture ? 0.55 + t * 0.45 : 0.28 + t * 0.5)
-      const boost = furniture ? 1.45 : 1.15
+      const t = Math.min(1, Math.max(0, (tmp.y + 1) / 6))
+      brassColor(color, hot ? 0.55 + t * 0.45 : 0.32 + t * 0.5)
+      const boost = hot ? 1.5 : 1.2
       colors[i3] = Math.min(1, color.r * boost)
       colors[i3 + 1] = Math.min(1, color.g * boost)
       colors[i3 + 2] = Math.min(1, color.b * boost)
@@ -456,11 +462,10 @@ async function bakeOffice() {
     offset++
   }
 
-  normalizePositions(positions, 2.35)
+  normalizePositions(positions, 2.2)
   writeBin('office.bin', positions)
   writeBin('office_colors.bin', colors)
-  // Larger cores so chairs / monitors hold a hard edge
-  writeBin('office_sizes.bin', defaultSizes(N, 0.95, 1.7))
+  writeBin('office_sizes.bin', defaultSizes(N, 1.0, 1.75))
 }
 
 const only = process.argv[2]

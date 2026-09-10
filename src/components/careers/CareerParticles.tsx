@@ -1333,16 +1333,16 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     wave: 0,
   },
   office: {
-    // Full studio 3/4 — denser/brighter so desks and chairs hold definition
-    camera: { x: 0.25, y: 0.55, z: 4.6, lookX: 0, lookY: -0.05, lookZ: 0, fov: 34 },
+    // Chair left-foreground, desk across frame — matches the product reference
+    camera: { x: -0.2, y: 0.28, z: 3.5, lookX: 0.1, lookY: -0.12, lookZ: 0, fov: 38 },
     bloom: 1.5,
     pointScale: 4.3,
     alpha: 0.94,
     noiseAmp: 0.00035,
     rotX: 0,
     spinX: 0,
-    spinY: 0.28,
-    spinYAmp: 0.22,
+    spinY: 0.25,
+    spinYAmp: 0.18,
     spinZ: 0,
     wave: 0,
   },
