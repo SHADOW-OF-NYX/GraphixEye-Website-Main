@@ -199,8 +199,8 @@ const FEELS: Record<PaletteName, Feel> = {
     twinkle: 0.05,
     sparkle: 0,
     drift: 'grain',
-    morphHold: 0.34,
-    morphCatchup: 2.0,
+    morphHold: 0.46,
+    morphCatchup: 1.55,
   },
 };
 
@@ -1391,6 +1391,32 @@ function holdEase(u: number, hold: number): number {
   return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
+function smoothstep(edge0: number, edge1: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - edge0) / Math.max(1e-6, edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Animated shapes (Haas press, forklift) only play once that section has settled.
+ * Mid-morph they freeze on the rest pose so the blend does not jitter against
+ * a moving target.
+ */
+function resolveAnimPositions(
+  shape: Built,
+  time: number,
+  out: Float32Array,
+  settle: number,
+): Float32Array {
+  if (!shape.animFrames || settle < 0.001) return shape.positions;
+  sampleAnimPositions(shape, time, out);
+  if (settle > 0.999) return out;
+  const rest = shape.positions;
+  for (let i = 0; i < out.length; i++) {
+    out[i] = rest[i] + (out[i] - rest[i]) * settle;
+  }
+  return out;
+}
+
 async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promise<Built> {
   if (BAKED_VENDOR.has(variant)) {
     const baked = await loadVendorBaked(variant as VendorBakedId);
@@ -1632,8 +1658,12 @@ export default function CareerParticles({
         const noiseAmp = lerp(ca.noiseAmp, cb.noiseAmp, u) * feel.noiseScale;
         const waveAmt = lerp(ca.wave, cb.wave, u);
 
-        const Apos = A.animFrames ? (sampleAnimPositions(A, t, animA), animA) : A.positions;
-        const Bpos = B.animFrames ? (sampleAnimPositions(B, t, animB), animB) : B.positions;
+        // Only run baked animation when that section is fully held — otherwise
+        // rest poses morph cleanly (fixes Haas jitter across warehouse ↔ desk).
+        const aSettle = A.animFrames ? smoothstep(0.9, 1, 1 - u) : 0;
+        const bSettle = B.animFrames ? smoothstep(0.9, 1, u) : 0;
+        const Apos = resolveAnimPositions(A, t, animA, aSettle);
+        const Bpos = resolveAnimPositions(B, t, animB, bSettle);
 
         // Blend positions + colours + sizes, then add feel-specific motion
         for (let i = 0; i < N; i++) {
