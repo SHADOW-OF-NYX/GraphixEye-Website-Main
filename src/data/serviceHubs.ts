@@ -26,7 +26,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'Commercial Printing Company in Dammam, Saudi Arabia',
     eyebrow: 'Press & finish',
     intro:
-      'GraphixEye is a commercial printing company in Dammam built for brands that need colour accuracy, finish quality, and reliable turnaround across Saudi Arabia. From our factory in the 2nd Industrial City we run offset and digital presses, silk screen, UV and hot stamping, continuous forms, and full bindery — so one team owns the job from proof to delivery.',
+      'GraphixEye is a commercial printing company in Dammam built for brands that need colour accuracy, finish quality, and reliable turnaround across Saudi Arabia. From our factory in the 2nd Industrial City we run offset and digital presses, silk screen, UV and hot stamping, continuous forms, and full bindery, so one team owns the job from proof to delivery.',
     sections: [
       {
         h2: 'Digital Printing Services KSA',
@@ -34,14 +34,14 @@ export const serviceHubs: ServiceHub[] = [
       },
       {
         h2: 'Offset Printing Dammam',
-        body: 'For volume catalogues, packaging inserts, and high-run collateral, offset printing KSA buyers choose GraphixEye for press-side colour control. We lock proofs, run commercial printing Saudi Arabia jobs at industrial scale, and finish in house with binding, lamination, and die cutting. That is why organisations treat us as their printing company Dammam partner for repeatable quality — the next reprint looks like the first.',
+        body: 'For volume catalogues, packaging inserts, and high-run collateral, offset printing KSA buyers choose GraphixEye for press-side colour control. We lock proofs, run commercial printing Saudi Arabia jobs at industrial scale, and finish in house with binding, lamination, and die cutting. That is why organisations treat us as their printing company Dammam partner for repeatable quality, the next reprint looks like the first.',
       },
       {
         h2: 'Large Format Printing Saudi Arabia',
         body: 'Banners, exhibition graphics, POS, and site boards need more than a desktop print. Our large format printing Saudi Arabia capability supports events, retail rollouts, and industrial sites with durable materials and install-ready finishing. Combined with our signage and packaging floors, GraphixEye keeps print, structure, and brand in one production conversation instead of a chain of vendors.',
       },
     ],
-    arabicH2: 'طباعة في الدمام — شركة طباعة في السعودية',
+    arabicH2: 'طباعة في الدمام: شركة طباعة في السعودية',
     arabicBody:
       'جرافيكس آي هي شركة طباعة في الدمام تقدم خدمات الطباعة التجارية للأوفست والرقمية عبر المملكة العربية السعودية. من مصنعنا في المدينة الصناعية الثانية نوفر بطاقات الأعمال والكتيبات واللافتات والطباعة كبيرة الحجم بجودة يمكن الاعتماد عليها للعلامات التجارية في الدمام والرياض وجدة والمنطقة الشرقية.',
     image: '/images/divider-printing.jpg',
@@ -63,14 +63,14 @@ export const serviceHubs: ServiceHub[] = [
       },
       {
         h2: 'Packaging Design Saudi Arabia',
-        body: 'Packaging design Saudi Arabia is not decoration alone — it is dielines, hierarchy, bilingual Arabic/English artwork, and finish specs that survive the press. GraphixEye pairs in-house design with the packaging floor so creative intent survives manufacturing. From innovative industry-specific solutions to sustainable and recyclable options, we keep design and production on one schedule.',
+        body: 'Packaging design Saudi Arabia is not decoration alone, it is dielines, hierarchy, bilingual Arabic/English artwork, and finish specs that survive the press. GraphixEye pairs in-house design with the packaging floor so creative intent survives manufacturing. From innovative industry-specific solutions to sustainable and recyclable options, we keep design and production on one schedule.',
       },
       {
         h2: 'Flexible, Specialty & Sustainable Packaging',
         body: 'Pouches, bags, specialty forms, and recyclable lines sit alongside premium custom work. As a packaging company Saudi Arabia operators can rely on, we help you choose formats that fit logistics and brand story. Brands across Dammam, Riyadh, and Jeddah use GraphixEye when packaging must look intentional and ship reliably.',
       },
     ],
-    arabicH2: 'تصميم تغليف السعودية — تغليف مخصص من الدمام',
+    arabicH2: 'تصميم تغليف السعودية: تغليف مخصص من الدمام',
     arabicBody:
       'تقدم جرافيكس آي حلول التغليف المخصص وتصميم العبوات في المملكة العربية السعودية من مصنعنا في الدمام. نصمم وننتج علب وملصقات وتغليف مرن ومستدام يحمي المنتج ويعزز تجربة فتح العبوة للعلامات التجارية في جميع أنحاء المملكة.',
     image: '/images/divider-packaging.jpg',
@@ -84,7 +84,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'Signage Company in Dammam, Saudi Arabia',
     eyebrow: 'Environments & wayfinding',
     intro:
-      'GraphixEye is a signage company Dammam organisations call when exterior identity, interior wayfinding, LED programmes, and fleet graphics must be fabricated and installed correctly. From the 2nd Industrial City we manufacture custom signs Saudi Arabia wide — headquarters, industrial sites, retail, and exhibitions — with crews who understand onshore and offshore realities.',
+      'GraphixEye is a signage company Dammam organisations call when exterior identity, interior wayfinding, LED programmes, and fleet graphics must be fabricated and installed correctly. From the 2nd Industrial City we manufacture custom signs Saudi Arabia wide, headquarters, industrial sites, retail, and exhibitions, with crews who understand onshore and offshore realities.',
     sections: [
       {
         h2: 'Outdoor Signage Dammam',
@@ -95,11 +95,11 @@ export const serviceHubs: ServiceHub[] = [
         body: 'LED signage KSA programmes need content planning as much as hardware. We deliver digital signage, screen networks, and hybrid physical-digital environments for lobbies, campuses, and events. Combined with wall branding and display stands, brands get a coherent environmental system rather than disconnected boards.',
       },
       {
-        h2: 'Custom Signs Saudi Arabia — Interior & Events',
+        h2: 'Custom Signs Saudi Arabia: Interior & Events',
         body: 'Interior signage, directional systems, exhibition booths, and event branding complete the offer. Custom signs Saudi Arabia clients expect bilingual clarity and durable finishes; we produce and fit them from the same Dammam floor that runs print and packaging, keeping colour and craft consistent across touchpoints.',
       },
     ],
-    arabicH2: 'لوحات الدمام — تصنيع وتركيب اللوحات في السعودية',
+    arabicH2: 'لوحات الدمام: تصنيع وتركيب اللوحات في السعودية',
     arabicBody:
       'جرافيكس آي شركة لوحات ولافتات في الدمام متخصصة في اللوحات الخارجية والداخلية والإرشادية ولوحات LED والواجهات والمركبات. نصنع ونركب حلول اللافتات للمشاريع في الدمام والرياض وجدة والمنشآت الصناعية في جميع أنحاء المملكة العربية السعودية.',
     image: '/images/divider-signage.jpg',
@@ -113,7 +113,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'Corporate Gifting & Branded Gifts Saudi Arabia',
     eyebrow: 'Branded kits & recognition',
     intro:
-      'Corporate gifting Saudi Arabia programmes succeed when the gift feels intentional, on brand, and deliverable at scale. GraphixEye produces branded gifts KSA teams use for employees, clients, and events — giveaways, acrylic trophies, lanyards, uniforms, and safety wear — from our Dammam production facility.',
+      'Corporate gifting Saudi Arabia programmes succeed when the gift feels intentional, on brand, and deliverable at scale. GraphixEye produces branded gifts KSA teams use for employees, clients, and events, giveaways, acrylic trophies, lanyards, uniforms, and safety wear, from our Dammam production facility.',
     sections: [
       {
         h2: 'Branded Gifts KSA',
@@ -128,7 +128,7 @@ export const serviceHubs: ServiceHub[] = [
         body: 'Corporate wear and safety wears extend the brand onto people and sites. From apparel to industrial PPE branding, GraphixEye supports programmes that must look professional and survive real work conditions across Saudi Arabia.',
       },
     ],
-    arabicH2: 'هدايا الشركات السعودية — هدايا وهوية من الدمام',
+    arabicH2: 'هدايا الشركات السعودية: هدايا وهوية من الدمام',
     arabicBody:
       'تقدم جرافيكس آي هدايا الشركات والهدايا الترويجية المخصصة في المملكة العربية السعودية من منشأتنا في الدمام. نصنع هدايا العلامة التجارية والجوائز والزي الموحد ومستلزمات الفعاليات بجودة تناسب الشركات والمؤسسات في جميع أنحاء المملكة.',
     image: '/images/divider-gifting.jpg',
@@ -142,7 +142,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'Graphic Design & Branding Agency in Dammam, KSA',
     eyebrow: 'Identity systems',
     intro:
-      'GraphixEye is a graphic design Dammam studio embedded in a real production house. Logos, brand systems, print and digital design, packaging graphics, and illustration are built as artwork that is ready for press, signage, and immersive channels across Saudi Arabia — not files that fall apart in manufacturing.',
+      'GraphixEye is a graphic design Dammam studio embedded in a real production house. Logos, brand systems, print and digital design, packaging graphics, and illustration are built as artwork that is ready for press, signage, and immersive channels across Saudi Arabia, not files that fall apart in manufacturing.',
     sections: [
       {
         h2: 'Branding Agency Saudi Arabia',
@@ -157,7 +157,7 @@ export const serviceHubs: ServiceHub[] = [
         body: 'Graphic design Dammam only matters if it prints. Our designers sit beside presses and fabrication, checking proofs before volume runs. From Riyadh campaigns to Eastern Province sites, GraphixEye delivers creative that is production-ready across Saudi Arabia.',
       },
     ],
-    arabicH2: 'تصميم جرافيك الدمام — هوية وعلامة تجارية',
+    arabicH2: 'تصميم جرافيك الدمام: هوية وعلامة تجارية',
     arabicBody:
       'جرافيكس آي وكالة تصميم جرافيك وهوية بصرية في الدمام تعمل داخل مصنع إنتاج حقيقي. نصمم الشعارات وأنظمة الهوية والمواد التسويقية والتغليف بأعمال فنية جاهزة للطباعة واللوحات والتجارب الرقمية في المملكة العربية السعودية.',
     image: '/images/divider-design.jpg',
@@ -172,7 +172,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'AR, VR & MR Immersive Experiences Saudi Arabia',
     eyebrow: 'Spatial & immersive',
     intro:
-      'GraphixEye builds AR VR solutions Saudi Arabia brands use for launches, retail, training, and exhibitions. Augmented reality, virtual reality, and mixed reality experiences extend print and physical environments into interactive layers — produced alongside the same Dammam team that fabricates the spaces those experiences live in.',
+      'GraphixEye builds AR VR solutions Saudi Arabia brands use for launches, retail, training, and exhibitions. Augmented reality, virtual reality, and mixed reality experiences extend print and physical environments into interactive layers, produced alongside the same Dammam team that fabricates the spaces those experiences live in.',
     sections: [
       {
         h2: 'Augmented Reality KSA',
@@ -184,10 +184,10 @@ export const serviceHubs: ServiceHub[] = [
       },
       {
         h2: 'Events, Retail & Brand Activations',
-        body: 'AR VR solutions Saudi Arabia perform best when creative, fabrication, and tech share one schedule. We support experiential marketing across the Kingdom with a production house mindset — clear specs, tested colour, and crews who understand both the physical and digital layers of the experience.',
+        body: 'AR VR solutions Saudi Arabia perform best when creative, fabrication, and tech share one schedule. We support experiential marketing across the Kingdom with a production house mindset, clear specs, tested colour, and crews who understand both the physical and digital layers of the experience.',
       },
     ],
-    arabicH2: 'الواقع المعزز السعودية — تجارب غامرة من الدمام',
+    arabicH2: 'الواقع المعزز السعودية: تجارب غامرة من الدمام',
     arabicBody:
       'تقدم جرافيكس آي حلول الواقع المعزز والافتراضي والمختلط للعلامات التجارية في المملكة العربية السعودية. نصمم تجارب غامرة للفعاليات والتجزئة والمعارض انطلاقاً من الدمام، ونجمع بين التقنية والإنتاج الميداني تحت سقف واحد.',
     image: '/images/works/augmented-reality.jpg',
@@ -202,7 +202,7 @@ export const serviceHubs: ServiceHub[] = [
     h1: 'AI-Powered Creative Solutions Saudi Arabia',
     eyebrow: 'Smart production',
     intro:
-      'GraphixEye delivers AI solutions Saudi Arabia marketing and operations teams can actually put into production. We blend artificial intelligence KSA workflows with design, imaging, and content pipelines inside a Dammam factory that still checks colour on press — so AI accelerates craft instead of replacing accountability.',
+      'GraphixEye delivers AI solutions Saudi Arabia marketing and operations teams can actually put into production. We blend artificial intelligence KSA workflows with design, imaging, and content pipelines inside a Dammam factory that still checks colour on press, so AI accelerates craft instead of replacing accountability.',
     sections: [
       {
         h2: 'Artificial Intelligence KSA for Brand Teams',
@@ -214,10 +214,10 @@ export const serviceHubs: ServiceHub[] = [
       },
       {
         h2: 'From Pilot to Kingdom-Wide Rollout',
-        body: 'AI solutions Saudi Arabia scale when the first pilot is documented. We lock prompts, templates, and approval steps so the next branch, event, or SKU follows the same quality bar across the Kingdom — aligned with our print, packaging, and immersive teams.',
+        body: 'AI solutions Saudi Arabia scale when the first pilot is documented. We lock prompts, templates, and approval steps so the next branch, event, or SKU follows the same quality bar across the Kingdom, aligned with our print, packaging, and immersive teams.',
       },
     ],
-    arabicH2: 'حلول الذكاء الاصطناعي السعودية — إبداع وإنتاج',
+    arabicH2: 'حلول الذكاء الاصطناعي السعودية: إبداع وإنتاج',
     arabicBody:
       'تمزج جرافيكس آي بين الذكاء الاصطناعي والإنتاج الإبداعي في الدمام. نساعد العلامات التجارية في المملكة العربية السعودية على تسريع التصميم والمحتوى والصور مع الحفاظ على معايير الجودة قبل الطباعة والتنفيذ.',
     image: '/images/works/ai-services.jpg',

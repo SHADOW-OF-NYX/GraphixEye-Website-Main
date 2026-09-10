@@ -58,7 +58,7 @@ const CTA_VARIANT: SceneVariant[] = ['seal'];
 const FLOOR_STOPS = [
   {
     title: 'Press & print',
-    body: 'Offset, digital, silk screen, and UV — colour checked on the machine, not only on a screen.',
+    body: 'Offset, digital, silk screen, and UV, colour checked on the machine, not only on a screen.',
   },
   {
     title: 'Finishing bays',
@@ -100,7 +100,7 @@ export default function Experience() {
                 floor with us
               </h1>
               <p className="ce-lead">
-                Identity, signage, print, and finishing under one roof in the 2nd Industrial City —
+                Identity, signage, print, and finishing under one roof in the 2nd Industrial City -
                 a working factory we are proud to show, not a showroom built for photographs.
               </p>
               <div className="ce-actions">
@@ -126,7 +126,7 @@ export default function Experience() {
               </div>
               <div className="ce-split-right">
                 <p className="ce-body">
-                  A visit is a walkthrough of live work — not a slide deck. You see how colour is
+                  A visit is a walkthrough of live work, not a slide deck. You see how colour is
                   locked, how finishes are written into the job, and how install is planned while
                   the piece is still on the floor.
                 </p>
@@ -150,7 +150,7 @@ export default function Experience() {
               </h2>
               <p className="ce-body ce-body--center ce-galaxy-body">
                 Designers, press operators, and finishers share one building. That is why a proof
-                here means something — the people who approved it are the people who will print it.
+                here means something, the people who approved it are the people who will print it.
               </p>
               <div className="ce-actions ce-actions--center">
                 <PrimaryButton href="#stops">Floor stops</PrimaryButton>
@@ -173,7 +173,7 @@ export default function Experience() {
                 <p className="ce-stat-label">Under one roof</p>
                 <p className="ce-stat-value ce-stat-value--brass">1</p>
                 <p className="ce-stat-note">
-                  Design through finishing — no handoff to an outside vendor mid-job.
+                  Design through finishing, no handoff to an outside vendor mid-job.
                 </p>
               </div>
 
@@ -205,7 +205,7 @@ export default function Experience() {
                 <div className="ce-job-head" style={{ cursor: 'default' }}>
                   <div className="ce-job-headline">
                     <h3 className="ce-job-title">
-                      0{i + 1} — {stop.title}
+                      0{i + 1} · {stop.title}
                     </h3>
                     <p className="ce-job-summary">{stop.body}</p>
                   </div>
@@ -231,7 +231,7 @@ export default function Experience() {
             <Badge>From first call</Badge>
             <h2 className="ce-h2 ce-shimmer">How a job runs</h2>
             <p className="ce-body ce-body--center">
-              The same path whether you visit the floor or brief us remotely — consultation through
+              The same path whether you visit the floor or brief us remotely, consultation through
               reprints, with specs that stay on file.
             </p>
           </div>

@@ -122,7 +122,7 @@ export default function Home() {
               A Dammam factory for design, print, signage, and finishing.
             </p>
             <p className="text-[14px] leading-relaxed text-ll-white/80 mb-6">
-              GraphixEye is a production house in the 2nd Industrial City — presses, finishing lines, and craftsmen
+              GraphixEye is a production house in the 2nd Industrial City, presses, finishing lines, and craftsmen
               under one roof. {site.tagline}. Price on request.
             </p>
             <ul className="space-y-2 text-[13px] text-ll-white/75">
@@ -140,7 +140,7 @@ export default function Home() {
           <div className="absolute inset-0">
             <Placeholder
               src={photos.studio}
-              label="The Studio — production floor"
+              label="The Studio: production floor"
               className="w-full h-full opacity-55"
             />
           </div>
@@ -150,7 +150,7 @@ export default function Home() {
               <h2 className="display-md max-w-sm">The Studio</h2>
               <p className="max-w-sm text-[14px] leading-relaxed text-ll-white/85">
                 Our production floor in Dammam’s 2nd Industrial City. Since {site.established} we have built identity,
-                environments, and print on industrial presses and finishing lines — a facility we are proud to walk you
+                environments, and print on industrial presses and finishing lines, a facility we are proud to walk you
                 through.
               </p>
             </div>
@@ -251,7 +251,7 @@ export default function Home() {
           </Link>
         </div>
         <div data-reveal>
-          <Placeholder src={photos.tabs[serviceTabs[tab].id as keyof typeof photos.tabs]} label={`Tab — ${serviceTabs[tab].id}`} className="card-r h-[520px]" />
+          <Placeholder src={photos.tabs[serviceTabs[tab].id as keyof typeof photos.tabs]} label={`Tab: ${serviceTabs[tab].id}`} className="card-r h-[520px]" />
         </div>
       </section>
 
@@ -300,9 +300,9 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-16 grid md:grid-cols-2 gap-10 items-center">
-          <Placeholder src={photos.guided} label="Guided session — tablet / brief flow" className="card-r h-[420px]" />
+          <Placeholder src={photos.guided} label="Guided session: tablet / brief flow" className="card-r h-[420px]" />
           <div>
-            <p className="text-black/50 font-display text-[18px] mb-6">One factory — work made for the site</p>
+            <p className="text-black/50 font-display text-[18px] mb-6">One factory. Work made for the site.</p>
             <div className="flex flex-wrap gap-2">
               {industries.map((ind) => (
                 <span key={ind} className="pill bg-ll-sand px-4 h-10 inline-flex items-center text-[13px]">
@@ -349,12 +349,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* JOURNEY — dark */}
+      {/* JOURNEY, dark */}
       <section data-nav-tone="dark" className="mx-4 md:mx-8 card-r glow-wash text-ll-white py-20 px-8 md:px-14 mb-8 overflow-hidden relative">
         <div className="absolute inset-0">
           <Placeholder
             src={photos.craft}
-            label="Craftsmanship — press / finishing"
+            label="Craftsmanship: press / finishing"
             className="w-full h-full opacity-30"
           />
         </div>

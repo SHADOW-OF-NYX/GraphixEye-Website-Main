@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createNoise3D } from 'simplex-noise';
+import { loadVendorBaked, type VendorBakedId } from '../../lib/particles/loadVendors';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,12 +14,16 @@ export type SceneVariant =
   | 'galaxy'
   | 'helix'
   | 'vortex'
-  // Vendors
+  // Vendors — procedural
   | 'lattice'
   | 'lanes'
   | 'orbit'
   | 'stack'
   | 'converge'
+  // Vendors — baked from logo / GLBs (see scripts/bake-vendors.mjs)
+  | 'logo'
+  | 'forklift'
+  | 'handshake'
   // Experience — factory visit / craft process
   | 'press'
   | 'sheet'
@@ -214,7 +219,13 @@ interface Built {
   positions: Float32Array;
   colors: Float32Array;
   sizes: Float32Array;
+  /** Optional looping position frames (forklift). */
+  animFrames?: Float32Array[];
+  animDuration?: number;
 }
+
+type ProceduralVariant = Exclude<SceneVariant, 'logo' | 'forklift' | 'handshake'>;
+const BAKED_VENDOR = new Set<SceneVariant>(['logo', 'forklift', 'handshake']);
 
 interface ShapeConfig {
   camera: { x: number; y: number; z: number; lookX: number; lookY: number; lookZ: number; fov: number };
@@ -1029,7 +1040,7 @@ function buildSeal(n: number, P: Palette): Built {
   return { positions, colors, sizes };
 }
 
-const BUILDERS: Record<SceneVariant, (n: number, P: Palette) => Built> = {
+const BUILDERS: Record<ProceduralVariant, (n: number, P: Palette) => Built> = {
   ring: buildRing,
   wave: buildWave,
   galaxy: buildGalaxy,
@@ -1171,6 +1182,44 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
   },
 
   /*
+   * Baked Vendor models. Low noise so the logo / forklift / handshake silhouettes
+   * hold — sparkle still comes from the vendors feel shader.
+   */
+  logo: {
+    camera: { x: 0.35, y: 0.05, z: 4.2, lookX: 0.15, lookY: 0.02, lookZ: 0, fov: 36 },
+    bloom: 1.75,
+    pointScale: 5.2,
+    alpha: 0.95,
+    noiseAmp: 0.0008,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
+  forklift: {
+    camera: { x: 0.35, y: 0.55, z: 4.4, lookX: 0, lookY: -0.08, lookZ: 0, fov: 36 },
+    bloom: 1.35,
+    pointScale: 3.6,
+    alpha: 0.78,
+    noiseAmp: 0.0018,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
+  handshake: {
+    camera: { x: 0, y: 0.15, z: 3.9, lookX: 0, lookY: 0.02, lookZ: 0, fov: 38 },
+    bloom: 1.4,
+    pointScale: 3.8,
+    alpha: 0.8,
+    noiseAmp: 0.0012,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
+
+  /*
    * Experience scenes. Quiet motion — a walkthrough of craft, not a cosmos
    * or a pour. Cameras leave room in the centre for the factory-visit copy.
    * Finer pointScale so the grain feel reads as dust, not soft nebula blobs.
@@ -1262,6 +1311,39 @@ function holdEase(u: number, hold: number): number {
   return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
+async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promise<Built> {
+  if (BAKED_VENDOR.has(variant)) {
+    const baked = await loadVendorBaked(variant as VendorBakedId);
+    return {
+      positions: baked.positions,
+      colors: baked.colors,
+      sizes: baked.sizes,
+      animFrames: baked.animFrames,
+      animDuration: baked.animDuration,
+    };
+  }
+  return BUILDERS[variant as ProceduralVariant](n, P);
+}
+
+/** Write an animated shape's positions for time t into `out`. */
+function sampleAnimPositions(shape: Built, time: number, out: Float32Array) {
+  const frames = shape.animFrames;
+  if (!frames || frames.length === 0) {
+    out.set(shape.positions);
+    return;
+  }
+  const dur = shape.animDuration || 2.67;
+  const u = ((time % dur) / dur) * frames.length;
+  const i0 = Math.floor(u) % frames.length;
+  const i1 = (i0 + 1) % frames.length;
+  const f = u - Math.floor(u);
+  const a = frames[i0];
+  const b = frames[i1];
+  for (let i = 0; i < out.length; i++) {
+    out[i] = a[i] + (b[i] - a[i]) * f;
+  }
+}
+
 interface Props {
   /** One variant renders a static scene; several morph across scroll. */
   variants: SceneVariant[];
@@ -1298,9 +1380,13 @@ export default function CareerParticles({
       const P = PALETTES[palette];
       const feel = FEELS[palette];
       const N = feel.count;
-      const shapes = variants.map((v) => BUILDERS[v](N, P));
+      const shapes = await Promise.all(variants.map((v) => resolveShape(v, N, P)));
+      if (cancelled) return;
       const configs = variants.map((v) => CONFIG[v]);
       const multi = shapes.length > 1;
+      // Scratch buffers for animated shapes (forklift) during the morph blend
+      const animA = new Float32Array(N * 3);
+      const animB = new Float32Array(N * 3);
 
       const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1455,13 +1541,16 @@ export default function CareerParticles({
         const noiseAmp = lerp(ca.noiseAmp, cb.noiseAmp, u) * feel.noiseScale;
         const waveAmt = lerp(ca.wave, cb.wave, u);
 
+        const Apos = A.animFrames ? (sampleAnimPositions(A, t, animA), animA) : A.positions;
+        const Bpos = B.animFrames ? (sampleAnimPositions(B, t, animB), animB) : B.positions;
+
         // Blend positions + colours + sizes, then add feel-specific motion
         for (let i = 0; i < N; i++) {
           const i3 = i * 3;
 
-          const bx = lerp(A.positions[i3], B.positions[i3], u);
-          const by = lerp(A.positions[i3 + 1], B.positions[i3 + 1], u);
-          const bz = lerp(A.positions[i3 + 2], B.positions[i3 + 2], u);
+          const bx = lerp(Apos[i3], Bpos[i3], u);
+          const by = lerp(Apos[i3 + 1], Bpos[i3 + 1], u);
+          const bz = lerp(Apos[i3 + 2], Bpos[i3 + 2], u);
 
           let nx = 0;
           let ny = 0;

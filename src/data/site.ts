@@ -72,7 +72,7 @@ export const serviceTabs = [
 export const operatorPoints = [
   {
     title: 'Clear production.',
-    body: 'Finish, volume, and unit cost are agreed before we go to press — no catalogue guesswork.',
+    body: 'Finish, volume, and unit cost are agreed before we go to press, no catalogue guesswork.',
   },
   {
     title: 'One factory.',
@@ -107,7 +107,7 @@ export const industries = [
 export const standAlone = [
   {
     title: 'The Dammam floor.',
-    body: 'Presses, finishing bays, and a sample room you can walk — a working factory, not a digital overlay.',
+    body: 'Presses, finishing bays, and a sample room you can walk, a working factory, not a digital overlay.',
   },
   {
     title: 'Colour & materials.',
@@ -157,7 +157,7 @@ export type Testimonial = {
 export const testimonials: Testimonial[] = [
   {
     id: 'seed-1',
-    quote: 'GraphixEye became the production house we actually trust — identity, environments, and print from one floor.',
+    quote: 'GraphixEye became the production house we actually trust, identity, environments, and print from one floor.',
     name: 'Placeholder name',
     role: 'Brand lead · replace this',
     rating: 5,
@@ -182,7 +182,7 @@ export const faqs = {
   client: [
     {
       q: 'What does GraphixEye actually produce?',
-      a: 'Design, signage, printing, packaging, and gifting — from logos to architectural environments — all from our factory in Dammam.',
+      a: 'Design, signage, printing, packaging, and gifting, from logos to architectural environments, all from our factory in Dammam.',
     },
     {
       q: 'What happens during the first brief?',
@@ -198,7 +198,7 @@ export const faqs = {
     },
     {
       q: 'Do you work outside Dammam?',
-      a: 'Yes. We produce in Dammam and deliver and install across the Kingdom — headquarters, industrial sites, retail, and events.',
+      a: 'Yes. We produce in Dammam and deliver and install across the Kingdom, headquarters, industrial sites, retail, and events.',
     },
   ],
   partner: [

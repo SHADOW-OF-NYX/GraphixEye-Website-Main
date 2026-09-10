@@ -273,7 +273,7 @@ export default function Showcase() {
                       <div className="mirror-hall-rim" aria-hidden="true" />
                     </div>
 
-                    {/* Water reflection — clip outer, flip inner (origin must NOT be top) */}
+                    {/* Water reflection, clip outer, flip inner (origin must NOT be top) */}
                     <div
                       data-hall-mirror
                       className="mirror-hall-reflection pointer-events-none"

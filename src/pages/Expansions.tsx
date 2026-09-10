@@ -17,7 +17,7 @@ const PROCESS = [
   },
   {
     title: 'Prototype',
-    body: 'A working sample of the core idea — a scannable panel, a rough walkthrough — so you are approving something real rather than a description.',
+    body: 'A working sample of the core idea, a scannable panel, a rough walkthrough, so you are approving something real rather than a description.',
   },
   {
     title: 'Build',
@@ -30,7 +30,7 @@ const PROCESS = [
 ];
 
 /**
- * Immersive particle morph page — AI → AR → VR → MR.
+ * Immersive particle morph page, AI → AR → VR → MR.
  * No solid cream/about slab under the track; canvas stays the stage.
  */
 export default function Expansions() {
@@ -89,7 +89,7 @@ export default function Expansions() {
                 takes form
               </h1>
               <p className="mt-7 text-[12px] tracking-widest uppercase text-black/40 max-w-xs">
-                AI · AR · VR · MR — scroll to explore
+                AI · AR · VR · MR · scroll to explore
               </p>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function Expansions() {
               </div>
               <div className="md:col-span-6 md:col-start-7 flex flex-col gap-5">
                 <p className="text-black/60 text-[15px] leading-relaxed">
-                  Most immersive work fails at the handover — an agency builds the digital piece,
+                  Most immersive work fails at the handover, an agency builds the digital piece,
                   someone else fabricates the physical one, and the two meet for the first time on
                   site. We have been printing, fabricating, and installing out of Dammam since 2009,
                   so the structure and the content are made by the same company.
@@ -153,7 +153,7 @@ export default function Expansions() {
                   className="card-r border border-black/10 bg-white/60 p-8 md:p-10 flex flex-col"
                 >
                   <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-4">
-                    {service.index} — {service.eyebrow}
+                    {service.index} · {service.eyebrow}
                   </p>
                   <h3 className="display-md text-black mb-4">{service.title}</h3>
                   <p className="text-black/60 text-[15px] leading-relaxed mb-7">{service.body}</p>
@@ -226,7 +226,7 @@ export default function Expansions() {
             </h2>
             <p className="text-ll-sand/70 max-w-lg text-[15px] leading-relaxed">
               Bring a date, a space, and a budget range. We will come back with what we would build,
-              what it costs, and what it takes to run it — no obligation to proceed.
+              what it costs, and what it takes to run it, no obligation to proceed.
             </p>
             <Link
               to="/contact"

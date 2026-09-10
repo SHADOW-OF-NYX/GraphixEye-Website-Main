@@ -44,7 +44,7 @@ export default function About() {
         </p>
         <p className="text-[16px] leading-relaxed text-black/55 mb-8">
           Brands choose GraphixEye when they want artwork, fabrication, press, finishing, and install under one roof.
-          That single floor approach keeps colour, materials, and timelines accountable — whether the job is a logo
+          That single floor approach keeps colour, materials, and timelines accountable, whether the job is a logo
           system, outdoor signage, commercial printing, custom packaging, or an immersive brand activation in Riyadh,
           Jeddah, or the Eastern Province.
         </p>
@@ -57,7 +57,7 @@ export default function About() {
           <h2 className="display-md mb-4 text-right">عن جرافيكس آي في الدمام</h2>
           <p className="text-[16px] leading-relaxed text-black/55 text-right">
             جرافيكس آي بيت إنتاج إبداعي في الدمام متخصص في التصميم واللوحات والطباعة والتغليف وهدايا الشركات والتجارب
-            الغامرة في المملكة العربية السعودية. شعارنا: نفعل كما نعد — من المصنع إلى موقعك في أنحاء المملكة.
+            الغامرة في المملكة العربية السعودية. شعارنا: نفعل كما نعد، من المصنع إلى موقعك في أنحاء المملكة.
           </p>
         </section>
 

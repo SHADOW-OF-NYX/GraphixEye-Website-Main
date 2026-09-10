@@ -63,7 +63,7 @@ const CTA_VARIANT: SceneVariant[] = ['vortex'];
 function JobCard({ job }: { job: Job }) {
   const [open, setOpen] = useState(false);
   const mailto = `mailto:${site.email}?subject=${encodeURIComponent(
-    `Application — ${job.title}`,
+    `Application: ${job.title}`,
   )}&body=${encodeURIComponent(
     `Hello GraphixEye team,\n\nI would like to apply for the ${job.title} position (${job.department}, ${job.location}).\n\nMy CV is attached.\n\nThank you,\n`,
   )}`;
@@ -161,7 +161,7 @@ export default function Careers() {
             the nature of craft
           </h1>
           <p className="ce-lead">
-            We build brands at the intersection of design, print, and space — where something
+            We build brands at the intersection of design, print, and space, where something
             genuinely made comes to life.
           </p>
           <div className="ce-actions">
@@ -179,7 +179,7 @@ export default function Careers() {
             <h2 className="ce-h2 ce-shimmer">
               Everything revolves
               <br />
-              around one thing —
+              around one thing:
               <br />
               your growth
             </h2>
@@ -203,7 +203,7 @@ export default function Careers() {
         <div className="ce-inner ce-center ce-galaxy-inner">
           <Badge>Our team ecosystem</Badge>
           <h2 className="ce-h2 ce-shimmer">
-            A universe of disciplines —
+            A universe of disciplines,
             <br />
             already in motion
           </h2>
@@ -234,7 +234,7 @@ export default function Careers() {
             <p className="ce-stat-label">Disciplines under one roof</p>
             <p className="ce-stat-value ce-stat-value--blue">8</p>
             <p className="ce-stat-note">
-              Design through finishing — no handoffs to outside vendors.
+              Design through finishing, no handoffs to outside vendors.
             </p>
           </div>
 

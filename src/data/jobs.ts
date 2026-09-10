@@ -77,7 +77,7 @@ export const jobs: Job[] = [
     location: 'Dammam, KSA',
     experience: '3+ years',
     summary:
-      'Grow accounts across signage, print, packaging, and gifting — from first brief to delivered install.',
+      'Grow accounts across signage, print, packaging, and gifting, from first brief to delivered install.',
     responsibilities: [
       'Develop new business across industrial, retail, and corporate sectors',
       'Prepare quotations and negotiate commercial terms',
@@ -166,7 +166,7 @@ export const jobs: Job[] = [
     location: 'Dammam, KSA',
     experience: '5+ years',
     summary:
-      'Run the signage floor — fabrication, quality, and on-site install across onshore and offshore projects.',
+      'Run the signage floor, fabrication, quality, and on-site install across onshore and offshore projects.',
     responsibilities: [
       'Plan and supervise fabrication schedules',
       'Manage CNC, welding, acrylic, and LED assembly teams',
@@ -275,7 +275,7 @@ export const jobs: Job[] = [
     location: 'Dammam, KSA',
     experience: '3+ years',
     summary:
-      'Build the immersive layer — AR overlays, VR environments, and mixed reality installs for brand experiences.',
+      'Build the immersive layer, AR overlays, VR environments, and mixed reality installs for brand experiences.',
     responsibilities: [
       'Develop AR and VR experiences in Unity or Unreal',
       'Build WebAR and WebXR experiences for browser delivery',

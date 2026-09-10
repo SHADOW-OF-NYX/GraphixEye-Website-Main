@@ -57,8 +57,8 @@ function GhostButton({ children, href }: { children: React.ReactNode; href: stri
   );
 }
 
-/* Supply-floor shapes and the foundry palette — deliberately not the Careers set */
-const MORPH_VARIANTS: SceneVariant[] = ['lattice', 'lanes', 'orbit', 'stack'];
+/* Baked Vendor models: logo → forklift → handshake → stack */
+const MORPH_VARIANTS: SceneVariant[] = ['logo', 'forklift', 'handshake', 'stack'];
 const CTA_VARIANT: SceneVariant[] = ['converge'];
 
 type VendorFormState = {
@@ -166,8 +166,8 @@ export default function Vendors() {
       `Contact: ${form.contact}`,
       `Email: ${form.email}`,
       `Phone: ${form.phone}`,
-      `CR number: ${form.crNumber || '—'}`,
-      `VAT number: ${form.vatNumber || '—'}`,
+      `CR number: ${form.crNumber || '-'}`,
+      `VAT number: ${form.vatNumber || '-'}`,
       `City: ${form.city}`,
       `Category: ${form.category}`,
       '',
@@ -179,7 +179,7 @@ export default function Vendors() {
     ].join('\n');
 
     const mailto = `mailto:${site.email}?subject=${encodeURIComponent(
-      `Vendor registration — ${form.company || 'New supplier'}`,
+      `Vendor registration: ${form.company || 'New supplier'}`,
     )}&body=${encodeURIComponent(body)}`;
 
     window.location.href = mailto;
@@ -211,7 +211,7 @@ export default function Vendors() {
               </h1>
               <p className="ce-lead">
                 We partner with suppliers who can keep pace with design, print, finishing, and
-                install — under one roof in the 2nd Industrial City.
+                install, under one roof in the 2nd Industrial City.
               </p>
               <div className="ce-actions">
                 <PrimaryButton href="#register">Start registration</PrimaryButton>
@@ -234,7 +234,7 @@ export default function Vendors() {
               </div>
               <div className="ce-split-right">
                 <p className="ce-body">
-                  GraphixEye buys for a working production floor — not a chain of middlemen. If your
+                  GraphixEye buys for a working production floor, not a chain of middlemen. If your
                   materials, equipment, or services hold up under industrial load, we want your
                   details on file.
                 </p>
@@ -250,9 +250,9 @@ export default function Vendors() {
             <div className="ce-inner ce-center ce-galaxy-inner">
               <Badge>What we buy</Badge>
               <h2 className="ce-h2 ce-shimmer">
-                From stock to site —
+                From stock to site.
                 <br />
-                every input matters
+                Every input matters
               </h2>
               <p className="ce-body ce-body--center ce-galaxy-body">
                 Substrates, finishing consumables, machine parts, freight, and specialist services
@@ -288,7 +288,7 @@ export default function Vendors() {
                 <p className="ce-stat-label">Why partners stay</p>
                 <p className="ce-stat-value ce-stat-value--gold">1</p>
                 <p className="ce-stat-note">
-                  One buyer for the whole floor — clearer specs, fewer handoffs.
+                  One buyer for the whole floor, clearer specs, fewer handoffs.
                 </p>
               </div>
             </div>

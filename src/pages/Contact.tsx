@@ -22,7 +22,7 @@ export default function Contact() {
             Saudi Arabia. {site.contactLead} We aim to respond within 24 hours.
           </p>
           <p className="text-black/45 text-[15px] leading-relaxed mb-12 max-w-md">
-            GraphixEye is your printing and signage company in Dammam — visit the 2nd Industrial City factory or send
+            GraphixEye is your printing and signage company in Dammam, visit the 2nd Industrial City factory or send
             a brief online.
           </p>
 

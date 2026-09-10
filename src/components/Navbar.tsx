@@ -5,6 +5,7 @@ import { navLinks, site } from '../data/site';
 import { isDarkBackdrop } from '../lib/backdropContrast';
 import { preloadExpansions } from '../lib/particles/preloadExpansions';
 import { preloadCareers } from '../lib/particles/preloadCareers';
+import { preloadVendors } from '../lib/particles/preloadVendors';
 import { usePageTransition } from './PageTransition';
 
 /** Routes that sit on a dark backdrop directly beneath the nav on first paint. */
@@ -14,7 +15,7 @@ const DARK_BACKDROP_ROUTES = new Set(['/', '/careers', '/vendors', '/experience'
 const PRELOADERS: Record<string, () => void> = {
   '/expansions': preloadExpansions,
   '/careers': preloadCareers,
-  '/vendors': preloadCareers,
+  '/vendors': preloadVendors,
   '/experience': preloadCareers,
 };
 

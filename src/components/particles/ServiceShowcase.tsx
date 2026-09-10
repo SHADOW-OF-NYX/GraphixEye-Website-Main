@@ -113,7 +113,7 @@ export default function ServiceShowcase() {
               }}
             />
             <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-3">
-              {s.index} — {s.eyebrow.toUpperCase()}
+              {s.index} · {s.eyebrow.toUpperCase()}
             </p>
             <h2 className="display-md text-black mb-4">{s.title}</h2>
             <p

@@ -36,7 +36,7 @@ export const vendorCategoryDetails: {
   {
     id: 'Equipment',
     title: 'Equipment & spare parts',
-    summary: 'Press, finishing, and fabrication hardware — plus the parts that keep lines running.',
+    summary: 'Press, finishing, and fabrication hardware, plus the parts that keep lines running.',
     examples: ['Press & finishing OEMs', 'Spare parts', 'Maintenance partners'],
   },
   {
@@ -54,7 +54,7 @@ export const vendorCategoryDetails: {
   {
     id: 'Other',
     title: 'Something else',
-    summary: 'If your category is not listed, tell us what you supply — we review every serious brief.',
+    summary: 'If your category is not listed, tell us what you supply, we review every serious brief.',
     examples: ['Niche materials', 'New processes', 'Regional partners'],
   },
 ];
@@ -66,7 +66,7 @@ export const vendorBenefits = [
   },
   {
     title: 'Clear specifications',
-    body: 'We buy to locked colour, finish, and volume — not catalogue guesswork.',
+    body: 'We buy to locked colour, finish, and volume, not catalogue guesswork.',
   },
   {
     title: 'Long-run partners',

@@ -5,7 +5,7 @@ export type ImmersiveService = {
   index: string
   title: string
   eyebrow: string
-  /** One concrete sentence for the scroll panel — what it is, not what it evokes */
+  /** One concrete sentence for the scroll panel, what it is, not what it evokes */
   body: string
   /** What a client actually receives */
   deliverables: string[]
@@ -25,7 +25,7 @@ export const immersiveServices: ImmersiveService[] = [
     index: '01',
     title: 'AI Services',
     eyebrow: 'Smart Production',
-    body: 'We use AI to take the slow, repetitive work out of large campaigns — resizing, adapting, and versioning artwork across hundreds of items without redrawing each one by hand.',
+    body: 'We use AI to take the slow, repetitive work out of large campaigns, resizing, adapting, and versioning artwork across hundreds of items without redrawing each one by hand.',
     deliverables: [
       'Bulk artwork adaptation across sizes and formats',
       'Product and packaging visuals generated from existing assets',
@@ -43,7 +43,7 @@ export const immersiveServices: ImmersiveService[] = [
     index: '02',
     title: 'Augmented Reality',
     eyebrow: 'Spatial Overlays',
-    body: 'We add a scannable digital layer to printed and installed work — packs, brochures, and signage that open a video, a spec sheet, or a 3D model when a phone points at them.',
+    body: 'We add a scannable digital layer to printed and installed work, packs, brochures, and signage that open a video, a spec sheet, or a 3D model when a phone points at them.',
     deliverables: [
       'Marker and QR-triggered AR built into printed artwork',
       'Web-based AR that runs in the browser, no app install',
@@ -61,7 +61,7 @@ export const immersiveServices: ImmersiveService[] = [
     index: '03',
     title: 'Virtual Reality',
     eyebrow: 'Immersive Worlds',
-    body: 'We build walkthrough environments for spaces that do not exist yet, or cannot be visited — stands, showrooms, and plant areas your team can review in a headset before anything is fabricated.',
+    body: 'We build walkthrough environments for spaces that do not exist yet, or cannot be visited, stands, showrooms, and plant areas your team can review in a headset before anything is fabricated.',
     deliverables: [
       'Walkthrough builds of stands, showrooms, and interiors',
       'Headset and desktop versions from one model',
@@ -79,7 +79,7 @@ export const immersiveServices: ImmersiveService[] = [
     index: '04',
     title: 'Mixed Reality',
     eyebrow: 'Hybrid Experiences',
-    body: 'We combine something physically built with a digital layer running on top of it — a real stand, wall, or product with projection, sensors, or tracked content responding to the people in front of it.',
+    body: 'We combine something physically built with a digital layer running on top of it, a real stand, wall, or product with projection, sensors, or tracked content responding to the people in front of it.',
     deliverables: [
       'Interactive installations for events, lobbies, and showrooms',
       'Projection and screen content mapped to a built structure',

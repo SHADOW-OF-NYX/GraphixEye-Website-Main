@@ -15,7 +15,7 @@ export interface Work {
   location: string;
   image: string;
   summary: string;
-  /** Only projects for this service — never mixes in sibling flash cards. */
+  /** Only projects for this service, never mixes in sibling flash cards. */
   projects: ServiceProject[];
 }
 
@@ -26,19 +26,19 @@ function seedProjects(slug: string, title: string, location: string): ServicePro
   return [
     {
       id: `${slug}-01`,
-      title: `${title} — Selected work 01`,
+      title: `${title}: Selected work 01`,
       location,
       image: local(slug),
     },
     {
       id: `${slug}-02`,
-      title: `${title} — Selected work 02`,
+      title: `${title}: Selected work 02`,
       location,
       image: local(slug),
     },
     {
       id: `${slug}-03`,
-      title: `${title} — Selected work 03`,
+      title: `${title}: Selected work 03`,
       location,
       image: local(slug),
     },
@@ -65,7 +65,7 @@ function service(
 
 export const works: Work[] = [
   service('logo-design', 'Logo Design', 'Design', 'Brand Identity', 'Marks and wordmarks built for print, signage, and digital systems.'),
-  service('branding-identity', 'Branding and Identity', 'Design', 'Dammam, KSA', 'Full identity systems — colour, type, and guidelines across touchpoints.'),
+  service('branding-identity', 'Branding and Identity', 'Design', 'Dammam, KSA', 'Full identity systems, colour, type, and guidelines across touchpoints.'),
   service('print-design', 'Print Design', 'Design', 'Collateral', 'Brochures, stationery, and collateral designed for press and finish.'),
   service('digital-design', 'Digital Design', 'Design', 'Social & Web', 'Social, web, and screen graphics aligned to the brand system.'),
   service('packaging-design', 'Packaging Design', 'Design', 'Unboxing', 'Structural and graphic packaging designed for shelf and unboxing.'),
@@ -110,7 +110,7 @@ export const featuredWorks = [
   works.find((w) => w.slug === 'packaging-custom')!,
 ];
 
-/** Cards pinned in the home page horizontal scroll — AI, AR, VR, and MR. */
+/** Cards pinned in the home page horizontal scroll, AI, AR, VR, and MR. */
 export const horizontalScrollWorks = [
   works.find((w) => w.slug === 'ai-services')!,
   works.find((w) => w.slug === 'augmented-reality')!,
@@ -137,7 +137,7 @@ export const workCategories: WorkCategoryMeta[] = [
     category: 'Design',
     title: 'Design',
     eyebrow: 'Identity systems',
-    body: 'Logo, branding, print and digital design, packaging systems, illustration, and infographics — built as one visual language.',
+    body: 'Logo, branding, print and digital design, packaging systems, illustration, and infographics, built as one visual language.',
     glow: 'from-[#ff443a] via-[#ff6e8f] to-[#ff9ae7]',
   },
   {
@@ -153,7 +153,7 @@ export const workCategories: WorkCategoryMeta[] = [
     category: 'Printing',
     title: 'Printing',
     eyebrow: 'Press & finish',
-    body: 'Offset, digital, silk screen, UV and hot stamping, continuous forms, binding, and finishing — colour you can check on press.',
+    body: 'Offset, digital, silk screen, UV and hot stamping, continuous forms, binding, and finishing, colour you can check on press.',
     glow: 'from-[#ff5860] via-[#ff93a5] to-[#ff9ae7]',
   },
   {
