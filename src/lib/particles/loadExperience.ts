@@ -30,7 +30,7 @@ export async function loadExperienceBaked(id: ExperienceBakedId): Promise<Experi
   if (cache?.[id]) return cache[id]!;
 
   const base = `/particle-targets/experience/${id}`;
-  const v = 'v=20260910exp4';
+  const v = 'v=20260910exp5';
   const [positions, colors, sizes] = await Promise.all([
     loadBin(`${base}.bin?${v}`),
     loadBin(`${base}_colors.bin?${v}`),

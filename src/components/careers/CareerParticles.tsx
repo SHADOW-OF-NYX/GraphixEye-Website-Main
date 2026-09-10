@@ -1294,14 +1294,14 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
    * No spin so the warehouse / press silhouette stays designed.
    */
   warehouse: {
-    // Pulled back elevated 3/4 — Revit shed as floor hero under the title
-    camera: { x: 0.25, y: 1.1, z: 5.6, lookX: 0, lookY: -0.15, lookZ: 0, fov: 32 },
-    bloom: 1.25,
-    pointScale: 3.5,
-    alpha: 0.85,
+    // Interior bay — slow orbit so columns / conveyor read in the round
+    camera: { x: 0.15, y: 1.25, z: 5.4, lookX: 0, lookY: -0.2, lookZ: 0, fov: 34 },
+    bloom: 1.3,
+    pointScale: 3.6,
+    alpha: 0.88,
     noiseAmp: 0.0008,
     rotX: 0,
-    spinY: 0,
+    spinY: 0.045,
     spinZ: 0,
     wave: 0,
   },

@@ -237,30 +237,81 @@ function evaluateLocalSamples(samples, positions) {
 }
 
 async function bakeWarehouse() {
-  console.log('\n— warehouse from', WAREHOUSE)
+  console.log('\n— warehouse (interior) from', WAREHOUSE)
   const gltf = await loadGltf(WAREHOUSE)
   /*
-   * Revit sample shed — longest in Z. Elevated front-left 3/4 so facade depth
-   * and roof volume read together (not a flat side strip).
+   * Interior bay — drop exterior walls/roof/doors/skylight shells so particles
+   * show the floor, steel frame, and conveyor. Elevated look down the aisle.
    */
-  gltf.scene.rotation.set(-0.38, 1.05, 0.03)
+  gltf.scene.rotation.set(-0.42, 0.95, 0.02)
   gltf.scene.updateMatrixWorld(true)
 
-  const meshes = collectMeshes(gltf.scene)
-  const positions = new Float32Array(N * 3)
-  const colors = sampleMeshes(meshes, N, positions, (color, p) => {
-    const t = Math.min(1, Math.max(0, (p.y + 2) / 10))
-    brassColor(color, 0.25 + t * 0.7)
-    const boost = 1.15
-    color.r = Math.min(1, color.r * boost)
-    color.g = Math.min(1, color.g * boost)
-    color.b = Math.min(1, color.b * boost)
+  const EXTERIOR =
+    /Basic_Wall|Basic_Roof|Door-Exterior|curtain_panel_louver|Sectional_Overhead|Skylight-Ridge/i
+  const all = collectMeshes(gltf.scene)
+  const meshes = all.filter((m) => {
+    const n = `${m.name || ''}|${m.parent?.name || ''}`
+    return !EXTERIOR.test(n)
+  })
+  console.log('  interior meshes', meshes.length, '/', all.length)
+
+  // Favour steel + conveyor over the huge floor slab so the bay reads as space
+  const weights = meshes.map((mesh) => {
+    let w = meshWeight(mesh)
+    const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
+    if (/Floor_Concrete/i.test(n)) w *= 0.35
+    else if (/conveyor/i.test(n)) w *= 3.2
+    else if (/W_Shapes/i.test(n)) w *= 2.4
+    return Math.max(w, 1)
   })
 
-  normalizePositions(positions, 2.4)
+  const positions = new Float32Array(N * 3)
+  const colors = new Float32Array(N * 3)
+  const total = weights.reduce((a, b) => a + b, 0) || 1
+  let offset = 0
+  const tmp = new THREE.Vector3()
+  const normal = new THREE.Vector3()
+  const color = new THREE.Color()
+
+  for (let m = 0; m < meshes.length; m++) {
+    const mesh = meshes[m]
+    const share =
+      m === meshes.length - 1
+        ? N - offset
+        : Math.max(1, Math.round((weights[m] / total) * N))
+    if (share <= 0 || !mesh.geometry?.attributes?.position) continue
+    const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
+    for (let i = 0; i < share && offset + i < N; i++) {
+      sampler.sample(tmp, normal)
+      tmp.applyMatrix4(mesh.matrixWorld)
+      const i3 = (offset + i) * 3
+      positions[i3] = tmp.x
+      positions[i3 + 1] = tmp.y
+      positions[i3 + 2] = tmp.z
+      const t = Math.min(1, Math.max(0, (tmp.y + 1) / 8))
+      brassColor(color, 0.3 + t * 0.7)
+      const boost = 1.2
+      colors[i3] = Math.min(1, color.r * boost)
+      colors[i3 + 1] = Math.min(1, color.g * boost)
+      colors[i3 + 2] = Math.min(1, color.b * boost)
+    }
+    offset += share
+  }
+  while (offset < N) {
+    const src = (offset % Math.max(1, offset)) * 3
+    positions[offset * 3] = positions[src]
+    positions[offset * 3 + 1] = positions[src + 1]
+    positions[offset * 3 + 2] = positions[src + 2]
+    colors[offset * 3] = colors[src]
+    colors[offset * 3 + 1] = colors[src + 1]
+    colors[offset * 3 + 2] = colors[src + 2]
+    offset++
+  }
+
+  normalizePositions(positions, 2.45)
   writeBin('warehouse.bin', positions)
   writeBin('warehouse_colors.bin', colors)
-  writeBin('warehouse_sizes.bin', defaultSizes(N, 0.7, 1.45))
+  writeBin('warehouse_sizes.bin', defaultSizes(N, 0.75, 1.5))
 }
 
 async function bakeHaasPress() {
