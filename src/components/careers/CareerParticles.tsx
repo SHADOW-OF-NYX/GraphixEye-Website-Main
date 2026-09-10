@@ -1619,9 +1619,22 @@ export default function CareerParticles({
         geometry.attributes.aColor.needsUpdate = true;
         geometry.attributes.aSize.needsUpdate = true;
 
-        // Blended rotation — accumulated so shifting rates never jump
-        spinY += lerp(ca.spinY, cb.spinY, u) * delta;
-        spinZ += lerp(ca.spinZ, cb.spinZ, u) * delta;
+        // Blended rotation — accumulated so shifting rates never jump.
+        // When the target rate is zero (logo / forklift / handshake), unwind any
+        // leftover angle from a spinning neighbor (e.g. stack) so static models
+        // settle back to their designed orientation.
+        const rateY = lerp(ca.spinY, cb.spinY, u);
+        const rateZ = lerp(ca.spinZ, cb.spinZ, u);
+        if (Math.abs(rateY) < 1e-5) {
+          spinY += (0 - spinY) * Math.min(1, delta * 5);
+        } else {
+          spinY += rateY * delta;
+        }
+        if (Math.abs(rateZ) < 1e-5) {
+          spinZ += (0 - spinZ) * Math.min(1, delta * 5);
+        } else {
+          spinZ += rateZ * delta;
+        }
         points.rotation.x = lerp(ca.rotX, cb.rotX, u);
         points.rotation.y = spinY;
         points.rotation.z = spinZ;
