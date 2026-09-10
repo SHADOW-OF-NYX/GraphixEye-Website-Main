@@ -240,14 +240,15 @@ async function bakeWarehouse() {
   console.log('\n— warehouse (interior) from', WAREHOUSE)
   const gltf = await loadGltf(WAREHOUSE)
   /*
-   * Interior bay — drop exterior walls/roof/doors/skylight shells so particles
-   * show the floor, steel frame, and conveyor. Elevated look down the aisle.
+   * Upright floor plan — camera sits inside the bay at runtime (no baked 3/4
+   * product tilt). Drop exterior shell (thick walls / roof / louvers / skylight)
+   * but keep interior partitions, dock doors, steel, tables, and conveyor.
    */
-  gltf.scene.rotation.set(-0.42, 0.95, 0.02)
+  gltf.scene.rotation.set(0, 0, 0)
   gltf.scene.updateMatrixWorld(true)
 
   const EXTERIOR =
-    /Basic_Wall|Basic_Roof|Door-Exterior|curtain_panel_louver|Sectional_Overhead|Skylight-Ridge/i
+    /Basic_Wall_Generic_-_8"|Basic_Roof|Door-Exterior|curtain_panel_louver|Skylight-Ridge/i
   const all = collectMeshes(gltf.scene)
   const meshes = all.filter((m) => {
     const n = `${m.name || ''}|${m.parent?.name || ''}`
@@ -255,12 +256,14 @@ async function bakeWarehouse() {
   })
   console.log('  interior meshes', meshes.length, '/', all.length)
 
-  // Favour steel + conveyor over the huge floor slab so the bay reads as space
+  // Favour steel + conveyor + tables over the huge floor slab so the bay reads
   const weights = meshes.map((mesh) => {
     let w = meshWeight(mesh)
     const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    if (/Floor_Concrete/i.test(n)) w *= 0.35
-    else if (/conveyor/i.test(n)) w *= 3.2
+    if (/Floor_Concrete/i.test(n)) w *= 0.3
+    else if (/conveyor/i.test(n)) w *= 3.5
+    else if (/TALL_INDUSTRIAL_TABLE/i.test(n)) w *= 3.0
+    else if (/Sectional_Overhead|Basic_Wall_Generic_-_6"/i.test(n)) w *= 1.8
     else if (/W_Shapes/i.test(n)) w *= 2.4
     return Math.max(w, 1)
   })

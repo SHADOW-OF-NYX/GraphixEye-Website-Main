@@ -244,6 +244,7 @@ interface ShapeConfig {
   /** Static tilt applied to the point cloud */
   rotX: number;
   /** Continuous spin rate (radians/sec) */
+  spinX: number;
   spinY: number;
   spinZ: number;
   /** 1 enables the rolling terrain motion used by the wave */
@@ -1074,6 +1075,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.6,
     noiseAmp: 0.012,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0.045,
     wave: 0,
@@ -1085,6 +1087,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.55,
     noiseAmp: 0.006,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 1,
@@ -1096,6 +1099,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.55,
     noiseAmp: 0.01,
     rotX: -0.5,
+    spinX: 0,
     spinY: 0.07,
     spinZ: 0,
     wave: 0,
@@ -1107,6 +1111,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.6,
     noiseAmp: 0.012,
     rotX: 0,
+    spinX: 0,
     spinY: 0.22,
     spinZ: 0,
     wave: 0,
@@ -1118,6 +1123,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.6,
     noiseAmp: 0.014,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: -0.05,
     wave: 0,
@@ -1139,6 +1145,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.68,
     noiseAmp: 0.006,
     rotX: -0.2,
+    spinX: 0,
     spinY: 0.05,
     spinZ: 0,
     wave: 0,
@@ -1150,6 +1157,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.62,
     noiseAmp: 0.005,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1161,6 +1169,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.62,
     noiseAmp: 0.01,
     rotX: -0.42,
+    spinX: 0,
     spinY: 0.06,
     spinZ: 0,
     wave: 0,
@@ -1173,6 +1182,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.65,
     noiseAmp: 0.007,
     rotX: 0,
+    spinX: 0,
     spinY: 0.14,
     spinZ: 0,
     wave: 0,
@@ -1184,6 +1194,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.65,
     noiseAmp: 0.012,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0.04,
     wave: 0,
@@ -1200,6 +1211,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.95,
     noiseAmp: 0.0008,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1212,6 +1224,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.92,
     noiseAmp: 0.0008,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1223,6 +1236,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.8,
     noiseAmp: 0.0012,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1240,6 +1254,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.55,
     noiseAmp: 0.005,
     rotX: 0,
+    spinX: 0,
     spinY: 0.04,
     spinZ: 0,
     wave: 0,
@@ -1251,6 +1266,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.5,
     noiseAmp: 0.005,
     rotX: -0.55,
+    spinX: 0,
     spinY: 0.03,
     spinZ: 0,
     wave: 0,
@@ -1262,6 +1278,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.55,
     noiseAmp: 0.005,
     rotX: 0,
+    spinX: 0,
     spinY: 0.05,
     spinZ: 0,
     wave: 0,
@@ -1273,6 +1290,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.52,
     noiseAmp: 0.007,
     rotX: -0.08,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1284,24 +1302,26 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.55,
     noiseAmp: 0.009,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0.035,
     wave: 0,
   },
 
   /*
-   * Baked Experience models. Static framing; Haas keeps its baked animation.
-   * No spin so the warehouse / press silhouette stays designed.
+   * Baked Experience models. Warehouse: eye-level interior looking down the
+   * conveyor bay; slow pitch on X only (no Y turntable).
    */
   warehouse: {
-    // Interior bay — slow orbit so columns / conveyor read in the round
-    camera: { x: 0.15, y: 1.25, z: 5.4, lookX: 0, lookY: -0.2, lookZ: 0, fov: 34 },
+    // Inside the bay — conveyor in the foreground, looking toward the far wall
+    camera: { x: 0.52, y: -0.06, z: 1.08, lookX: -0.08, lookY: -0.2, lookZ: -0.28, fov: 56 },
     bloom: 1.3,
     pointScale: 3.6,
     alpha: 0.88,
     noiseAmp: 0.0008,
     rotX: 0,
-    spinY: 0.045,
+    spinX: 0.04,
+    spinY: 0,
     spinZ: 0,
     wave: 0,
   },
@@ -1313,6 +1333,7 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     alpha: 0.95,
     noiseAmp: 0.0004,
     rotX: 0,
+    spinX: 0,
     spinY: 0,
     spinZ: 0,
     wave: 0,
@@ -1544,6 +1565,7 @@ export default function CareerParticles({
 
       let frame = 0;
       let last = performance.now();
+      let spinX = 0;
       let spinY = 0;
       let spinZ = 0;
 
@@ -1670,8 +1692,14 @@ export default function CareerParticles({
         // When the target rate is zero (logo / forklift / handshake), unwind any
         // leftover angle from a spinning neighbor (e.g. stack) so static models
         // settle back to their designed orientation.
+        const rateX = lerp(ca.spinX, cb.spinX, u);
         const rateY = lerp(ca.spinY, cb.spinY, u);
         const rateZ = lerp(ca.spinZ, cb.spinZ, u);
+        if (Math.abs(rateX) < 1e-5) {
+          spinX += (0 - spinX) * Math.min(1, delta * 5);
+        } else {
+          spinX += rateX * delta;
+        }
         if (Math.abs(rateY) < 1e-5) {
           spinY += (0 - spinY) * Math.min(1, delta * 5);
         } else {
@@ -1682,7 +1710,7 @@ export default function CareerParticles({
         } else {
           spinZ += rateZ * delta;
         }
-        points.rotation.x = lerp(ca.rotX, cb.rotX, u);
+        points.rotation.x = lerp(ca.rotX, cb.rotX, u) + spinX;
         points.rotation.y = spinY;
         points.rotation.z = spinZ;
 
