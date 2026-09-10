@@ -21,7 +21,8 @@ import {
 import { horizontalScrollWorks } from '../data/works';
 import ReviewSection from '../components/ReviewSection';
 import Seo from '../components/Seo';
-import { getPageSeo } from '../data/seo';
+import { faqPageJsonLd, getPageSeo } from '../data/seo';
+import { serviceHubs } from '../data/serviceHubs';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,10 +96,11 @@ export default function Home() {
 
   const faqItems = faqs[faqGroup];
   const featured = horizontalScrollWorks;
+  const homeFaqs = [...faqs.client, ...faqs.partner];
 
   return (
     <div className="bg-ll-white text-black">
-      <Seo page={getPageSeo('/')!} includeLocalBusiness />
+      <Seo page={getPageSeo('/')!} includeLocalBusiness jsonLd={faqPageJsonLd(homeFaqs)} />
       {/* HERO */}
       <section ref={heroWrap} className="relative h-[280vh] bg-ll-white">
         <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-ll-white">
@@ -111,7 +113,7 @@ export default function Home() {
             <span ref={heroTitle} className="flex justify-center w-full opacity-0">
               <img
                 src="/graphixeye-wordmark.png"
-                alt="GraphixEye"
+                alt="GraphixEye — one-stop printing signage packaging Dammam Saudi Arabia"
                 className="block w-auto max-w-full h-auto max-h-[18vh] md:max-h-[26vh] object-contain drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]"
               />
             </span>
@@ -119,11 +121,11 @@ export default function Home() {
 
           <div ref={introCopy} className="absolute bottom-16 right-6 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
             <p className="display-md mb-6">
-              A Dammam factory for design, print, signage, and finishing.
+              One-stop Dammam factory for design, print, signage, packaging, and finishing.
             </p>
             <p className="text-[14px] leading-relaxed text-ll-white/80 mb-6">
-              GraphixEye is a production house in the 2nd Industrial City, presses, finishing lines, and craftsmen
-              under one roof. {site.tagline}. Price on request.
+              GraphixEye is a production house in the 2nd Industrial City — presses, finishing lines, and craftsmen
+              under one roof across Saudi Arabia. {site.tagline}. Price on request.
             </p>
             <ul className="space-y-2 text-[13px] text-ll-white/75">
               {heroPoints.map((p) => (
@@ -131,6 +133,39 @@ export default function Home() {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* ONE-STOP SERVICE HUBS */}
+      <section className="px-6 md:px-12 py-16 md:py-20 border-b border-ll-stroke">
+        <p className="text-[12px] tracking-[0.22em] uppercase text-black/40 mb-3">One factory · Full stack</p>
+        <h2 className="display-md mb-4 max-w-3xl">The one-stop production house for Saudi brands</h2>
+        <p className="text-[16px] leading-relaxed text-black/55 max-w-2xl mb-10">
+          Printing, signage, packaging, design, gifting, and immersive AR/VR from one Dammam floor — brief once,
+          produce once, install across the Kingdom.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {serviceHubs.map((hub) => (
+            <Link
+              key={hub.slug}
+              to={`/services/${hub.slug}`}
+              className="border border-ll-stroke rounded-3xl px-4 py-5 hover:border-ll-highlight transition-colors"
+            >
+              <span className="block text-[12px] tracking-[0.14em] uppercase text-black/40 mb-2">{hub.eyebrow}</span>
+              <span className="font-display text-[16px] capitalize">{hub.slug.replace('-', ' / ')}</span>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-8 flex flex-wrap gap-4">
+          <Link to="/about" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            About GraphixEye
+          </Link>
+          <Link to="/faq" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            FAQ
+          </Link>
+          <Link to="/contact" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            Get a free quote in Dammam
+          </Link>
         </div>
       </section>
 
@@ -397,6 +432,9 @@ export default function Home() {
               </button>
             ))}
           </div>
+          <Link to="/faq" className="mt-6 inline-block text-[13px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            View full FAQ
+          </Link>
         </div>
         <div className="flex flex-col gap-2">
           {faqItems.map((item) => (
@@ -408,6 +446,12 @@ export default function Home() {
               <p className="pt-4 text-[14px] leading-relaxed text-black/55 max-w-2xl">{item.a}</p>
             </details>
           ))}
+          <Link
+            to="/faq"
+            className="mt-4 text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors w-fit"
+          >
+            View all FAQs →
+          </Link>
         </div>
       </section>
 

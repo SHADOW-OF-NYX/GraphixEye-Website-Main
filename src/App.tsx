@@ -14,6 +14,7 @@ import Careers from './pages/Careers';
 import Vendors from './pages/Vendors';
 import Expansions from './pages/Expansions';
 import About from './pages/About';
+import Faq from './pages/Faq';
 import { DefaultSiteSeo } from './components/Seo';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 
@@ -63,6 +64,7 @@ function AppShell() {
           <Route path="/expansions" element={<Expansions />} />
           <Route path="/experience" element={<Experience />} />
           <Route path="/about" element={<About />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/vendors" element={<Vendors />} />

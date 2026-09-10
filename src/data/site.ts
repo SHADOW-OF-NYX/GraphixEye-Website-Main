@@ -22,9 +22,9 @@ export const navLinks = [
 ];
 
 export const heroPoints = [
-  'Identity, signage, print, packaging, and gifting from one factory floor',
+  'One-stop design, signage, print, packaging, and gifting from a single Dammam factory',
   'Offset, digital, silk screen, UV, and bindery with colour you can check on press',
-  'Reprints, rollouts, and install handled by the same Dammam team',
+  'Reprints, rollouts, and install handled by the same team across Saudi Arabia',
 ];
 
 export const studioSpecs = [
@@ -34,9 +34,9 @@ export const studioSpecs = [
 ];
 
 export const studioFeatures = [
-  { title: 'Design to install', body: 'Identity, signage, print, packaging, and gifting under one roof.' },
+  { title: 'One-stop stack', body: 'Identity, signage, print, packaging, and gifting under one roof in Dammam.' },
   { title: 'Press & finish', body: 'Offset, digital, silk screen, UV, hot stamping, bindery.' },
-  { title: 'Built for the site', body: 'Exterior, interior, fleet, and exhibition work made for real spaces.' },
+  { title: 'Built for the site', body: 'Exterior, interior, fleet, and exhibition work made for real spaces across KSA.' },
 ];
 
 export const serviceTabs = [
@@ -181,8 +181,16 @@ export const testimonials: Testimonial[] = [
 export const faqs = {
   client: [
     {
+      q: 'Is GraphixEye a one-stop solution for printing, signage, and packaging in Saudi Arabia?',
+      a: 'Yes. GraphixEye is a one-stop creative production house in Dammam. Design, commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR experiences are produced from one factory floor in the 2nd Industrial City — so you are not coordinating a chain of vendors across the Kingdom.',
+    },
+    {
       q: 'What does GraphixEye actually produce?',
-      a: 'Design, signage, printing, packaging, and gifting, from logos to architectural environments, all from our factory in Dammam.',
+      a: 'Design, signage, printing, packaging, corporate gifting, and immersive AR/VR/AI experiences — from logos to architectural environments — all from our factory in Dammam, Saudi Arabia.',
+    },
+    {
+      q: 'Where is GraphixEye located?',
+      a: 'GraphixEye is in the 2nd Industrial City, Dammam 34341, KSA (P.O. Box 4416). Call +966 13 802 1919 or email info@eramprintandpack.com. We produce in Dammam and deliver and install across Saudi Arabia.',
     },
     {
       q: 'What happens during the first brief?',
@@ -194,31 +202,38 @@ export const faqs = {
     },
     {
       q: 'Can we visit the factory?',
-      a: 'Yes. GraphixEye is in the 2nd Industrial City, Dammam. We welcome walkthroughs of the press floor, finishing bays, and live work.',
+      a: 'Yes. GraphixEye welcomes walkthroughs of the press floor, finishing bays, and live work at our Dammam factory.',
     },
     {
       q: 'Do you work outside Dammam?',
-      a: 'Yes. We produce in Dammam and deliver and install across the Kingdom, headquarters, industrial sites, retail, and events.',
+      a: 'Yes. We produce in Dammam and deliver and install across the Kingdom — headquarters, industrial sites, retail, and events in Riyadh, Jeddah, and the Eastern Province.',
     },
   ],
   partner: [
+    {
+      q: 'Why choose one factory instead of multiple vendors?',
+      a: 'One GraphixEye team owns artwork, press, fabrication, finishing, and install. Colour and materials stay locked, timelines stay accountable, and reprints for the next site match the first job.',
+    },
     {
       q: 'Who do you work with?',
       a: 'Corporates, industrial sites, hospitality, retail, and events that want serious production without a chain of vendors.',
     },
     {
       q: 'Can the work be customized for our brand?',
-      a: 'Yes. Artwork, materials, bilingual needs, and how the piece sits in the space are specified with you before we print.',
+      a: 'Yes. Artwork, materials, bilingual Arabic/English needs, and how the piece sits in the space are specified with you before we print.',
     },
     {
       q: 'Can you support several sites?',
-      a: 'Yes. Locked colour and finishing specs make reprints and new locations match the first install.',
+      a: 'Yes. Locked colour and finishing specs make reprints and new locations match the first install across Saudi Arabia.',
     },
     {
       q: 'How do we start?',
-      a: 'Contact us. After a short call we send a concrete offer with recommended materials, quantities, and a timeline from the Dammam floor.',
+      a: 'Contact GraphixEye in Dammam. After a short call we send a concrete offer with recommended materials, quantities, and a timeline from the factory floor.',
     },
   ],
 };
+
+/** Flat FAQ list for FAQPage schema and the /faq route. */
+export const allFaqs = [...faqs.client, ...faqs.partner];
 
 export const clients = ['Aramco', 'SABIC', 'Maaden', 'Sadara', 'Lulu', 'Eram'];

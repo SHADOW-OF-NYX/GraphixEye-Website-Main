@@ -11,6 +11,11 @@ export const GEO = {
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 export const LOGO_URL = `${SITE_URL}/logo.png`;
 
+export function absoluteUrl(path: string): string {
+  if (path === '/') return `${SITE_URL}/`;
+  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
 export type PageSeo = {
   path: string;
   title: string;
@@ -25,15 +30,23 @@ export type PageSeo = {
 
 export const localBusinessJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
+  '@type': ['LocalBusiness', 'Organization'],
+  '@id': `${SITE_URL}/#business`,
   name: 'GraphixEye',
+  alternateName: 'Graphix Eye',
+  legalName: 'GraphixEye — Eram Printing & Packaging Factory Co.',
   url: SITE_URL,
   logo: LOGO_URL,
   image: OG_IMAGE,
   description:
-    'Dammam-based production house specializing in printing, packaging, signage, corporate gifting, and AR/VR/MR immersive experiences across Saudi Arabia.',
+    'One-stop creative production house in Dammam, Saudi Arabia for graphic design, commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR immersive experiences — all from a single factory floor.',
   telephone: '+966-13-802-1919',
   email: 'info@eramprintandpack.com',
+  foundingDate: '2009',
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'Eram Printing & Packaging Factory Co.',
+  },
   address: {
     '@type': 'PostalAddress',
     streetAddress: '2nd Industrial City',
@@ -42,7 +55,20 @@ export const localBusinessJsonLd = {
     postalCode: '34341',
     addressCountry: 'SA',
   },
-  areaServed: ['Saudi Arabia', 'Dammam', 'Riyadh', 'Jeddah', 'Eastern Province'],
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 26.3927,
+    longitude: 49.9777,
+  },
+  areaServed: [
+    { '@type': 'Country', name: 'Saudi Arabia' },
+    { '@type': 'City', name: 'Dammam' },
+    { '@type': 'City', name: 'Riyadh' },
+    { '@type': 'City', name: 'Jeddah' },
+    { '@type': 'AdministrativeArea', name: 'Eastern Province' },
+  ],
+  knowsLanguage: ['en', 'ar'],
+  priceRange: '$$',
   serviceType: [
     'Printing',
     'Packaging',
@@ -55,18 +81,71 @@ export const localBusinessJsonLd = {
     'Immersive Experiences',
     'AI Solutions',
   ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'GraphixEye production services',
+    itemListElement: [
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Commercial Printing', url: `${SITE_URL}/services/printing` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Custom Packaging', url: `${SITE_URL}/services/packaging` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Signage Manufacturing', url: `${SITE_URL}/services/signage` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Corporate Gifting', url: `${SITE_URL}/services/gifting` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Graphic Design', url: `${SITE_URL}/services/design` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'AR VR MR Experiences', url: `${SITE_URL}/services/ar-vr` } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'AI Creative Solutions', url: `${SITE_URL}/services/ai` } },
+    ],
+  },
   sameAs: [
     'https://www.instagram.com/graphixeyesa',
     'https://www.linkedin.com/company/graphixeye',
   ],
 };
 
+export const webSiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${SITE_URL}/#website`,
+  name: 'GraphixEye',
+  url: SITE_URL,
+  description:
+    'GraphixEye — Dammam one-stop production house for printing, signage, packaging, design, gifting, and immersive experiences across Saudi Arabia.',
+  publisher: { '@id': `${SITE_URL}/#business` },
+  inLanguage: ['en', 'ar'],
+};
+
+export function faqPageJsonLd(faqs: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+}
+
+export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
 export const pageSeo: Record<string, PageSeo> = {
   '/': {
     path: '/',
     title: 'GraphixEye | Printing, Signage & Packaging Company in Dammam, Saudi Arabia',
     description:
-      "GraphixEye is Dammam's leading production house for commercial printing, custom signage, packaging, corporate gifting, and immersive AR/VR/MR experiences across Saudi Arabia. We Do As We Promise.",
+      "GraphixEye is Dammam's one-stop production house for commercial printing, custom signage, packaging, corporate gifting, and immersive AR/VR/MR experiences across Saudi Arabia. We Do As We Promise.",
     keywords:
       'printing company Dammam, signage Saudi Arabia, packaging KSA, AR VR Saudi Arabia, graphic design Dammam, corporate gifting KSA',
     ogTitle: 'GraphixEye | Printing, Signage & Packaging - Dammam, Saudi Arabia',
@@ -182,12 +261,14 @@ export const pageSeo: Record<string, PageSeo> = {
       'Discover how GraphixEye expands brand presence through design, environments, and production from our Dammam factory across the Kingdom of Saudi Arabia.',
     priority: 0.6,
   },
+  '/faq': {
+    path: '/faq',
+    title: 'FAQ | One-Stop Printing, Signage & Packaging in Dammam | GraphixEye',
+    description:
+      'Answers about GraphixEye in Dammam: one-stop design, printing, signage, packaging, gifting, and AR/VR production across Saudi Arabia. Factory visits, timelines, and how to get a quote.',
+    priority: 0.7,
+  },
 };
-
-export function absoluteUrl(path: string): string {
-  if (path === '/') return `${SITE_URL}/`;
-  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
-}
 
 export function getPageSeo(path: string): PageSeo | undefined {
   const normalized = path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path;

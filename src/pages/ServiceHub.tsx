@@ -2,31 +2,38 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { Placeholder } from '../components/ui';
-import { getPageSeo, SITE_URL } from '../data/seo';
+import { getPageSeo, SITE_URL, breadcrumbJsonLd } from '../data/seo';
 import { getServiceHub, worksForHub, type ServiceHub } from '../data/serviceHubs';
 import { getCategoryForWork } from '../data/works';
 
 function hubJsonLd(hub: ServiceHub) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: hub.h1,
-    serviceType: hub.schemaServiceType,
-    description: hub.intro,
-    provider: {
-      '@type': 'LocalBusiness',
-      name: 'GraphixEye',
-      url: SITE_URL,
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'Dammam',
-        addressRegion: 'Eastern Province',
-        addressCountry: 'SA',
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: hub.h1,
+      serviceType: hub.schemaServiceType,
+      description: hub.intro,
+      provider: {
+        '@type': 'LocalBusiness',
+        name: 'GraphixEye',
+        url: SITE_URL,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Dammam',
+          addressRegion: 'Eastern Province',
+          addressCountry: 'SA',
+        },
       },
+      areaServed: ['Saudi Arabia', 'Dammam', 'Riyadh', 'Jeddah'],
+      url: `${SITE_URL}/services/${hub.slug}`,
     },
-    areaServed: ['Saudi Arabia', 'Dammam', 'Riyadh', 'Jeddah'],
-    url: `${SITE_URL}/services/${hub.slug}`,
-  };
+    breadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'Services', path: '/services' },
+      { name: hub.eyebrow, path: `/services/${hub.slug}` },
+    ]),
+  ];
 }
 
 export default function ServiceHubPage({ hub }: { hub: ServiceHub }) {

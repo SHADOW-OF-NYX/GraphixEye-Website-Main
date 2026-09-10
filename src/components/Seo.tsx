@@ -6,6 +6,7 @@ import {
   SITE_URL,
   absoluteUrl,
   localBusinessJsonLd,
+  webSiteJsonLd,
   type PageSeo,
 } from '../data/seo';
 
@@ -31,7 +32,10 @@ export default function Seo({
   const ogDescription = page.ogDescription ?? page.description;
   const schemas: Record<string, unknown>[] = [];
 
-  if (includeLocalBusiness) schemas.push(localBusinessJsonLd);
+  if (includeLocalBusiness) {
+    schemas.push(localBusinessJsonLd);
+    schemas.push(webSiteJsonLd);
+  }
   if (jsonLd) schemas.push(...(Array.isArray(jsonLd) ? jsonLd : [jsonLd]));
 
   return (

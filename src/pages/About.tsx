@@ -1,34 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
-import { getPageSeo, SITE_URL } from '../data/seo';
-import { site } from '../data/site';
+import { breadcrumbJsonLd, faqPageJsonLd, getPageSeo, SITE_URL } from '../data/seo';
+import { allFaqs, site } from '../data/site';
 import { serviceHubs } from '../data/serviceHubs';
 
 export default function About() {
   const seo = getPageSeo('/about')!;
 
-  const aboutJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'AboutPage',
-    name: seo.title,
-    description: seo.description,
-    url: `${SITE_URL}/about`,
-    mainEntity: {
-      '@type': 'LocalBusiness',
-      name: 'GraphixEye',
-      foundingDate: site.established,
-      parentOrganization: site.parent,
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: '2nd Industrial City',
-        addressLocality: 'Dammam',
-        addressRegion: 'Eastern Province',
-        postalCode: '34341',
-        addressCountry: 'SA',
-      },
+  const aboutJsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: seo.title,
+      description: seo.description,
+      url: `${SITE_URL}/about`,
+      mainEntity: { '@id': `${SITE_URL}/#business` },
     },
-  };
+    faqPageJsonLd(allFaqs.slice(0, 6)),
+    breadcrumbJsonLd([
+      { name: 'Home', path: '/' },
+      { name: 'About', path: '/about' },
+    ]),
+  ];
 
   return (
     <div className="bg-ll-white min-h-screen pt-36 pb-28">
@@ -36,28 +30,52 @@ export default function About() {
 
       <div className="max-w-[900px] mx-auto px-6 md:px-8">
         <p className="text-[12px] tracking-[0.22em] uppercase text-black/40 mb-4">About</p>
-        <h1 className="display-xl mb-8">Dammam&apos;s creative production house</h1>
+        <h1 className="display-xl mb-8">Saudi Arabia&apos;s one-stop creative production house in Dammam</h1>
         <p className="text-[17px] leading-relaxed text-black/65 mb-8">
-          GraphixEye is a Dammam-based production house for design, signage, printing, packaging, corporate gifting,
-          and immersive AR/VR/MR experiences across Saudi Arabia. Part of {site.parent}, we have operated from the
-          2nd Industrial City since {site.established} with one promise: {site.tagline}.
+          GraphixEye is the one-stop solution brands use when they need design, commercial printing, custom signage,
+          packaging, corporate gifting, and immersive AR/VR/MR — without splitting the job across vendors. Part of{' '}
+          {site.parent}, we have operated from Dammam&apos;s 2nd Industrial City since {site.established}. Our promise:{' '}
+          {site.tagline}.
         </p>
         <p className="text-[16px] leading-relaxed text-black/55 mb-8">
-          Brands choose GraphixEye when they want artwork, fabrication, press, finishing, and install under one roof.
-          That single floor approach keeps colour, materials, and timelines accountable, whether the job is a logo
-          system, outdoor signage, commercial printing, custom packaging, or an immersive brand activation in Riyadh,
-          Jeddah, or the Eastern Province.
-        </p>
-        <p className="text-[16px] leading-relaxed text-black/55 mb-14">
-          From P.O. Box 4416, 2nd Industrial City, Dammam 34341, KSA, we deliver and install across the Kingdom. Visit
-          the factory, brief the team, and leave with a production plan you can follow from proof to site check.
+          Artwork, fabrication, press, finishing, and install sit on one floor. That single-factory model keeps colour,
+          materials, and timelines accountable — whether the brief is a logo system, outdoor signage, commercial
+          printing, custom packaging, branded gifts, or an immersive activation in Riyadh, Jeddah, or the Eastern
+          Province.
         </p>
 
+        <h2 className="display-md mb-4">One factory. Full production stack.</h2>
+        <p className="text-[16px] leading-relaxed text-black/55 mb-10">
+          Instead of a design agency plus a printer plus a signage contractor plus a packaging supplier, GraphixEye
+          delivers the full stack from Dammam and installs across the Kingdom. That is what &ldquo;one-stop&rdquo; means
+          here: one brief, one team, one set of locked specs for the next reprint or the next site.
+        </p>
+
+        <address className="not-italic bg-ll-sand card-r p-6 md:p-8 mb-14 text-[15px] leading-relaxed text-black/65">
+          <p className="text-[12px] tracking-[0.22em] uppercase text-black/40 mb-3">Factory · NAP</p>
+          <p className="font-display text-[18px] text-black mb-2">GraphixEye</p>
+          <p>{site.address.join(', ')}</p>
+          <p className="mt-2">
+            <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="hover:text-ll-highlight transition-colors">
+              {site.phone}
+            </a>
+            {' · '}
+            <a href={`mailto:${site.email}`} className="hover:text-ll-highlight transition-colors">
+              {site.email}
+            </a>
+          </p>
+          <p className="mt-2">
+            <Link to="/contact" className="underline underline-offset-4 hover:text-ll-highlight transition-colors">
+              Contact / get a quote
+            </Link>
+          </p>
+        </address>
+
         <section className="mb-16" lang="ar" dir="rtl">
-          <h2 className="display-md mb-4 text-right">عن جرافيكس آي في الدمام</h2>
+          <h2 className="display-md mb-4 text-right">جرافيكس آي — حل متكامل في الدمام</h2>
           <p className="text-[16px] leading-relaxed text-black/55 text-right">
-            جرافيكس آي بيت إنتاج إبداعي في الدمام متخصص في التصميم واللوحات والطباعة والتغليف وهدايا الشركات والتجارب
-            الغامرة في المملكة العربية السعودية. شعارنا: نفعل كما نعد، من المصنع إلى موقعك في أنحاء المملكة.
+            جرافيكس آي بيت إنتاج إبداعي متكامل في الدمام: تصميم، طباعة، لوحات، تغليف، هدايا الشركات، وتجارب غامرة تحت
+            سقف واحد. نخدم العملاء في الرياض وجدة والمنطقة الشرقية وجميع أنحاء المملكة. شعارنا: نفعل كما نعد.
           </p>
         </section>
 
@@ -76,11 +94,29 @@ export default function About() {
           ))}
         </ul>
 
+        <h2 className="display-md mb-6">Common questions</h2>
+        <div className="flex flex-col gap-2 mb-6">
+          {allFaqs.slice(0, 5).map((item) => (
+            <details key={item.q} className="faq-item group bg-ll-sand card-r px-6 py-5">
+              <summary className="flex items-center justify-between cursor-pointer list-none font-display text-[16px]">
+                {item.q}
+                <span className="faq-plus ml-4 text-xl leading-none">+</span>
+              </summary>
+              <p className="pt-4 text-[14px] leading-relaxed text-black/55">{item.a}</p>
+            </details>
+          ))}
+        </div>
+        <p className="mb-16">
+          <Link to="/faq" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            See all FAQs →
+          </Link>
+        </p>
+
         <div className="bg-ll-sand card-r p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div>
             <h2 className="display-md mb-3">Work with GraphixEye</h2>
             <p className="text-[15px] text-black/55 max-w-md">
-              Request a quote for your next printing, signage, packaging, or immersive project in Saudi Arabia.
+              Request a quote for your next one-stop printing, signage, packaging, or immersive project in Saudi Arabia.
             </p>
           </div>
           <Link

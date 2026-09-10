@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Seo from '../components/Seo';
 import { Placeholder } from '../components/ui';
-import { serviceDetailSeo, SITE_URL } from '../data/seo';
+import { breadcrumbJsonLd, serviceDetailSeo, SITE_URL } from '../data/seo';
 import {
   bannerCropSlugs,
   getCategoryForWork,
@@ -54,15 +54,22 @@ export default function ServiceDetail() {
       <Seo
         page={pageSeo}
         image={`${SITE_URL}${work.image}`}
-        jsonLd={{
-          '@context': 'https://schema.org',
-          '@type': 'Service',
-          name: work.title,
-          description: work.summary,
-          url: `${SITE_URL}/services/${work.slug}`,
-          provider: { '@type': 'LocalBusiness', name: 'GraphixEye', url: SITE_URL },
-          areaServed: 'Saudi Arabia',
-        }}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Service',
+            name: work.title,
+            description: work.summary,
+            url: `${SITE_URL}/services/${work.slug}`,
+            provider: { '@type': 'LocalBusiness', name: 'GraphixEye', url: SITE_URL },
+            areaServed: 'Saudi Arabia',
+          },
+          breadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Services', path: '/services' },
+            { name: work.title, path: `/services/${work.slug}` },
+          ]),
+        ]}
       />
       <section className="px-4 md:px-8 mb-12">
         <div className="relative card-r overflow-hidden min-h-[70vh] bg-black" data-nav-tone="dark">

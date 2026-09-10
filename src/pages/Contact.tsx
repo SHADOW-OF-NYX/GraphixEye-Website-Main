@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
-import { getPageSeo } from '../data/seo';
+import { breadcrumbJsonLd, getPageSeo } from '../data/seo';
 import { site } from '../data/site';
 import { serviceHubs } from '../data/serviceHubs';
 
@@ -10,7 +10,13 @@ export default function Contact() {
 
   return (
     <div className="bg-ll-white min-h-screen pt-36 pb-24">
-      <Seo page={seo} />
+      <Seo
+        page={seo}
+        jsonLd={breadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Contact', path: '/contact' },
+        ])}
+      />
       <div className="max-w-[1600px] mx-auto px-6 md:px-8 flex flex-col md:flex-row gap-20">
         <div className="w-full md:w-1/2">
           <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Contact</p>
@@ -18,12 +24,17 @@ export default function Contact() {
             Contact GraphixEye<br />in Dammam
           </h1>
           <p className="text-black/55 text-[16px] leading-relaxed mb-6 max-w-md">
-            Request a quote for printing, packaging, signage, corporate gifting, design, or AR/VR/MR projects across
-            Saudi Arabia. {site.contactLead} We aim to respond within 24 hours.
+            Request a quote for one-stop printing, packaging, signage, corporate gifting, design, or AR/VR/MR projects
+            across Saudi Arabia. {site.contactLead} We aim to respond within 24 hours.
           </p>
-          <p className="text-black/45 text-[15px] leading-relaxed mb-12 max-w-md">
-            GraphixEye is your printing and signage company in Dammam, visit the 2nd Industrial City factory or send
-            a brief online.
+          <p className="text-black/45 text-[15px] leading-relaxed mb-8 max-w-md">
+            GraphixEye is your one-stop printing and signage company in Dammam — visit the 2nd Industrial City factory
+            or send a brief online.
+          </p>
+          <p className="mb-12">
+            <Link to="/faq" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+              Read FAQs about our factory and services →
+            </Link>
           </p>
 
           <div className="border-t border-ll-stroke pt-10 mb-10">

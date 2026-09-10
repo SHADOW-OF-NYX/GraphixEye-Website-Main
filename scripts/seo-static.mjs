@@ -126,6 +126,13 @@ const pages = [
       'Discover how GraphixEye expands brand presence through design, environments, and production from our Dammam factory across the Kingdom of Saudi Arabia.',
     priority: 0.6,
   },
+  {
+    path: '/faq',
+    title: 'FAQ | One-Stop Printing, Signage & Packaging in Dammam | GraphixEye',
+    description:
+      'Answers about GraphixEye in Dammam: one-stop design, printing, signage, packaging, gifting, and AR/VR production across Saudi Arabia. Factory visits, timelines, and how to get a quote.',
+    priority: 0.7,
+  },
 ];
 
 const workSlugs = [
