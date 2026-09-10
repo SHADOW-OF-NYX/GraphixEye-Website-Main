@@ -409,10 +409,12 @@ async function bakeOffice() {
   const weights = meshes.map((mesh) => {
     let w = meshWeight(mesh)
     const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
-    if (/Monitor|Keyboard|Thinker|10105/i.test(n)) w *= 4.5
-    else if (/Kastel/i.test(n)) w *= 3.6
-    else if (/GOMA|Cilindro/i.test(n)) w *= 3.2
-    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 2.4
+    // Screen / desk / CPU get the densest brightest sample
+    if (/Monitor/i.test(n)) w *= 6.5
+    else if (/Rounding|Cube031|Cube013/i.test(n)) w *= 5.2
+    else if (/GOMA|Cilindro/i.test(n)) w *= 5.5
+    else if (/Keyboard|Thinker|10105/i.test(n)) w *= 3.2
+    else if (/Kastel/i.test(n)) w *= 2.4
     return Math.max(w, 1)
   })
 
@@ -432,9 +434,8 @@ async function bakeOffice() {
         : Math.max(1, Math.round((weights[m] / total) * N))
     if (share <= 0 || !mesh.geometry?.attributes?.position) continue
     const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
-    const hot = /Monitor|Keyboard|Thinker|Kastel|GOMA/i.test(
-      `${mesh.name || ''}|${mesh.parent?.name || ''}`,
-    )
+    const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
+    const hero = /Monitor|Rounding|Cube031|Cube013|GOMA|Cilindro/i.test(n)
     for (let i = 0; i < share && offset + i < N; i++) {
       sampler.sample(tmp, normal)
       tmp.applyMatrix4(mesh.matrixWorld)
@@ -443,8 +444,8 @@ async function bakeOffice() {
       positions[i3 + 1] = tmp.y
       positions[i3 + 2] = tmp.z
       const t = Math.min(1, Math.max(0, (tmp.y + 1) / 6))
-      brassColor(color, hot ? 0.55 + t * 0.45 : 0.32 + t * 0.5)
-      const boost = hot ? 1.5 : 1.2
+      brassColor(color, hero ? 0.7 + t * 0.3 : 0.35 + t * 0.45)
+      const boost = hero ? 1.75 : 1.15
       colors[i3] = Math.min(1, color.r * boost)
       colors[i3 + 1] = Math.min(1, color.g * boost)
       colors[i3 + 2] = Math.min(1, color.b * boost)
@@ -465,7 +466,7 @@ async function bakeOffice() {
   normalizePositions(positions, 2.2)
   writeBin('office.bin', positions)
   writeBin('office_colors.bin', colors)
-  writeBin('office_sizes.bin', defaultSizes(N, 1.0, 1.75))
+  writeBin('office_sizes.bin', defaultSizes(N, 1.05, 1.9))
 }
 
 const only = process.argv[2]

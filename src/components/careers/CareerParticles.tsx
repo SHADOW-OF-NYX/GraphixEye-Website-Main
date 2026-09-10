@@ -1333,12 +1333,12 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     wave: 0,
   },
   office: {
-    // Chair left-foreground, desk across frame — matches the product reference
-    camera: { x: -0.2, y: 0.28, z: 3.5, lookX: 0.1, lookY: -0.12, lookZ: 0, fov: 38 },
-    bloom: 1.5,
-    pointScale: 4.3,
-    alpha: 0.94,
-    noiseAmp: 0.00035,
+    // Higher vantage over the desk — chair left, denser screen / desk / CPU
+    camera: { x: -0.15, y: 0.72, z: 3.55, lookX: 0.08, lookY: -0.22, lookZ: 0, fov: 36 },
+    bloom: 1.65,
+    pointScale: 4.6,
+    alpha: 0.96,
+    noiseAmp: 0.0003,
     rotX: 0,
     spinX: 0,
     spinY: 0.25,
