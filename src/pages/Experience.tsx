@@ -51,9 +51,9 @@ function GhostButton({ children, href }: { children: React.ReactNode; href: stri
   );
 }
 
-/* Press rollers → stock sheet → die cut → production path; seal for the visit CTA */
-const MORPH_VARIANTS: SceneVariant[] = ['press', 'sheet', 'die', 'path'];
-const CTA_VARIANT: SceneVariant[] = ['seal'];
+/* Warehouse floor → Haas press → die → path; Haas again as visit CTA (honorable mention) */
+const MORPH_VARIANTS: SceneVariant[] = ['warehouse', 'haasPress', 'die', 'path'];
+const CTA_VARIANT: SceneVariant[] = ['haasPress'];
 
 const FLOOR_STOPS = [
   {

@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createNoise3D } from 'simplex-noise';
 import { loadVendorBaked, type VendorBakedId } from '../../lib/particles/loadVendors';
+import { loadExperienceBaked, type ExperienceBakedId } from '../../lib/particles/loadExperience';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,7 +30,10 @@ export type SceneVariant =
   | 'sheet'
   | 'die'
   | 'path'
-  | 'seal';
+  | 'seal'
+  // Experience — baked warehouse + Haas press (see scripts/bake-experience.mjs)
+  | 'warehouse'
+  | 'haasPress';
 
 const TAU = Math.PI * 2;
 const noise3D = createNoise3D();
@@ -224,8 +228,12 @@ interface Built {
   animDuration?: number;
 }
 
-type ProceduralVariant = Exclude<SceneVariant, 'logo' | 'forklift' | 'handshake'>;
+type ProceduralVariant = Exclude<
+  SceneVariant,
+  'logo' | 'forklift' | 'handshake' | 'warehouse' | 'haasPress'
+>;
 const BAKED_VENDOR = new Set<SceneVariant>(['logo', 'forklift', 'handshake']);
+const BAKED_EXPERIENCE = new Set<SceneVariant>(['warehouse', 'haasPress']);
 
 interface ShapeConfig {
   camera: { x: number; y: number; z: number; lookX: number; lookY: number; lookZ: number; fov: number };
@@ -1280,6 +1288,35 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     spinZ: 0.035,
     wave: 0,
   },
+
+  /*
+   * Baked Experience models. Static framing; Haas keeps its baked animation.
+   * No spin so the warehouse / press silhouette stays designed.
+   */
+  warehouse: {
+    // Pulled back elevated 3/4 — shed sits as a floor hero under the title
+    camera: { x: 0.2, y: 1.05, z: 5.5, lookX: 0, lookY: -0.2, lookZ: 0, fov: 32 },
+    bloom: 1.15,
+    pointScale: 3.2,
+    alpha: 0.8,
+    noiseAmp: 0.001,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
+  haasPress: {
+    // Full machine product shot — bed, frame, and lever all in frame
+    camera: { x: 0.35, y: 0.75, z: 5.3, lookX: 0, lookY: 0.05, lookZ: 0, fov: 34 },
+    bloom: 1.2,
+    pointScale: 3.0,
+    alpha: 0.78,
+    noiseAmp: 0.001,
+    rotX: 0,
+    spinY: 0,
+    spinZ: 0,
+    wave: 0,
+  },
 };
 
 /*
@@ -1315,6 +1352,16 @@ function holdEase(u: number, hold: number): number {
 async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promise<Built> {
   if (BAKED_VENDOR.has(variant)) {
     const baked = await loadVendorBaked(variant as VendorBakedId);
+    return {
+      positions: baked.positions,
+      colors: baked.colors,
+      sizes: baked.sizes,
+      animFrames: baked.animFrames,
+      animDuration: baked.animDuration,
+    };
+  }
+  if (BAKED_EXPERIENCE.has(variant)) {
+    const baked = await loadExperienceBaked(variant as ExperienceBakedId);
     return {
       positions: baked.positions,
       colors: baked.colors,
