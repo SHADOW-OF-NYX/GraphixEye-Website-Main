@@ -41,7 +41,11 @@ export default function Home() {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
+      const narrow = window.matchMedia('(max-width: 767px)');
+
       if (heroWrap.current && heroFrame.current) {
+        const inset = narrow.matches ? 12 : 28;
+        const radius = narrow.matches ? 22 : 40;
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: heroWrap.current,
@@ -54,7 +58,7 @@ export default function Home() {
         tl.fromTo(
           heroFrame.current,
           { top: 0, left: 0, right: 0, bottom: 0, borderRadius: 0 },
-          { top: 28, left: 28, right: 28, bottom: 28, borderRadius: 40, duration: 1, ease: 'none' },
+          { top: inset, left: inset, right: inset, bottom: inset, borderRadius: radius, duration: 1, ease: 'none' },
           0,
         );
         tl.fromTo(heroDim.current, { opacity: 0.12 }, { opacity: 0.4, duration: 0.4, ease: 'none' }, 0.12);
@@ -64,7 +68,8 @@ export default function Home() {
         tl.fromTo(introCopy.current, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: 'none' }, 0.58);
       }
 
-      if (horizWrap.current && horizTrack.current) {
+      // Desktop: GSAP pin scrub. Mobile: native horizontal swipe (see CSS).
+      if (!narrow.matches && horizWrap.current && horizTrack.current) {
         const getDistance = () => Math.max(0, horizTrack.current!.scrollWidth - window.innerWidth + 80);
         gsap.to(horizTrack.current, {
           x: () => -getDistance(),
@@ -102,8 +107,8 @@ export default function Home() {
     <div className="bg-ll-white text-black">
       <Seo page={getPageSeo('/')!} includeLocalBusiness jsonLd={faqPageJsonLd(homeFaqs)} />
       {/* HERO */}
-      <section ref={heroWrap} className="relative h-[280vh] bg-ll-white">
-        <div className="sticky top-0 h-screen overflow-hidden flex items-center justify-center bg-ll-white">
+      <section ref={heroWrap} className="relative h-[200vh] md:h-[280vh] bg-ll-white">
+        <div className="sticky top-0 h-[100dvh] overflow-hidden flex items-center justify-center bg-ll-white">
           <div ref={heroFrame} data-nav-tone="dark" className="absolute inset-0 overflow-hidden will-change-transform bg-black">
             <HeroVideo src={heroVideo} poster={photos.hero} />
             <div ref={heroDim} className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0.12 }} />
@@ -114,20 +119,20 @@ export default function Home() {
               <img
                 src="/graphixeye-wordmark.png"
                 alt="GraphixEye — one-stop printing signage packaging Dammam Saudi Arabia"
-                className="block w-auto max-w-full h-auto max-h-[18vh] md:max-h-[26vh] object-contain drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]"
+                className="block w-auto max-w-full h-auto max-h-[14vh] sm:max-h-[18vh] md:max-h-[26vh] object-contain drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]"
               />
             </span>
           </h1>
 
-          <div ref={introCopy} className="absolute bottom-16 right-6 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
-            <p className="display-md mb-6">
+          <div ref={introCopy} className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-5 right-5 md:left-auto md:bottom-16 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
+            <p className="display-md mb-4 md:mb-6 text-[clamp(1.35rem,4.5vw,2.25rem)]">
               One-stop Dammam factory for design, print, signage, packaging, and finishing.
             </p>
-            <p className="text-[14px] leading-relaxed text-ll-white/80 mb-6">
+            <p className="text-[14px] leading-relaxed text-ll-white/80 mb-4 md:mb-6 hidden sm:block">
               GraphixEye is a production house in the 2nd Industrial City — presses, finishing lines, and craftsmen
               under one roof across Saudi Arabia. {site.tagline}. Price on request.
             </p>
-            <ul className="space-y-2 text-[13px] text-ll-white/75">
+            <ul className="space-y-2 text-[13px] text-ll-white/75 hidden md:block">
               {heroPoints.map((p) => (
                 <li key={p}>{p}</li>
               ))}
@@ -171,7 +176,7 @@ export default function Home() {
 
       {/* DEVICE / STUDIO */}
       <section className="px-4 md:px-8 py-10 md:py-16">
-        <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-[78vh] relative text-ll-white">
+        <div data-nav-tone="dark" className="card-r glow-wash overflow-hidden min-h-[70dvh] md:min-h-[78vh] relative text-ll-white">
           <div className="absolute inset-0">
             <Placeholder
               src={photos.studio}
@@ -180,8 +185,8 @@ export default function Home() {
             />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/15" />
-          <div className="relative z-10 flex flex-col justify-between min-h-[78vh] p-8 md:p-12">
-            <div className="flex justify-between items-start gap-8">
+          <div className="relative z-10 flex flex-col justify-between min-h-[70dvh] md:min-h-[78vh] p-6 sm:p-8 md:p-12">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 md:gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
               <p className="max-w-sm text-[14px] leading-relaxed text-ll-white/85">
                 Our production floor in Dammam’s 2nd Industrial City. Since {site.established} we have built identity,
@@ -189,7 +194,7 @@ export default function Home() {
                 through.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 md:mt-24">
               {studioFeatures.map((f) => (
                 <div key={f.title}>
                   <LogoDots />
@@ -222,17 +227,17 @@ export default function Home() {
         </h2>
       </section>
 
-      <section ref={horizWrap} className="horiz-pin h-screen">
-        <div className="h-screen flex flex-col justify-center">
-          <p className="px-8 mb-5 text-[18px] md:text-[22px] font-display tracking-[0.08em] uppercase text-black/55">
+      <section ref={horizWrap} className="horiz-pin md:h-screen max-md:horiz-pin--native">
+        <div className="md:h-screen flex flex-col justify-center py-10 md:py-0">
+          <p className="px-6 md:px-8 mb-5 text-[16px] md:text-[22px] font-display tracking-[0.08em] uppercase text-black/55">
             Newly Added Services
           </p>
-          <div ref={horizTrack} className="flex gap-6 px-8 will-change-transform">
+          <div ref={horizTrack} className="flex gap-4 md:gap-6 px-6 md:px-8 will-change-transform max-md:horiz-native-track">
             {featured.map((work, i) => (
               <article
                 key={work.slug}
                 data-nav-tone="dark"
-                className="relative w-[72vw] md:w-[36vw] h-[62vh] card-r overflow-hidden shrink-0 bg-ll-sand group"
+                className="relative w-[78vw] sm:w-[62vw] md:w-[36vw] h-[52vh] md:h-[62vh] card-r overflow-hidden shrink-0 bg-ll-sand group"
               >
                 <div className={`absolute inset-x-0 top-0 h-40 opacity-80 ${washes[i % washes.length]} blur-2xl`} />
                 <Placeholder
@@ -242,9 +247,9 @@ export default function Home() {
                   className="w-full h-full opacity-90 group-hover:opacity-100 transition-opacity"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8 text-ll-white">
+                <div className="absolute bottom-6 left-6 right-6 md:bottom-8 md:left-8 md:right-8 text-ll-white">
                   <p className="text-[12px] tracking-widest uppercase opacity-70 mb-2">{work.category}</p>
-                  <h3 className="font-display text-3xl">{work.title}</h3>
+                  <h3 className="font-display text-2xl md:text-3xl">{work.title}</h3>
                   <p className="text-[14px] mt-2 text-ll-white/75">{work.location}</p>
                 </div>
               </article>
@@ -254,15 +259,15 @@ export default function Home() {
       </section>
 
       {/* TABS */}
-      <section className="px-6 md:px-12 py-24 grid md:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
+      <section className="px-6 md:px-12 py-16 md:py-24 grid md:grid-cols-[1.1fr_0.9fr] gap-10 md:gap-12 items-center">
         <div data-reveal>
-          <div className="flex gap-2 mb-10">
+          <div className="flex flex-wrap gap-2 mb-8 md:mb-10">
             {serviceTabs.map((t, i) => (
               <button
                 key={t.id}
                 type="button"
                 onClick={() => setTab(i)}
-                className={`h-10 px-5 pill text-[13px] transition-colors ${
+                className={`min-h-11 px-5 pill text-[13px] transition-colors ${
                   tab === i ? 'bg-black text-ll-white' : 'bg-ll-sand text-black hover:bg-black/10'
                 }`}
               >
@@ -280,13 +285,13 @@ export default function Home() {
           </ul>
           <Link
             to="/experience"
-            className="mt-10 pill border border-black h-[61px] px-8 inline-flex items-center text-[14px] hover:bg-black hover:text-ll-white transition-colors"
+            className="mt-10 pill border border-black h-[54px] md:h-[61px] px-8 inline-flex items-center text-[14px] hover:bg-black hover:text-ll-white transition-colors"
           >
             Visit the factory
           </Link>
         </div>
         <div data-reveal>
-          <Placeholder src={photos.tabs[serviceTabs[tab].id as keyof typeof photos.tabs]} label={`Tab: ${serviceTabs[tab].id}`} className="card-r h-[520px]" />
+          <Placeholder src={photos.tabs[serviceTabs[tab].id as keyof typeof photos.tabs]} label={`Tab: ${serviceTabs[tab].id}`} className="card-r h-[280px] sm:h-[380px] md:h-[520px]" />
         </div>
       </section>
 
@@ -335,7 +340,7 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-16 grid md:grid-cols-2 gap-10 items-center">
-          <Placeholder src={photos.guided} label="Guided session: tablet / brief flow" className="card-r h-[420px]" />
+          <Placeholder src={photos.guided} label="Guided session: tablet / brief flow" className="card-r h-[260px] sm:h-[340px] md:h-[420px]" />
           <div>
             <p className="text-black/50 font-display text-[18px] mb-6">One factory. Work made for the site.</p>
             <div className="flex flex-wrap gap-2">

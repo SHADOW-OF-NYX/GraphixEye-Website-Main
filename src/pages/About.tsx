@@ -25,7 +25,7 @@ export default function About() {
   ];
 
   return (
-    <div className="bg-ll-white min-h-screen pt-36 pb-28">
+    <div className="bg-ll-white min-h-screen pt-28 sm:pt-36 pb-28">
       <Seo page={seo} jsonLd={aboutJsonLd} />
 
       <div className="max-w-[900px] mx-auto px-6 md:px-8">

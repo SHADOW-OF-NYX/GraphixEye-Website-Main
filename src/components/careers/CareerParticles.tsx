@@ -5,6 +5,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { createNoise3D } from 'simplex-noise';
 import { loadVendorBaked, type VendorBakedId } from '../../lib/particles/loadVendors';
 import { loadExperienceBaked, type ExperienceBakedId } from '../../lib/particles/loadExperience';
+import {
+  getParticleBudget,
+  scaledParticleCount,
+  subsampleScalar,
+  subsampleVec3,
+} from '../../lib/device';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -1441,6 +1447,18 @@ async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promi
   return BUILDERS[variant as ProceduralVariant](n, P);
 }
 
+function fitBuiltToCount(built: Built, n: number): Built {
+  const srcCount = Math.floor(built.positions.length / 3);
+  if (srcCount === n) return built;
+  return {
+    positions: subsampleVec3(built.positions, n),
+    colors: subsampleVec3(built.colors, n),
+    sizes: subsampleScalar(built.sizes, n),
+    animFrames: built.animFrames?.map((frame) => subsampleVec3(frame, n)),
+    animDuration: built.animDuration,
+  };
+}
+
 /** Write an animated shape's positions for time t into `out`. */
 function sampleAnimPositions(shape: Built, time: number, out: Float32Array) {
   const frames = shape.animFrames;
@@ -1493,10 +1511,16 @@ export default function CareerParticles({
 
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+      const budget = getParticleBudget();
       const P = PALETTES[palette];
       const feel = FEELS[palette];
-      const N = feel.count;
-      const shapes = await Promise.all(variants.map((v) => resolveShape(v, N, P)));
+      const N = scaledParticleCount(feel.count);
+      const shapes = await Promise.all(
+        variants.map(async (v) => {
+          const built = await resolveShape(v, N, P);
+          return fitBuiltToCount(built, N);
+        }),
+      );
       if (cancelled) return;
       const configs = variants.map((v) => CONFIG[v]);
       const multi = shapes.length > 1;
@@ -1505,7 +1529,7 @@ export default function CareerParticles({
       const animB = new Float32Array(N * 3);
 
       const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, budget.maxDpr);
       renderer.setPixelRatio(dpr);
       renderer.setClearColor(0x000000, 0);
       host.appendChild(renderer.domElement);
@@ -1558,8 +1582,8 @@ export default function CareerParticles({
       composer.addPass(new RenderPass(scene, camera));
       const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(host.clientWidth || 1, host.clientHeight || 1),
-        configs[0].bloom * feel.bloomMul,
-        feel.bloomRadius,
+        configs[0].bloom * feel.bloomMul * (budget.reduceBloom ? 0.55 : 1),
+        feel.bloomRadius * (budget.reduceBloom ? 0.7 : 1),
         feel.bloomThreshold,
       );
       composer.addPass(bloomPass);
@@ -1789,7 +1813,7 @@ export default function CareerParticles({
 
         material.uniforms.uScale.value = lerp(ca.pointScale, cb.pointScale, u);
         material.uniforms.uAlpha.value = lerp(ca.alpha, cb.alpha, u);
-        bloomPass.strength = lerp(ca.bloom, cb.bloom, u) * feel.bloomMul;
+        bloomPass.strength = lerp(ca.bloom, cb.bloom, u) * feel.bloomMul * (budget.reduceBloom ? 0.55 : 1);
 
         composer.render();
       };

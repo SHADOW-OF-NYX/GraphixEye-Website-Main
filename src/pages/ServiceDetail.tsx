@@ -72,7 +72,7 @@ export default function ServiceDetail() {
         ]}
       />
       <section className="px-4 md:px-8 mb-12">
-        <div className="relative card-r overflow-hidden min-h-[70vh] bg-black" data-nav-tone="dark">
+        <div className="relative card-r overflow-hidden min-h-[52vh] md:min-h-[70vh] bg-black" data-nav-tone="dark">
           <Placeholder
             src={work.image}
             label={`${work.title} ${work.location} GraphixEye Dammam Saudi Arabia`}

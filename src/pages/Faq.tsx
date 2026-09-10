@@ -9,7 +9,7 @@ export default function Faq() {
   const seo = getPageSeo('/faq')!;
 
   return (
-    <div className="bg-ll-white min-h-screen pt-36 pb-28">
+    <div className="bg-ll-white min-h-screen pt-28 sm:pt-36 pb-28">
       <Seo
         page={seo}
         jsonLd={[

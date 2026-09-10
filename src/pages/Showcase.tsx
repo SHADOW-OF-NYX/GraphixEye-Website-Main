@@ -232,7 +232,7 @@ export default function Showcase() {
         {looped.length ? (
           <div
             ref={stageRef}
-            className="mirror-hall-stage relative select-none cursor-grab active:cursor-grabbing touch-pan-y"
+            className="mirror-hall-stage relative select-none cursor-grab active:cursor-grabbing touch-pan-x"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
             onPointerDown={onPointerDown}

@@ -9,7 +9,7 @@ export default function Contact() {
   const seo = getPageSeo('/contact')!;
 
   return (
-    <div className="bg-ll-white min-h-screen pt-36 pb-24">
+    <div className="bg-ll-white min-h-screen pt-28 sm:pt-36 pb-24">
       <Seo
         page={seo}
         jsonLd={breadcrumbJsonLd([

@@ -48,7 +48,7 @@ export default function ServiceHubPage({ hub }: { hub: ServiceHub }) {
       <Seo page={seo} jsonLd={hubJsonLd(hub)} image={`${SITE_URL}${hub.image}`} />
 
       <section className="px-4 md:px-8 mb-14">
-        <div className="relative card-r overflow-hidden min-h-[58vh] bg-black" data-nav-tone="dark">
+        <div className="relative card-r overflow-hidden min-h-[48vh] md:min-h-[58vh] bg-black" data-nav-tone="dark">
           <Placeholder src={hub.image} label={hub.imageAlt} eager className="absolute inset-0" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/15" />
           <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-14 text-ll-white">

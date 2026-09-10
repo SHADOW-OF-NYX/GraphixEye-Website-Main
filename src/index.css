@@ -31,9 +31,22 @@ body,
   font-family: var(--font-sans);
 }
 
+html {
+  /* Prefer dynamic viewport on mobile browsers (URL bar show/hide). */
+  --app-vh: 100dvh;
+}
+
+@supports not (height: 100dvh) {
+  html {
+    --app-vh: 100vh;
+  }
+}
+
 body {
   font-size: 14px;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 h1,
@@ -52,7 +65,7 @@ h4,
 }
 
 .hero-title {
-  font-size: clamp(3.5rem, 9vw, 7.75rem);
+  font-size: clamp(2.75rem, 9vw, 7.75rem);
   letter-spacing: -0.01em;
   line-height: 0.92;
 }
@@ -142,16 +155,39 @@ h4,
   overflow: hidden;
 }
 
+/* Native horizontal swipe on phones — GSAP pin is disabled below md */
+.horiz-pin--native {
+  overflow: visible;
+  height: auto !important;
+}
+
+.horiz-pin--native .horiz-native-track {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.horiz-pin--native .horiz-native-track::-webkit-scrollbar {
+  display: none;
+}
+
+.horiz-pin--native .horiz-native-track > * {
+  scroll-snap-align: center;
+}
+
 /* ─── Mirror Hall page shell ─── */
 .mh-page {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   background: #05040d;
 }
 
 /* Mirror Hall — full-bleed section */
 .mirror-hall {
   position: relative;
-  min-height: 100vh;
+  min-height: var(--app-vh);
   background: #05040d;
   color: #fff;
   isolation: isolate;
@@ -442,6 +478,16 @@ h4,
   .mh-header {
     padding-top: 5.5rem;
   }
+
+  /* Skip expensive SVG water filter on small phones */
+  .mirror-hall-reflection-flip {
+    filter: none;
+  }
+
+  .mh-filter-pill {
+    min-height: 2.5rem;
+    padding-inline: 0.9rem;
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -516,7 +562,7 @@ h4,
 .ce-morph-canvas {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: var(--app-vh);
   width: 100%;
   z-index: 0;
 }
@@ -524,7 +570,7 @@ h4,
 .ce-morph-content {
   position: relative;
   z-index: 2;
-  margin-top: -100vh;
+  margin-top: calc(var(--app-vh) * -1);
 }
 
 /* Sections inside the track must stay transparent to reveal the canvas */
@@ -731,7 +777,7 @@ h4,
 
 /* ── Hero ── */
 .ce-hero {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   display: flex;
   align-items: center;
   padding: 8rem 0 5rem;
@@ -778,7 +824,7 @@ h4,
 
 /* ── Growth / wave ── */
 .ce-wave-section {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   display: flex;
   align-items: center;
   padding: 7rem 0;
@@ -797,7 +843,7 @@ h4,
 
 /* ── Teams / galaxy ── */
 .ce-galaxy-section {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   display: flex;
   align-items: center;
   padding: 7rem 0;
@@ -814,7 +860,7 @@ h4,
 
 /* ── Stats / helix ── */
 .ce-helix-section {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   padding: 7rem 0;
   display: flex;
   align-items: center;
@@ -1189,7 +1235,7 @@ h4,
 
 /* ── CTA ── */
 .ce-cta-section {
-  min-height: 100vh;
+  min-height: var(--app-vh);
   display: flex;
   align-items: center;
   padding: 7rem 0;
@@ -1223,6 +1269,19 @@ h4,
     min-height: auto;
     display: flex;
     flex-direction: column;
+  }
+
+  .ce-wave-section,
+  .ce-galaxy-section,
+  .ce-helix-section,
+  .ce-cta-section {
+    min-height: auto;
+    padding: 5rem 0;
+  }
+
+  .ce-hero {
+    padding-top: 7rem;
+    padding-bottom: 4rem;
   }
 }
 

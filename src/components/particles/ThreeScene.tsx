@@ -11,10 +11,11 @@ import {
 } from '../../lib/particles/shapes'
 import { loadBakedTargets, sampleEyeBlink, type BakedTargets } from '../../lib/particles/loadTargets'
 import { MORPH_HOLD } from '../../lib/particles/morphTiming'
+import { getParticleBudget, scaledParticleCount, subsampleVec3 } from '../../lib/device'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const N = 32_000
+const BASE_N = 32_000
 const noise3D = createNoise3D()
 
 const VERTEX_SHADER = /* glsl */`
@@ -90,14 +91,23 @@ const SHAPES: {
   { name: 'bonsai', cameraX: -0.92, cameraY: 0.06, cameraZ: 3.35, lookX: 0.38,  lookY: -0.03, fov: 42, cageOpa: 0.13, noiseAmp: 0.008 },
 ]
 
-function resolveShape(name: ShapeName, baked: BakedTargets | null): Float32Array {
+function resolveShape(name: ShapeName, baked: BakedTargets | null, n: number): Float32Array {
   switch (name) {
-    case 'eye':    return baked?.eye ?? generateHandPositions(N)
-    case 'face':   return baked?.face ?? generateHandPositions(N)
-    case 'holo':   return baked?.holo ?? generateXPositions(N)
-    case 'quest':  return baked?.quest ?? generateXPositions(N)
-    case 'bonsai': return baked?.bonsai ?? generateBonsaiPositions(N)
+    case 'eye':    return takeOrGenerate(baked?.eye, () => generateHandPositions(n), n)
+    case 'face':   return takeOrGenerate(baked?.face, () => generateHandPositions(n), n)
+    case 'holo':   return takeOrGenerate(baked?.holo, () => generateXPositions(n), n)
+    case 'quest':  return takeOrGenerate(baked?.quest, () => generateXPositions(n), n)
+    case 'bonsai': return takeOrGenerate(baked?.bonsai, () => generateBonsaiPositions(n), n)
   }
+}
+
+function takeOrGenerate(
+  baked: Float32Array | null | undefined,
+  fallback: () => Float32Array,
+  n: number,
+): Float32Array {
+  if (!baked) return fallback()
+  return subsampleVec3(baked, n)
 }
 
 const _c = new THREE.Color()
@@ -224,21 +234,22 @@ function colorizeShape(
   stops: Stop[],
   axis: 'x' | 'y',
 ): Float32Array {
-  const out = new Float32Array(N * 3)
+  const n = Math.floor(positions.length / 3)
+  const out = new Float32Array(n * 3)
   const offset = axis === 'x' ? 0 : 1
 
   let min = Infinity
   let max = -Infinity
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < n; i++) {
     const v = positions[i * 3 + offset]
     if (v < min) min = v
     if (v > max) max = v
   }
   const span = Math.max(1e-5, max - min)
 
-  const usable = bakedColors && bakedColors.length === N * 3 ? bakedColors : null
+  const usable = bakedColors && bakedColors.length === n * 3 ? bakedColors : null
 
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < n; i++) {
     const i3 = i * 3
     const c = rampAt(stops, (positions[i3 + offset] - min) / span)
 
@@ -255,7 +266,6 @@ function colorizeShape(
     out[i3 + 1] = c.g * k
     out[i3 + 2] = c.b * k
   }
-
   return out
 }
 
@@ -285,7 +295,8 @@ function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
     colors.set(baked)
     return
   }
-  for (let i = 0; i < N; i++) {
+  const n = Math.floor(colors.length / 3)
+  for (let i = 0; i < n; i++) {
     const roll = Math.random()
     const src = roll < 0.34 ? INK_RED : roll < 0.68 ? INK_INDIGO : INK_GRAPHITE
     const jitter = 0.78 + Math.random() * 0.44
@@ -297,8 +308,9 @@ function paintEyeRGB(colors: Float32Array, baked: Float32Array | null) {
 
 /** Iris + pupil — fade the whole blue core during blinks, not just deep pupil dots. */
 function buildEyeCoreFadeWeights(eyeOpen: Float32Array, colors: Float32Array | null): Float32Array {
-  const weights = new Float32Array(N)
-  for (let i = 0; i < N; i++) {
+  const n = Math.floor(eyeOpen.length / 3)
+  const weights = new Float32Array(n)
+  for (let i = 0; i < n; i++) {
     const i3 = i * 3
     const x = eyeOpen[i3]
     const y = eyeOpen[i3 + 1]
@@ -364,8 +376,11 @@ export default function ThreeScene() {
       }
       if (cancelled) return
 
+      const budget = getParticleBudget()
+      const N = scaledParticleCount(BASE_N)
+
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, budget.maxDpr))
       renderer.setSize(window.innerWidth, window.innerHeight)
       renderer.setClearColor(0x000000, 0)
       disposeList.push(() => renderer.dispose())
@@ -385,16 +400,17 @@ export default function ThreeScene() {
       disposeList.push(() => composer.dispose())
 
       // The opening eye stays monochrome ink; the services carry the colour
-      const eyeInk = baked?.eyeColors ? inkify(baked.eyeColors) : null
+      const eyeInkRaw = baked?.eyeColors ? inkify(baked.eyeColors) : null
+      const eyeInk = eyeInkRaw ? subsampleVec3(eyeInkRaw, N) : null
       const bakedColorsFor: Record<Exclude<ShapeName, 'eye'>, Float32Array | null> = {
-        face: baked?.faceColors ?? null,
-        holo: baked?.holoColors ?? null,
-        quest: baked?.questColors ?? null,
-        bonsai: baked?.bonsaiColors ?? null,
+        face: baked?.faceColors ? subsampleVec3(baked.faceColors, N) : null,
+        holo: baked?.holoColors ? subsampleVec3(baked.holoColors, N) : null,
+        quest: baked?.questColors ? subsampleVec3(baked.questColors, N) : null,
+        bonsai: baked?.bonsaiColors ? subsampleVec3(baked.bonsaiColors, N) : null,
       }
 
       // ── Prefetch all shape targets for scroll scrubbing ──────────────────
-      const shapePos = SHAPES.map((s) => resolveShape(s.name, baked))
+      const shapePos = SHAPES.map((s) => resolveShape(s.name, baked, N))
       const shapeColors = SHAPES.map((s, i) => {
         if (s.name === 'eye') {
           const c = new Float32Array(N * 3)
@@ -404,6 +420,8 @@ export default function ThreeScene() {
         const { stops, axis } = SERVICE_RAMPS[s.name]
         return colorizeShape(shapePos[i], bakedColorsFor[s.name], stops, axis)
       })
+
+      const eyeBlinkFrames = baked?.eyeBlink?.map((frame) => subsampleVec3(frame, N)) ?? null
 
       const sizesDefault = new Float32Array(N)
       const sizesEye = new Float32Array(N)
@@ -487,7 +505,7 @@ export default function ThreeScene() {
         vertexShader: VERTEX_SHADER,
         fragmentShader: FRAGMENT_SHADER,
         uniforms: {
-          uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, budget.maxDpr) },
           uScale: { value: 3.0 },
         },
         depthWrite: false,
@@ -782,7 +800,7 @@ export default function ThreeScene() {
           eyeHoldClock += delta
           // Carry the overshoot instead of zeroing, so the cycle keeps exact time
           if (eyeHoldClock > EYE_TOTAL) eyeHoldClock -= EYE_TOTAL
-          sampleEyeBlink(baked!.eyeBlink, blinkAmount(eyeHoldClock), eyeLive)
+          if (eyeBlinkFrames) sampleEyeBlink(eyeBlinkFrames, blinkAmount(eyeHoldClock), eyeLive)
         } else {
           eyeHoldClock = 0
         }

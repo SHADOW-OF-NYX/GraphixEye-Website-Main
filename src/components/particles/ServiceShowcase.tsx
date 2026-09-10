@@ -93,10 +93,10 @@ export default function ServiceShowcase() {
         return (
           <article
             key={s.id}
-            className={`service-panel absolute top-1/2 -translate-y-1/2 max-w-sm md:max-w-md ${
+            className={`service-panel absolute top-[58%] md:top-1/2 -translate-y-1/2 max-w-[min(20rem,88vw)] md:max-w-md px-1 ${
               onLeft
-                ? 'left-5 md:left-14 text-left'
-                : 'right-5 md:right-14 text-right'
+                ? 'left-4 md:left-14 text-left'
+                : 'right-4 md:right-14 text-right'
             }`}
             data-service={s.id}
             data-side={s.textSide}
@@ -115,9 +115,9 @@ export default function ServiceShowcase() {
             <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-3">
               {s.index} · {s.eyebrow.toUpperCase()}
             </p>
-            <h2 className="display-md text-black mb-4">{s.title}</h2>
+            <h2 className="display-md text-black mb-3 md:mb-4 text-[clamp(1.35rem,4vw,2.25rem)]">{s.title}</h2>
             <p
-              className={`text-black/55 leading-relaxed text-[15px] max-w-md ${onLeft ? '' : 'ml-auto'}`}
+              className={`text-black/55 leading-relaxed text-[14px] md:text-[15px] max-w-md ${onLeft ? '' : 'ml-auto'}`}
             >
               {s.body}
             </p>
