@@ -74,6 +74,16 @@ export default function ServiceHubPage({ hub }: { hub: ServiceHub }) {
         ))}
       </section>
 
+      <section className="max-w-[900px] mx-auto px-6 md:px-8 space-y-10 mb-20">
+        <p className="text-[13px] tracking-[0.22em] uppercase text-black/40">Service areas</p>
+        {hub.cities.map((city) => (
+          <div key={city.h2}>
+            <h2 className="display-md mb-4">{city.h2}</h2>
+            <p className="text-[16px] leading-relaxed text-black/55">{city.body}</p>
+          </div>
+        ))}
+      </section>
+
       <section className="max-w-[900px] mx-auto px-6 md:px-8 mb-20" lang="ar" dir="rtl">
         <h2 className="display-md mb-4 text-right">{hub.arabicH2}</h2>
         <p className="text-[16px] leading-relaxed text-black/55 text-right">{hub.arabicBody}</p>
@@ -123,11 +133,11 @@ export default function ServiceHubPage({ hub }: { hub: ServiceHub }) {
               to={`/services/${r.slug}`}
               className="text-[15px] underline underline-offset-4 hover:text-ll-highlight transition-colors"
             >
-              {r.h1.split('|')[0].trim()}
+              {r.anchorLabel}
             </Link>
           ))}
           <Link to="/contact" className="text-[15px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
-            Contact GraphixEye
+            Get a quote — {hub.primaryKeyword}
           </Link>
         </div>
       </section>
@@ -135,9 +145,9 @@ export default function ServiceHubPage({ hub }: { hub: ServiceHub }) {
       <section className="max-w-[900px] mx-auto px-6 md:px-8">
         <div className="bg-ll-sand card-r p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
           <div>
-            <h2 className="display-md mb-3">Get a Free Quote in Dammam</h2>
+            <h2 className="display-md mb-3">Get a Free Quote for {hub.primaryKeyword}</h2>
             <p className="text-[15px] text-black/55 max-w-md">
-              Tell us about your printing, packaging, signage, gifting, or immersive brief. We respond within 24 hours.
+              Tell us about your {hub.primaryKeyword} brief in Dammam or anywhere in Saudi Arabia. We respond within 24 hours.
             </p>
           </div>
           <Link

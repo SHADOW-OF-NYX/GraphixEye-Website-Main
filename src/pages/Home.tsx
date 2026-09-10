@@ -152,7 +152,7 @@ export default function Home() {
               className="border border-ll-stroke rounded-3xl px-4 py-5 hover:border-ll-highlight transition-colors"
             >
               <span className="block text-[12px] tracking-[0.14em] uppercase text-black/40 mb-2">{hub.eyebrow}</span>
-              <span className="font-display text-[16px] capitalize">{hub.slug.replace('-', ' / ')}</span>
+              <span className="font-display text-[16px]">{hub.anchorLabel}</span>
             </Link>
           ))}
         </div>

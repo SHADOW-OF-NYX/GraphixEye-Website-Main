@@ -57,7 +57,7 @@ export default function Faq() {
                 to={`/services/${hub.slug}`}
                 className="inline-block border border-ll-stroke rounded-full px-4 py-2 text-[13px] hover:border-ll-highlight transition-colors"
               >
-                {hub.slug}
+                {hub.anchorLabel}
               </Link>
             </li>
           ))}

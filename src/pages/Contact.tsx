@@ -65,7 +65,7 @@ export default function Contact() {
                     to={`/services/${hub.slug}`}
                     className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors"
                   >
-                    {hub.slug}
+                    {hub.anchorLabel}
                   </Link>
                 </li>
               ))}

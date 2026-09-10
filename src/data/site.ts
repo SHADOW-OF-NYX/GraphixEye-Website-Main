@@ -185,6 +185,22 @@ export const faqs = {
       a: 'Yes. GraphixEye is a one-stop creative production house in Dammam. Design, commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR experiences are produced from one factory floor in the 2nd Industrial City — so you are not coordinating a chain of vendors across the Kingdom.',
     },
     {
+      q: 'Where can I find printing in Dammam?',
+      a: 'GraphixEye provides printing in Dammam from our 2nd Industrial City factory — offset, digital, large format, and finishing. Search printing Dammam or printing company Dammam and you will find the same team that proofs, prints, and delivers across Saudi Arabia.',
+    },
+    {
+      q: 'Who offers signage in Dammam and across Saudi Arabia?',
+      a: 'GraphixEye is a signage company in Dammam for outdoor signs, LED, wayfinding, fleet wraps, and exhibitions. We fabricate in Dammam and install in Riyadh, Jeddah, and industrial sites Kingdom-wide.',
+    },
+    {
+      q: 'Can GraphixEye handle packaging in Dammam?',
+      a: 'Yes. Packaging in Dammam is a core GraphixEye service: custom boxes, labels, flexible and sustainable formats designed and manufactured in our factory for brands across Saudi Arabia.',
+    },
+    {
+      q: 'Do you provide graphic design in Dammam?',
+      a: 'Yes. Graphic design Dammam at GraphixEye includes logos, brand systems, and production-ready artwork that goes straight to our print, packaging, and signage floors.',
+    },
+    {
       q: 'What does GraphixEye actually produce?',
       a: 'Design, signage, printing, packaging, corporate gifting, and immersive AR/VR/AI experiences — from logos to architectural environments — all from our factory in Dammam, Saudi Arabia.',
     },

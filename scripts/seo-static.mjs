@@ -44,51 +44,54 @@ const pages = [
   },
   {
     path: '/services/printing',
-    title: 'Commercial Printing Company in Dammam | GraphixEye KSA',
+    title: 'Printing Dammam | Commercial Printing Company | GraphixEye',
     description:
-      'GraphixEye offers professional offset and digital printing in Dammam, Saudi Arabia. Business cards, brochures, banners, catalogues, and large format printing for businesses across the Kingdom.',
+      'Printing in Dammam from GraphixEye: offset and digital printing, large format, brochures, and catalogues. Your printing company Dammam partner serving brands across Saudi Arabia.',
+    keywords: 'printing Dammam, printing company Dammam, commercial printing Saudi Arabia, offset printing KSA, digital printing Dammam',
     priority: 0.9,
   },
   {
     path: '/services/packaging',
-    title: 'Custom Packaging Solutions Saudi Arabia | GraphixEye Dammam',
+    title: 'Packaging Dammam | Custom Packaging Company Saudi Arabia | GraphixEye',
     description:
-      'Premium custom packaging design and manufacturing in Saudi Arabia. Boxes, labels, retail packaging, and brand packaging solutions delivered from our Dammam factory.',
+      'Packaging in Dammam from GraphixEye: custom boxes, labels, flexible and sustainable packaging. Packaging company Saudi Arabia production from our Dammam factory.',
+    keywords: 'packaging Dammam, packaging company Saudi Arabia, custom packaging KSA, product packaging Dammam',
     priority: 0.9,
   },
   {
     path: '/services/signage',
-    title: 'Signage Company in Dammam, Saudi Arabia | GraphixEye',
+    title: 'Signage Dammam | Signage Company Saudi Arabia | GraphixEye',
     description:
-      'Expert signage manufacturing and installation across Saudi Arabia. Indoor signs, outdoor signs, LED signage, wayfinding, and corporate branding from GraphixEye in Dammam.',
+      'Signage in Dammam from GraphixEye: outdoor signs, LED, wayfinding, and fleet graphics. Signage company Dammam fabrication and install across Saudi Arabia.',
+    keywords: 'signage Dammam, signage company Dammam, custom signs Saudi Arabia, LED signage KSA',
     priority: 0.9,
   },
   {
     path: '/services/gifting',
-    title: 'Corporate Gifting & Branded Gifts Saudi Arabia | GraphixEye',
+    title: 'Corporate Gifting Saudi Arabia | Branded Gifts Dammam | GraphixEye',
     description:
-      'Elevate your brand with premium corporate gifts and branded merchandise across Saudi Arabia. GraphixEye creates custom gifting solutions from our Dammam production facility.',
+      'Corporate gifting Saudi Arabia from GraphixEye in Dammam: branded gifts, promotional kits, trophies, uniforms, and event merchandise for brands across the Kingdom.',
     priority: 0.8,
   },
   {
     path: '/services/design',
-    title: 'Graphic Design & Branding Agency in Dammam, KSA | GraphixEye',
+    title: 'Graphic Design Dammam | Branding Agency Saudi Arabia | GraphixEye',
     description:
-      'Creative graphic design and brand identity services in Saudi Arabia. Logos, brand systems, marketing materials, and visual identity designed and produced in Dammam.',
+      'Graphic design in Dammam from GraphixEye: logos, brand systems, and production-ready artwork. Branding agency Saudi Arabia with in-house print and signage.',
     priority: 0.8,
   },
   {
     path: '/services/ar-vr',
-    title: 'AR, VR & MR Immersive Experiences Saudi Arabia | GraphixEye',
+    title: 'AR VR Saudi Arabia | Immersive Experiences Dammam | GraphixEye',
     description:
-      'Cutting-edge Augmented Reality, Virtual Reality, and Mixed Reality experiences built for Saudi brands. GraphixEye delivers immersive tech solutions for events and retail across the Kingdom.',
+      'AR VR solutions Saudi Arabia from GraphixEye: augmented, virtual, and mixed reality for events and retail, produced with immersive experiences Dammam fabrication.',
     priority: 0.8,
   },
   {
     path: '/services/ai',
-    title: 'AI-Powered Creative Solutions Saudi Arabia | GraphixEye',
+    title: 'AI Solutions Saudi Arabia | AI Design Dammam | GraphixEye',
     description:
-      'GraphixEye blends artificial intelligence with creative production. Discover how AI-powered design, content, and imaging solutions are transforming brands in Saudi Arabia.',
+      'AI solutions Saudi Arabia from GraphixEye: AI design Dammam workflows that end in print-ready, brand-safe creative for campaigns across the Kingdom.',
     priority: 0.8,
   },
   {
