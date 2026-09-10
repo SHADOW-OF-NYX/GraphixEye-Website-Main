@@ -31,9 +31,10 @@ export type SceneVariant =
   | 'die'
   | 'path'
   | 'seal'
-  // Experience — baked warehouse + Haas press (see scripts/bake-experience.mjs)
+  // Experience — baked warehouse + Haas press + office (see scripts/bake-experience.mjs)
   | 'warehouse'
-  | 'haasPress';
+  | 'haasPress'
+  | 'office';
 
 const TAU = Math.PI * 2;
 const noise3D = createNoise3D();
@@ -230,10 +231,10 @@ interface Built {
 
 type ProceduralVariant = Exclude<
   SceneVariant,
-  'logo' | 'forklift' | 'handshake' | 'warehouse' | 'haasPress'
+  'logo' | 'forklift' | 'handshake' | 'warehouse' | 'haasPress' | 'office'
 >;
 const BAKED_VENDOR = new Set<SceneVariant>(['logo', 'forklift', 'handshake']);
-const BAKED_EXPERIENCE = new Set<SceneVariant>(['warehouse', 'haasPress']);
+const BAKED_EXPERIENCE = new Set<SceneVariant>(['warehouse', 'haasPress', 'office']);
 
 interface ShapeConfig {
   camera: { x: number; y: number; z: number; lookX: number; lookY: number; lookZ: number; fov: number };
@@ -1314,8 +1315,8 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
   },
 
   /*
-   * Baked Experience models. Warehouse: eye-level interior looking down the
-   * conveyor bay; slow side-to-side yaw (Y), no pitch.
+   * Baked Experience models. Warehouse / office: interior cameras with bounded
+   * side-to-side yaw. Haas keeps its baked animation.
    */
   warehouse: {
     // Slightly wider interior — yaw sways in place so the view never leaves the bay
@@ -1328,6 +1329,20 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
     spinX: 0,
     spinY: 0.32,
     spinYAmp: 0.28,
+    spinZ: 0,
+    wave: 0,
+  },
+  office: {
+    // Design studio interior — desk height, looking into the room
+    camera: { x: 0.2, y: -0.35, z: 0.72, lookX: 0, lookY: -0.42, lookZ: -0.25, fov: 48 },
+    bloom: 1.35,
+    pointScale: 3.5,
+    alpha: 0.9,
+    noiseAmp: 0.0007,
+    rotX: 0,
+    spinX: 0,
+    spinY: 0.3,
+    spinYAmp: 0.26,
     spinZ: 0,
     wave: 0,
   },

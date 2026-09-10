@@ -1,8 +1,9 @@
 /**
- * Bake Experience page particle targets from warehouse + Haas press GLBs.
+ * Bake Experience page particle targets from warehouse + Haas press + office GLBs.
  * Runtime loads only the .bin files — source GLBs are not needed.
  *
  * Usage: node scripts/bake-experience.mjs
+ *        node scripts/bake-experience.mjs office
  */
 import fs from 'fs'
 import path from 'path'
@@ -31,6 +32,7 @@ const ROOT = path.resolve(__dirname, '..')
 const OUT = path.join(ROOT, 'public', 'particle-targets', 'experience')
 const WAREHOUSE = 'c:/Users/gauth/Downloads/sample_warehouse_-_revit.glb'
 const HAAS = 'c:/Users/gauth/Downloads/the_haas-galinha_press.glb'
+const OFFICE = 'c:/Users/gauth/Downloads/office_room.glb'
 
 /** Must match FEELS.experience.count in CareerParticles.tsx */
 const N = 34_000
@@ -385,6 +387,76 @@ async function bakeHaasPress() {
   )
 }
 
-await bakeWarehouse()
-await bakeHaasPress()
+async function bakeOffice() {
+  console.log('\n— office (interior) from', OFFICE)
+  const gltf = await loadGltf(OFFICE)
+  // Upright room — camera sits inside at runtime
+  gltf.scene.rotation.set(0, 0, 0)
+  gltf.scene.updateMatrixWorld(true)
+
+  const meshes = collectMeshes(gltf.scene)
+  console.log('  meshes', meshes.length)
+
+  const weights = meshes.map((mesh) => {
+    let w = meshWeight(mesh)
+    const n = `${mesh.name || ''}|${mesh.parent?.name || ''}`
+    // Favour desks / chairs / screens over large wall / floor planes
+    if (/Monitor|Keyboard|Kastel|GOMA|Thinker|Rounding|Cube031|Cilindro/i.test(n)) w *= 2.8
+    else if (/Mat3|Mat001|Mat1|schwarz_glass|Metallic/i.test(n)) w *= 0.45
+    return Math.max(w, 1)
+  })
+
+  const positions = new Float32Array(N * 3)
+  const colors = new Float32Array(N * 3)
+  const total = weights.reduce((a, b) => a + b, 0) || 1
+  let offset = 0
+  const tmp = new THREE.Vector3()
+  const normal = new THREE.Vector3()
+  const color = new THREE.Color()
+
+  for (let m = 0; m < meshes.length; m++) {
+    const mesh = meshes[m]
+    const share =
+      m === meshes.length - 1
+        ? N - offset
+        : Math.max(1, Math.round((weights[m] / total) * N))
+    if (share <= 0 || !mesh.geometry?.attributes?.position) continue
+    const sampler = new MeshSurfaceSampler(mesh).setWeightAttribute(null).build()
+    for (let i = 0; i < share && offset + i < N; i++) {
+      sampler.sample(tmp, normal)
+      tmp.applyMatrix4(mesh.matrixWorld)
+      const i3 = (offset + i) * 3
+      positions[i3] = tmp.x
+      positions[i3 + 1] = tmp.y
+      positions[i3 + 2] = tmp.z
+      const t = Math.min(1, Math.max(0, (tmp.y + 1) / 7))
+      brassColor(color, 0.35 + t * 0.65)
+      const boost = 1.25
+      colors[i3] = Math.min(1, color.r * boost)
+      colors[i3 + 1] = Math.min(1, color.g * boost)
+      colors[i3 + 2] = Math.min(1, color.b * boost)
+    }
+    offset += share
+  }
+  while (offset < N) {
+    const src = (offset % Math.max(1, offset)) * 3
+    positions[offset * 3] = positions[src]
+    positions[offset * 3 + 1] = positions[src + 1]
+    positions[offset * 3 + 2] = positions[src + 2]
+    colors[offset * 3] = colors[src]
+    colors[offset * 3 + 1] = colors[src + 1]
+    colors[offset * 3 + 2] = colors[src + 2]
+    offset++
+  }
+
+  normalizePositions(positions, 2.4)
+  writeBin('office.bin', positions)
+  writeBin('office_colors.bin', colors)
+  writeBin('office_sizes.bin', defaultSizes(N, 0.7, 1.45))
+}
+
+const only = process.argv[2]
+if (!only || only === 'warehouse') await bakeWarehouse()
+if (!only || only === 'haas' || only === 'haasPress') await bakeHaasPress()
+if (!only || only === 'office') await bakeOffice()
 console.log('\nDone →', OUT)

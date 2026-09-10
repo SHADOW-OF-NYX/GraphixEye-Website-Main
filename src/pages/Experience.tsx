@@ -51,8 +51,8 @@ function GhostButton({ children, href }: { children: React.ReactNode; href: stri
   );
 }
 
-/* Warehouse floor → Haas press → die → path; Haas again as visit CTA (honorable mention) */
-const MORPH_VARIANTS: SceneVariant[] = ['warehouse', 'haasPress', 'die', 'path'];
+/* Warehouse floor → Haas press → office → path; Haas again as visit CTA */
+const MORPH_VARIANTS: SceneVariant[] = ['warehouse', 'haasPress', 'office', 'path'];
 const CTA_VARIANT: SceneVariant[] = ['haasPress'];
 
 const FLOOR_STOPS = [
