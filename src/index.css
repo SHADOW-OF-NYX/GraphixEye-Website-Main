@@ -167,31 +167,18 @@ h4,
 }
 
 
-.horiz-pin {
-  overflow: hidden;
+/*
+ * Horizontal service strip — tall scrub track + sticky stage (height set in JS).
+ * Avoids GSAP pin spacers, which break the effect on Safari / iOS.
+ */
+.horiz-scrub {
+  /* min height until JS measures the track */
+  min-height: 100vh;
+  min-height: var(--app-vh, 100vh);
 }
 
-/* Native horizontal swipe on phones — GSAP pin is disabled below md */
-.horiz-pin--native {
-  overflow: visible;
-  height: auto !important;
-}
-
-.horiz-pin--native .horiz-native-track {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-}
-
-.horiz-pin--native .horiz-native-track::-webkit-scrollbar {
-  display: none;
-}
-
-.horiz-pin--native .horiz-native-track > * {
-  scroll-snap-align: center;
+.horiz-scrub-sticky {
+  width: 100%;
 }
 
 /* ─── Mirror Hall page shell ─── */

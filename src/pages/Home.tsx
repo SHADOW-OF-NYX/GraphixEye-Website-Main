@@ -68,20 +68,48 @@ export default function Home() {
         tl.fromTo(introCopy.current, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: 'none' }, 0.58);
       }
 
-      // Desktop: GSAP pin scrub. Mobile: native horizontal swipe (see CSS).
-      if (!narrow.matches && horizWrap.current && horizTrack.current) {
-        const getDistance = () => Math.max(0, horizTrack.current!.scrollWidth - window.innerWidth + 80);
-        gsap.to(horizTrack.current, {
-          x: () => -getDistance(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: horizWrap.current,
-            start: 'top top',
-            end: () => `+=${getDistance()}`,
-            pin: true,
-            scrub: 0.8,
-            invalidateOnRefresh: true,
+      // Horizontal AI/AR/VR/MR strip: CSS sticky + scrub (no GSAP pin).
+      // Safari fights pin spacers; sticky scrub keeps the same vertical→sideways effect.
+      if (horizWrap.current && horizTrack.current) {
+        const wrap = horizWrap.current;
+        const track = horizTrack.current;
+        const getDistance = () =>
+          Math.max(0, track.scrollWidth - Math.min(window.innerWidth, wrap.clientWidth) + 64);
+
+        const syncHeight = () => {
+          // Match sticky stage (h-app-screen / --app-vh) so iOS toolbar resize stays in sync
+          wrap.style.height = `calc(${getDistance()}px + var(--app-vh, 100vh))`;
+        };
+        syncHeight();
+
+        gsap.fromTo(
+          track,
+          { x: 0 },
+          {
+            x: () => -getDistance(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: wrap,
+              start: 'top top',
+              end: 'bottom bottom',
+              scrub: 0.8,
+              invalidateOnRefresh: true,
+              onRefresh: syncHeight,
+            },
           },
+        );
+
+        track.querySelectorAll('img').forEach((img) => {
+          if (!img.complete) {
+            img.addEventListener(
+              'load',
+              () => {
+                syncHeight();
+                ScrollTrigger.refresh();
+              },
+              { once: true },
+            );
+          }
         });
       }
 
@@ -96,7 +124,11 @@ export default function Home() {
       });
     });
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      if (horizWrap.current) horizWrap.current.style.height = '';
+      if (horizTrack.current) gsap.set(horizTrack.current, { clearProps: 'transform' });
+    };
   }, []);
 
   const faqItems = faqs[faqGroup];
@@ -227,12 +259,12 @@ export default function Home() {
         </h2>
       </section>
 
-      <section ref={horizWrap} className="horiz-pin md:h-screen max-md:horiz-pin--native">
-        <div className="md:h-screen flex flex-col justify-center py-10 md:py-0">
+      <section ref={horizWrap} className="horiz-scrub relative">
+        <div className="horiz-scrub-sticky sticky top-0 h-app-screen overflow-hidden flex flex-col justify-center">
           <p className="px-6 md:px-8 mb-5 text-[16px] md:text-[22px] font-display tracking-[0.08em] uppercase text-black/55">
             Newly Added Services
           </p>
-          <div ref={horizTrack} className="flex gap-4 md:gap-6 px-6 md:px-8 will-change-transform max-md:horiz-native-track">
+          <div ref={horizTrack} className="flex gap-4 md:gap-6 px-6 md:px-8 will-change-transform">
             {featured.map((work, i) => (
               <article
                 key={work.slug}
