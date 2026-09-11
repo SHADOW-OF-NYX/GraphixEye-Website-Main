@@ -61,13 +61,12 @@ export default function Expansions() {
   return (
     <div className="relative bg-ll-white text-black min-h-screen">
       <Seo page={getPageSeo('/expansions')!} />
-      <ThreeSceneLoader />
 
       {/* Cream wash lifted toward white behind the stage, sand at the edges */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          zIndex: -1,
+          zIndex: 0,
           background:
             'radial-gradient(ellipse 115% 78% at 50% 26%, #ffffff 0%, #fcf8f1 46%, #f2ece2 100%)',
         }}
@@ -77,8 +76,16 @@ export default function Expansions() {
       <ServiceShowcase />
 
       <div id="morph-track" className="relative" style={{ height: '620vh', zIndex: 10 }}>
+        {/*
+          Canvas lives inside the sticky stage (not a sibling fixed layer).
+          Safari often culls fixed WebGL canvases sitting behind sticky scrollers.
+        */}
         <div className="sticky top-0 h-app-screen overflow-hidden">
-          <div ref={introRef} className="absolute inset-0 pointer-events-none select-none">
+          <div className="absolute inset-0 z-0">
+            <ThreeSceneLoader />
+          </div>
+
+          <div ref={introRef} className="absolute inset-0 z-[1] pointer-events-none select-none">
             <div className="absolute left-6 md:left-14 top-1/2 -translate-y-1/2 -mt-10 max-w-xl">
               <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-5">
                 Expansions
@@ -95,7 +102,7 @@ export default function Expansions() {
           </div>
 
           <p
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 uppercase text-black/35 tracking-[0.2em] pointer-events-none"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 uppercase text-black/35 tracking-[0.2em] pointer-events-none z-[1]"
             style={{ fontSize: 10 }}
           >
             Scroll
@@ -103,7 +110,7 @@ export default function Expansions() {
         </div>
       </div>
 
-      {/* Opaque so it closes off the fixed canvas instead of scrolling over the model */}
+      {/* Opaque so it closes off the particle stage instead of scrolling over the model */}
       <div className="relative z-10 bg-ll-white">
         <div className="max-w-[1600px] mx-auto px-4 md:px-8">
           {/*

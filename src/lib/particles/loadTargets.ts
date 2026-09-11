@@ -38,62 +38,35 @@ export function clearBakedTargetCache() {
 
 export async function loadBakedTargets(): Promise<BakedTargets> {
   if (cache) return cache
-  const [eye, b0, b1, b2, bonsai] = await Promise.all([
+  const [
+    eye,
+    b0,
+    b1,
+    b2,
+    bonsai,
+    eyeColors,
+    face,
+    faceColors,
+    holo,
+    holoColors,
+    quest,
+    questColors,
+    bonsaiColors,
+  ] = await Promise.all([
     loadBin('/particle-targets/eye.bin'),
     loadBin('/particle-targets/eye_blink_0.bin'),
     loadBin('/particle-targets/eye_blink_1.bin'),
     loadBin('/particle-targets/eye_blink_2.bin'),
     loadBin('/particle-targets/bonsai.bin'),
+    loadBin('/particle-targets/eye_colors.bin').catch(() => null),
+    loadBin('/particle-targets/face.bin').catch(() => null),
+    loadBin('/particle-targets/face_colors.bin').catch(() => null),
+    loadBin('/particle-targets/holo.bin').catch(() => null),
+    loadBin('/particle-targets/holo_colors.bin').catch(() => null),
+    loadBin('/particle-targets/quest.bin').catch(() => null),
+    loadBin('/particle-targets/quest_colors.bin').catch(() => null),
+    loadBin('/particle-targets/bonsai_colors.bin').catch(() => null),
   ])
-
-  let eyeColors: Float32Array | null = null
-  let face: Float32Array | null = null
-  let faceColors: Float32Array | null = null
-  let holo: Float32Array | null = null
-  let holoColors: Float32Array | null = null
-  let quest: Float32Array | null = null
-  let questColors: Float32Array | null = null
-  let bonsaiColors: Float32Array | null = null
-  try {
-    eyeColors = await loadBin('/particle-targets/eye_colors.bin')
-  } catch {
-    eyeColors = null
-  }
-  try {
-    face = await loadBin('/particle-targets/face.bin')
-  } catch {
-    face = null
-  }
-  try {
-    faceColors = await loadBin('/particle-targets/face_colors.bin')
-  } catch {
-    faceColors = null
-  }
-  try {
-    holo = await loadBin('/particle-targets/holo.bin')
-  } catch {
-    holo = null
-  }
-  try {
-    holoColors = await loadBin('/particle-targets/holo_colors.bin')
-  } catch {
-    holoColors = null
-  }
-  try {
-    quest = await loadBin('/particle-targets/quest.bin')
-  } catch {
-    quest = null
-  }
-  try {
-    questColors = await loadBin('/particle-targets/quest_colors.bin')
-  } catch {
-    questColors = null
-  }
-  try {
-    bonsaiColors = await loadBin('/particle-targets/bonsai_colors.bin')
-  } catch {
-    bonsaiColors = null
-  }
 
   cache = {
     eye,

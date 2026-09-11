@@ -1425,7 +1425,12 @@ function resolveAnimPositions(
   return out;
 }
 
-async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promise<Built> {
+async function resolveShape(
+  variant: SceneVariant,
+  n: number,
+  P: Palette,
+  opts: { deferAnim?: boolean } = {},
+): Promise<Built> {
   if (BAKED_VENDOR.has(variant)) {
     const baked = await loadVendorBaked(variant as VendorBakedId);
     return {
@@ -1437,7 +1442,9 @@ async function resolveShape(variant: SceneVariant, n: number, P: Palette): Promi
     };
   }
   if (BAKED_EXPERIENCE.has(variant)) {
-    const baked = await loadExperienceBaked(variant as ExperienceBakedId);
+    const baked = await loadExperienceBaked(variant as ExperienceBakedId, {
+      deferAnim: opts.deferAnim,
+    });
     return {
       positions: baked.positions,
       colors: baked.colors,
@@ -1506,24 +1513,63 @@ export default function CareerParticles({
     const cleanup: Array<() => void> = [];
 
     const init = async () => {
-      const { EffectComposer } = await import('three/examples/jsm/postprocessing/EffectComposer.js');
-      const { RenderPass } = await import('three/examples/jsm/postprocessing/RenderPass.js');
-      const { UnrealBloomPass } = await import('three/examples/jsm/postprocessing/UnrealBloomPass.js');
-      if (cancelled) return;
-
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
       const budget = getParticleBudget();
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const P = PALETTES[palette];
       const feel = FEELS[palette];
       const N = scaledParticleCount(feel.count);
-      const shapes = await Promise.all(
-        variants.map(async (v) => {
-          const built = await resolveShape(v, N, P);
-          return fitBuiltToCount(built, N);
-        }),
+
+      // Import bloom stack only when we will use it — saves a chunk on Safari.
+      let EffectComposer: typeof import('three/examples/jsm/postprocessing/EffectComposer.js').EffectComposer | null =
+        null;
+      let RenderPass: typeof import('three/examples/jsm/postprocessing/RenderPass.js').RenderPass | null = null;
+      let UnrealBloomPass: typeof import('three/examples/jsm/postprocessing/UnrealBloomPass.js').UnrealBloomPass | null =
+        null;
+      if (!budget.skipBloom) {
+        [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }] = await Promise.all([
+          import('three/examples/jsm/postprocessing/EffectComposer.js'),
+          import('three/examples/jsm/postprocessing/RenderPass.js'),
+          import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
+        ]);
+      }
+      if (cancelled) return;
+
+      /*
+       * First paint: load shape 0 immediately (Haas anim deferred). Remaining
+       * morph targets fill in behind the first frame so phones are not blocked
+       * on the 13MB animation pack.
+       */
+      const firstBuilt = fitBuiltToCount(
+        await resolveShape(variants[0], N, P, { deferAnim: true }),
+        N,
       );
       if (cancelled) return;
+
+      const shapes: Built[] = variants.map(() => firstBuilt);
+      shapes[0] = firstBuilt;
+
+      const fillRest = (async () => {
+        await Promise.all(
+          variants.map(async (v, i) => {
+            if (i === 0) return;
+            const built = fitBuiltToCount(await resolveShape(v, N, P, { deferAnim: true }), N);
+            shapes[i] = built;
+          }),
+        );
+        // Upgrade Haas animation in the background after the rest pose is up
+        const haasIdx = variants.indexOf('haasPress');
+        if (haasIdx >= 0) {
+          const animated = fitBuiltToCount(
+            await resolveShape('haasPress', N, P, { deferAnim: false }),
+            N,
+          );
+          shapes[haasIdx] = animated;
+        }
+      })().catch((err) => console.warn('[particles] deferred shape load failed', err));
+      cleanup.push(() => {
+        void fillRest;
+      });
+
       const configs = variants.map((v) => CONFIG[v]);
       const multi = shapes.length > 1;
       // Scratch buffers for animated shapes (forklift) during the morph blend
@@ -1593,9 +1639,11 @@ export default function CareerParticles({
       scene.add(points);
 
       // Bloom makes particles read as bright on desktop; skipped on Safari/WebKit.
-      let composer: InstanceType<typeof EffectComposer> | null = null;
-      let bloomPass: InstanceType<typeof UnrealBloomPass> | null = null;
-      if (!skipBloom) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let composer: any = null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let bloomPass: any = null;
+      if (!skipBloom && EffectComposer && RenderPass && UnrealBloomPass) {
         composer = new EffectComposer(renderer);
         composer.addPass(new RenderPass(scene, camera));
         bloomPass = new UnrealBloomPass(

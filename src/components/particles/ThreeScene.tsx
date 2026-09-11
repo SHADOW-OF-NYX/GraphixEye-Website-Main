@@ -364,8 +364,18 @@ export default function ThreeScene() {
     const disposeList: Array<() => void> = []
 
     const init = async () => {
-      const { EffectComposer } = await import('three/examples/jsm/postprocessing/EffectComposer.js')
-      const { RenderPass } = await import('three/examples/jsm/postprocessing/RenderPass.js')
+      const budget = getParticleBudget()
+      const skipComposer = budget.skipBloom
+
+      let EffectComposer: typeof import('three/examples/jsm/postprocessing/EffectComposer.js').EffectComposer | null =
+        null
+      let RenderPass: typeof import('three/examples/jsm/postprocessing/RenderPass.js').RenderPass | null = null
+      if (!skipComposer) {
+        [{ EffectComposer }, { RenderPass }] = await Promise.all([
+          import('three/examples/jsm/postprocessing/EffectComposer.js'),
+          import('three/examples/jsm/postprocessing/RenderPass.js'),
+        ])
+      }
       if (cancelled) return
 
       let baked: BakedTargets | null = null
@@ -376,28 +386,44 @@ export default function ThreeScene() {
       }
       if (cancelled) return
 
-      const budget = getParticleBudget()
       const N = scaledParticleCount(BASE_N)
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, budget.maxDpr))
-      renderer.setSize(window.innerWidth, window.innerHeight)
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: false,
+        alpha: true,
+        powerPreference: skipComposer ? 'default' : 'high-performance',
+      })
+      const dpr = Math.min(window.devicePixelRatio || 1, budget.maxDpr)
+      renderer.setPixelRatio(dpr)
+      const sizeHost = () => {
+        const parent = canvas.parentElement
+        const w = Math.max(1, parent?.clientWidth || window.innerWidth)
+        const h = Math.max(1, parent?.clientHeight || window.innerHeight)
+        renderer.setSize(w, h, false)
+        return { w, h }
+      }
+      const { w: startW, h: startH } = sizeHost()
       renderer.setClearColor(0x000000, 0)
       disposeList.push(() => renderer.dispose())
 
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(SHAPES[0].fov, window.innerWidth / window.innerHeight, 0.1, 100)
+      const camera = new THREE.PerspectiveCamera(SHAPES[0].fov, startW / startH, 0.1, 100)
       camera.position.set(SHAPES[0].cameraX, SHAPES[0].cameraY, SHAPES[0].cameraZ)
       const lookTarget = new THREE.Vector3(SHAPES[0].lookX, SHAPES[0].lookY, 0)
       camera.lookAt(lookTarget)
 
       /*
-       * No bloom on the light theme — bloom adds light, which only washes the
-       * cream background out and erases the ink particles.
+       * No bloom on the light theme. EffectComposer itself can blank on Safari,
+       * so WebKit draws with the raw renderer.
        */
-      const composer = new EffectComposer(renderer)
-      composer.addPass(new RenderPass(scene, camera))
-      disposeList.push(() => composer.dispose())
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let composer: any = null
+      if (!skipComposer && EffectComposer && RenderPass) {
+        composer = new EffectComposer(renderer)
+        composer.addPass(new RenderPass(scene, camera))
+        disposeList.push(() => composer.dispose())
+      }
 
       // The opening eye stays monochrome ink; the services carry the colour
       const eyeInkRaw = baked?.eyeColors ? inkify(baked.eyeColors) : null
@@ -505,8 +531,9 @@ export default function ThreeScene() {
         vertexShader: VERTEX_SHADER,
         fragmentShader: FRAGMENT_SHADER,
         uniforms: {
-          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, budget.maxDpr) },
-          uScale: { value: 3.0 },
+          uPixelRatio: { value: dpr },
+          // Slightly larger on Safari where we skip the composer path
+          uScale: { value: skipComposer ? 3.8 : 3.0 },
         },
         depthWrite: false,
         blending: THREE.NormalBlending,
@@ -574,13 +601,15 @@ export default function ThreeScene() {
       disposeList.push(() => window.removeEventListener('mousemove', onMouseMove))
 
       const onResize = () => {
-        camera.aspect = window.innerWidth / window.innerHeight
+        const { w, h } = sizeHost()
+        camera.aspect = w / h
         camera.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
-        composer.setSize(window.innerWidth, window.innerHeight)
+        composer?.setSize(w, h)
       }
       window.addEventListener('resize', onResize)
       disposeList.push(() => window.removeEventListener('resize', onResize))
+      requestAnimationFrame(onResize)
+      window.setTimeout(onResize, 120)
 
       // ── Scroll-driven morph state ────────────────────────────────────────
       // target = raw ScrollTrigger progress; display = eased catch-up for smoother morphs
@@ -611,7 +640,16 @@ export default function ThreeScene() {
       })
       disposeList.push(() => entryTween.kill())
 
-      gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 2.0, ease: 'power1.inOut' })
+      gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 0.7, ease: 'power1.out' })
+      // Safari can stall GSAP opacity tweens on newly attached canvases
+      window.setTimeout(() => {
+        if (canvas.style.opacity !== '1') canvas.style.opacity = '1'
+      }, 900)
+
+      const draw = () => {
+        if (composer) composer.render()
+        else renderer.render(scene, camera)
+      }
 
       // Wait for morph track in DOM (page may hydrate after canvas mounts)
       const bindScroll = () => {
@@ -738,7 +776,7 @@ export default function ThreeScene() {
             posArr[i3 + 2] = bz + noise3D(bx * 0.9, by * 0.9, bz * 0.9 + t) * amp * 0.7
           }
           geometry.attributes.position.needsUpdate = true
-          composer.render()
+          draw()
           return
         }
 
@@ -928,7 +966,7 @@ export default function ThreeScene() {
           points.scale.lerp(v1, 0.06)
         }
 
-        composer.render()
+        draw()
       }
 
       tick()
@@ -946,8 +984,8 @@ export default function ThreeScene() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full block"
-      style={{ zIndex: 0, opacity: 0 }}
+      className="absolute inset-0 w-full h-full block pointer-events-none"
+      style={{ opacity: 0 }}
     />
   )
 }
