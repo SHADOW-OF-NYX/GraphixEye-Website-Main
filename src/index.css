@@ -580,9 +580,13 @@ h4,
 .ce-morph-canvas {
   position: sticky;
   top: 0;
+  height: 100vh;
   height: var(--app-vh);
   width: 100%;
   z-index: 0;
+  /* Promote a compositing layer — helps iOS Safari keep the WebGL canvas painted */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .ce-morph-content {

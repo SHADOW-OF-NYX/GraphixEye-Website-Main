@@ -35,7 +35,7 @@ export function shouldUseNativeScroll(): boolean {
  */
 export function getParticleBudget() {
   if (typeof window === 'undefined') {
-    return { countScale: 1, maxDpr: 2, reduceBloom: false };
+    return { countScale: 1, maxDpr: 2, reduceBloom: false, skipBloom: false };
   }
 
   const coarse = isCoarsePointer();
@@ -47,21 +47,25 @@ export function getParticleBudget() {
 
   if (narrow || (coarse && mid) || (safari && mid)) {
     return {
-      countScale: lowPower ? 0.35 : 0.45,
-      maxDpr: safari ? 1 : 1.25,
+      // Keep enough density for baked Experience models to read on phones
+      countScale: lowPower ? 0.45 : 0.55,
+      maxDpr: safari ? 1.5 : 1.25,
       reduceBloom: true,
+      // WebKit UnrealBloomPass often renders blank — draw points directly
+      skipBloom: safari,
     };
   }
 
   if (mid || coarse || safari) {
     return {
-      countScale: safari ? 0.55 : 0.65,
-      maxDpr: safari ? 1.25 : 1.5,
+      countScale: safari ? 0.65 : 0.65,
+      maxDpr: safari ? 1.5 : 1.5,
       reduceBloom: safari,
+      skipBloom: safari,
     };
   }
 
-  return { countScale: 1, maxDpr: 2, reduceBloom: false };
+  return { countScale: 1, maxDpr: 2, reduceBloom: false, skipBloom: false };
 }
 
 export function scaledParticleCount(base: number): number {

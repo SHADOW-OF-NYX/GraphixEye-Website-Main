@@ -1370,20 +1370,22 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
 /*
  * gl_PointSize is in PHYSICAL pixels. Dividing a tuned scale by view depth keeps
  * dots around 1–3 CSS px; the clamp stops near-camera points from ballooning and
- * blowing the additive blend out to white. Bloom supplies the glow instead.
+ * blowing the additive blend out to white. Bloom supplies the glow on desktop;
+ * Safari skips bloom and relies on a higher uMaxPoint instead.
  */
 const VERTEX_SHADER = /* glsl */ `
   attribute float aSize;
   attribute vec3 aColor;
   uniform float uScale;
   uniform float uDpr;
+  uniform float uMaxPoint;
   varying vec3 vColor;
 
   void main() {
     vColor = aColor;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
     float ps = aSize * uScale * uDpr / max(-mv.z, 0.15);
-    gl_PointSize = clamp(ps, 0.5, 5.0 * uDpr);
+    gl_PointSize = clamp(ps, 0.85, uMaxPoint);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -1528,7 +1530,11 @@ export default function CareerParticles({
       const animA = new Float32Array(N * 3);
       const animB = new Float32Array(N * 3);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+      const renderer = new THREE.WebGLRenderer({
+        antialias: false,
+        alpha: true,
+        powerPreference: budget.skipBloom ? 'default' : 'high-performance',
+      });
       const dpr = Math.min(window.devicePixelRatio || 1, budget.maxDpr);
       renderer.setPixelRatio(dpr);
       renderer.setClearColor(0x000000, 0);
@@ -1559,11 +1565,21 @@ export default function CareerParticles({
       geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
       cleanup.push(() => geometry.dispose());
 
+      /*
+       * Safari/iOS: UnrealBloomPass often composites to a blank frame.
+       * Draw points directly and compensate with larger, brighter dots.
+       */
+      const skipBloom = budget.skipBloom;
+      const scaleBoost = skipBloom ? 2.35 : 1;
+      const alphaBoost = skipBloom ? 1.25 : 1;
+      const maxPoint = skipBloom ? Math.max(10, 9 * dpr) : Math.max(5, 5 * dpr);
+
       const material = new THREE.ShaderMaterial({
         uniforms: {
-          uScale: { value: configs[0].pointScale },
+          uScale: { value: configs[0].pointScale * scaleBoost },
           uDpr: { value: dpr },
-          uAlpha: { value: configs[0].alpha },
+          uAlpha: { value: Math.min(1, configs[0].alpha * alphaBoost) },
+          uMaxPoint: { value: maxPoint },
         },
         vertexShader: VERTEX_SHADER,
         fragmentShader: feel.fragmentShader,
@@ -1576,36 +1592,47 @@ export default function CareerParticles({
       const points = new THREE.Points(geometry, material);
       scene.add(points);
 
-      // Bloom is what makes the particles read as bright rather than dim —
-      // radius and threshold are per-feel so pages don't share one glow recipe.
-      const composer = new EffectComposer(renderer);
-      composer.addPass(new RenderPass(scene, camera));
-      const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(host.clientWidth || 1, host.clientHeight || 1),
-        configs[0].bloom * feel.bloomMul * (budget.reduceBloom ? 0.55 : 1),
-        feel.bloomRadius * (budget.reduceBloom ? 0.7 : 1),
-        feel.bloomThreshold,
-      );
-      composer.addPass(bloomPass);
-      cleanup.push(() => composer.dispose());
+      // Bloom makes particles read as bright on desktop; skipped on Safari/WebKit.
+      let composer: InstanceType<typeof EffectComposer> | null = null;
+      let bloomPass: InstanceType<typeof UnrealBloomPass> | null = null;
+      if (!skipBloom) {
+        composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+        bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(host.clientWidth || 1, host.clientHeight || 1),
+          configs[0].bloom * feel.bloomMul * (budget.reduceBloom ? 0.7 : 1),
+          feel.bloomRadius * (budget.reduceBloom ? 0.85 : 1),
+          feel.bloomThreshold,
+        );
+        composer.addPass(bloomPass);
+        cleanup.push(() => composer?.dispose());
+      }
 
       const resize = () => {
-        const w = host.clientWidth || 1;
-        const h = host.clientHeight || 1;
+        const w = Math.max(1, host.clientWidth || window.innerWidth);
+        const h = Math.max(1, host.clientHeight || window.innerHeight);
         renderer.setSize(w, h, false);
-        composer.setSize(w, h);
-        bloomPass.resolution.set(w, h);
+        composer?.setSize(w, h);
+        bloomPass?.resolution.set(w, h);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
       };
       resize();
+      requestAnimationFrame(resize);
+      window.setTimeout(resize, 120);
+      window.setTimeout(resize, 400);
 
       const ro = new ResizeObserver(resize);
       ro.observe(host);
       cleanup.push(() => ro.disconnect());
 
       let visible = true;
-      const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { rootMargin: '200px' });
+      const io = new IntersectionObserver(
+        ([e]) => {
+          visible = e.isIntersecting || e.intersectionRatio > 0 || host.clientHeight > 0;
+        },
+        { rootMargin: '300px', threshold: [0, 0.01] },
+      );
       io.observe(host);
       cleanup.push(() => io.disconnect());
 
@@ -1811,11 +1838,15 @@ export default function CareerParticles({
           camera.updateProjectionMatrix();
         }
 
-        material.uniforms.uScale.value = lerp(ca.pointScale, cb.pointScale, u);
-        material.uniforms.uAlpha.value = lerp(ca.alpha, cb.alpha, u);
-        bloomPass.strength = lerp(ca.bloom, cb.bloom, u) * feel.bloomMul * (budget.reduceBloom ? 0.55 : 1);
+        material.uniforms.uScale.value = lerp(ca.pointScale, cb.pointScale, u) * scaleBoost;
+        material.uniforms.uAlpha.value = Math.min(1, lerp(ca.alpha, cb.alpha, u) * alphaBoost);
+        if (bloomPass) {
+          bloomPass.strength =
+            lerp(ca.bloom, cb.bloom, u) * feel.bloomMul * (budget.reduceBloom ? 0.7 : 1);
+        }
 
-        composer.render();
+        if (composer) composer.render();
+        else renderer.render(scene, camera);
       };
 
       tick();
