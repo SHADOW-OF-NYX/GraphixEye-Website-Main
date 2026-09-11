@@ -3,11 +3,17 @@ type Listener = () => void;
 let ready = false;
 const listeners = new Set<Listener>();
 
-/** Signal that the home hero video can display / play. Idempotent. */
+/** Signal that the home hero video is actually playing. Idempotent. */
 export function markHeroReady() {
   if (ready) return;
   ready = true;
   listeners.forEach((fn) => fn());
+  listeners.clear();
+}
+
+/** Reset so the next home visit waits for video again. */
+export function resetHeroReady() {
+  ready = false;
   listeners.clear();
 }
 

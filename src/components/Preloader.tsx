@@ -5,7 +5,8 @@ import { BrandLogo } from './ui';
 import { onHeroReady, markHeroReady } from '../lib/heroReady';
 
 const MIN_MS = 700;
-const MAX_MS = 2800;
+/** Absolute last resort if the hero never plays (broken file / offline). */
+const MAX_MS = 45_000;
 const FADE_MS = 700;
 
 export default function Preloader() {
@@ -34,7 +35,7 @@ export default function Preloader() {
       }, wait);
     };
 
-    // Only the home hero video gates the preloader
+    // Home: stay on the brand loader until the hero video is actually playing
     const needsHero = pathname === '/';
     let unsub = () => undefined;
     let maxTimer = 0;

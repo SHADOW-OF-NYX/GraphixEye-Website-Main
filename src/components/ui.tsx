@@ -1,5 +1,5 @@
 import React from 'react';
-import { markHeroReady } from '../lib/heroReady';
+import { markHeroReady, resetHeroReady } from '../lib/heroReady';
 
 export function BrandLogo({
   className = 'h-10',
@@ -105,8 +105,8 @@ export function Placeholder({
 
 /**
  * Hero background video.
- * Keep a real <img> poster underneath until `playing` fires — Safari often paints
- * a black frame while a large mp4 buffers, which looked like "no video".
+ * Preloader stays up until `playing` — not metadata / poster.
+ * A local factory still sits underneath so Safari never flashes Unsplash stock.
  */
 export function HeroVideo({
   src,
@@ -123,6 +123,8 @@ export function HeroVideo({
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    resetHeroReady();
 
     el.muted = true;
     el.defaultMuted = true;
@@ -142,6 +144,7 @@ export function HeroVideo({
     };
 
     const markPlaying = () => {
+      if (isPlaying) return;
       isPlaying = true;
       setPlaying(true);
       settle();
@@ -153,11 +156,9 @@ export function HeroVideo({
       const attempt = el.play();
       if (attempt && typeof attempt.then === 'function') {
         attempt.then(markPlaying).catch(() => {
-          // Poster stays visible; gesture/timers retry below.
-          settle();
+          // Keep waiting — do not lift the preloader until we are playing
+          // (or the absolute error / MAX failsafe fires).
         });
-      } else {
-        settle();
       }
     };
 
@@ -168,11 +169,12 @@ export function HeroVideo({
       el.addEventListener('loadedmetadata', onReady);
       el.addEventListener('canplay', onReady);
       el.addEventListener('loadeddata', onReady);
+      el.addEventListener('canplaythrough', onReady);
     }
     el.addEventListener('playing', markPlaying);
+    // Hard failure only — missing/corrupt file should not trap the site forever
     el.addEventListener('error', settle);
 
-    // Kick the network fetch; src is on the element for broadest Safari support
     try {
       el.load();
     } catch {
@@ -190,17 +192,16 @@ export function HeroVideo({
     });
     window.addEventListener('pageshow', unlock);
 
-    for (const ms of [400, 1000, 2000, 3500, 6000]) {
+    for (const ms of [300, 800, 1600, 3000, 5000, 8000, 12000]) {
       timers.push(window.setTimeout(tryPlay, ms));
     }
-    // Don't block the site on the 90MB+ hero file
-    timers.push(window.setTimeout(settle, 1800));
 
     return () => {
       timers.forEach((id) => window.clearTimeout(id));
       el.removeEventListener('loadedmetadata', onReady);
       el.removeEventListener('canplay', onReady);
       el.removeEventListener('loadeddata', onReady);
+      el.removeEventListener('canplaythrough', onReady);
       el.removeEventListener('playing', markPlaying);
       el.removeEventListener('error', settle);
       window.removeEventListener('touchstart', unlock);
@@ -212,13 +213,15 @@ export function HeroVideo({
   }, [src]);
 
   return (
-    <div className={`absolute inset-0 ${className}`}>
+    <div className={`absolute inset-0 bg-ll-ink ${className}`}>
       {poster ? (
         <img
           src={poster}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+            playing ? 'opacity-0' : 'opacity-100'
+          }`}
           decoding="async"
           fetchPriority="high"
         />
@@ -229,7 +232,6 @@ export function HeroVideo({
           playing ? 'opacity-100' : 'opacity-0'
         }`}
         src={src}
-        poster={poster}
         autoPlay
         muted
         loop
