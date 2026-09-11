@@ -19,9 +19,9 @@ export const photos = {
 };
 
 /** Drop a replacement file at public/videos/hero.mp4 to swap the header video. */
-export const heroVideo = '/videos/hero.mp4?v=4';
+export const heroVideo = '/videos/hero.mp4?v=5';
 
 /** 720p / Main@L4.0 / faststart — phones & tablets only (see shouldUseMobileHeroVideo). */
-export const heroVideoMobile = '/videos/hero-mobile.mp4?v=1';
+export const heroVideoMobile = '/videos/hero-mobile.mp4?v=2';
 
 export { u };

@@ -6,7 +6,7 @@ import { onHeroReady, markHeroReady } from '../lib/heroReady';
 
 const MIN_MS = 700;
 /** Absolute last resort if the hero never plays (broken file / offline). */
-const MAX_MS = 45_000;
+const MAX_MS = 12_000;
 const FADE_MS = 700;
 
 export default function Preloader() {
