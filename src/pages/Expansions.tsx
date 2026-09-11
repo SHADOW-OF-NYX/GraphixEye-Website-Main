@@ -87,15 +87,27 @@ export default function Expansions() {
 
           <div ref={introRef} className="absolute inset-0 z-[1] pointer-events-none select-none">
             <div className="absolute left-6 md:left-14 top-1/2 -translate-y-1/2 -mt-10 max-w-xl">
-              <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-5">
+              {/* Soft white bloom so headline stays readable over particles */}
+              <span
+                aria-hidden
+                className="absolute -inset-x-8 -inset-y-10 md:-inset-x-14 md:-inset-y-14 pointer-events-none"
+                style={{
+                  zIndex: -1,
+                  background:
+                    'radial-gradient(ellipse 72% 62% at 28% 45%, rgba(255,255,255,0.92) 0%, rgba(252,248,241,0.78) 42%, rgba(252,248,241,0) 76%)',
+                  filter: 'blur(18px)',
+                  WebkitFilter: 'blur(18px)',
+                }}
+              />
+              <p className="relative text-[12px] tracking-widest uppercase text-ll-highlight mb-5">
                 Expansions
               </p>
-              <h1 className="display-xl text-black">
+              <h1 className="relative display-xl text-black">
                 Where intent
                 <br />
                 takes form
               </h1>
-              <p className="mt-7 text-[12px] tracking-widest uppercase text-black/40 max-w-xs">
+              <p className="relative mt-7 text-[12px] tracking-widest uppercase text-black/40 max-w-xs">
                 AI · AR · VR · MR · scroll to explore
               </p>
             </div>

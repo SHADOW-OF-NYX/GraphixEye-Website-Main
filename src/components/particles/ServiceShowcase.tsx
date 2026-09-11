@@ -101,23 +101,35 @@ export default function ServiceShowcase() {
             data-service={s.id}
             data-side={s.textSide}
           >
-            {/* Cream fade so dark copy stays legible where a model drifts under it */}
+            {/* Soft white bloom + light blur so copy stays legible over particles */}
             <span
               aria-hidden
-              className="absolute -inset-x-10 -inset-y-12 pointer-events-none"
+              className="absolute -inset-x-10 -inset-y-12 md:-inset-x-14 md:-inset-y-14 pointer-events-none rounded-full"
               style={{
                 zIndex: -1,
-                background: `radial-gradient(ellipse 68% 58% at ${
+                background: `radial-gradient(ellipse 70% 60% at ${
                   onLeft ? '28%' : '72%'
-                } 50%, rgba(252,248,241,0.94) 0%, rgba(252,248,241,0.72) 45%, rgba(252,248,241,0) 74%)`,
+                } 50%, rgba(255,255,255,0.94) 0%, rgba(252,248,241,0.8) 40%, rgba(252,248,241,0) 74%)`,
+                filter: 'blur(16px)',
+                WebkitFilter: 'blur(16px)',
               }}
             />
-            <p className="text-[12px] tracking-widest uppercase text-ll-highlight mb-3">
+            <div
+              aria-hidden
+              className="absolute -inset-x-4 -inset-y-5 md:-inset-x-6 md:-inset-y-6 pointer-events-none rounded-3xl"
+              style={{
+                zIndex: -1,
+                background: 'rgba(252,248,241,0.42)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+              }}
+            />
+            <p className="relative text-[12px] tracking-widest uppercase text-ll-highlight mb-3">
               {s.index} · {s.eyebrow.toUpperCase()}
             </p>
-            <h2 className="display-md text-black mb-3 md:mb-4 text-[clamp(1.35rem,4vw,2.25rem)]">{s.title}</h2>
+            <h2 className="relative display-md text-black mb-3 md:mb-4 text-[clamp(1.35rem,4vw,2.25rem)]">{s.title}</h2>
             <p
-              className={`text-black/55 leading-relaxed text-[14px] md:text-[15px] max-w-md ${onLeft ? '' : 'ml-auto'}`}
+              className={`relative text-black/55 leading-relaxed text-[14px] md:text-[15px] max-w-md ${onLeft ? '' : 'ml-auto'}`}
             >
               {s.body}
             </p>
