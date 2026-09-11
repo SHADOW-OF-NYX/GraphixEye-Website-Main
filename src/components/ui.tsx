@@ -1,5 +1,6 @@
 import React from 'react';
 import { markHeroReady, resetHeroReady } from '../lib/heroReady';
+import { shouldUseMobileHeroVideo } from '../lib/device';
 
 export function BrandLogo({
   className = 'h-10',
@@ -105,26 +106,34 @@ export function Placeholder({
 
 /**
  * Hero background video.
- * Preloader stays up until `playing` — not metadata / poster.
- * A local factory still sits underneath so Safari never flashes Unsplash stock.
+ * Preloader stays up until a real frame is painted — not metadata alone.
+ * Phones get the lighter encode; laptops keep full 1080p.
+ * A local factory still sits underneath so Safari never flashes stock photos.
  */
 export function HeroVideo({
   src,
+  mobileSrc,
   poster,
   className = '',
 }: {
   src: string;
+  mobileSrc?: string;
   poster?: string;
   className?: string;
 }) {
   const ref = React.useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = React.useState(false);
+  const activeSrc = React.useMemo(() => {
+    if (mobileSrc && shouldUseMobileHeroVideo()) return mobileSrc;
+    return src;
+  }, [src, mobileSrc]);
 
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
     resetHeroReady();
+    setPlaying(false);
 
     el.muted = true;
     el.defaultMuted = true;
@@ -132,10 +141,13 @@ export function HeroVideo({
     el.setAttribute('muted', '');
     el.setAttribute('playsinline', '');
     el.setAttribute('webkit-playsinline', '');
+    el.setAttribute('x5-playsinline', 'true');
+    el.setAttribute('x5-video-player-type', 'h5');
 
     let settled = false;
-    let isPlaying = false;
+    let revealed = false;
     const timers: number[] = [];
+    let frameHandle = 0;
 
     const settle = () => {
       if (settled) return;
@@ -143,26 +155,55 @@ export function HeroVideo({
       markHeroReady();
     };
 
-    const markPlaying = () => {
-      if (isPlaying) return;
-      isPlaying = true;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
       setPlaying(true);
       settle();
     };
 
+    /** Safari often fires `playing` before any pixels — wait for a painted frame. */
+    const revealWhenFramed = () => {
+      if (revealed || !el) return;
+
+      const rVFC = (
+        el as HTMLVideoElement & {
+          requestVideoFrameCallback?: (cb: () => void) => number;
+        }
+      ).requestVideoFrameCallback;
+
+      if (typeof rVFC === 'function') {
+        try {
+          frameHandle = rVFC.call(el, () => reveal());
+          return;
+        } catch {
+          /* fall through */
+        }
+      }
+
+      if (el.readyState >= 2 && !el.paused && el.currentTime > 0) {
+        requestAnimationFrame(() => requestAnimationFrame(reveal));
+        return;
+      }
+
+      // Soft fallback — keep poster a beat longer than the playing event
+      timers.push(window.setTimeout(reveal, 120));
+    };
+
     const tryPlay = () => {
-      if (isPlaying || !el) return;
+      if (revealed || !el) return;
       el.muted = true;
       const attempt = el.play();
       if (attempt && typeof attempt.then === 'function') {
-        attempt.then(markPlaying).catch(() => {
-          // Keep waiting — do not lift the preloader until we are playing
+        attempt.then(revealWhenFramed).catch(() => {
+          // Keep waiting — do not lift the preloader until we paint a frame
           // (or the absolute error / MAX failsafe fires).
         });
       }
     };
 
     const onReady = () => tryPlay();
+    const onPlaying = () => revealWhenFramed();
 
     if (el.readyState >= 2) onReady();
     else {
@@ -171,7 +212,7 @@ export function HeroVideo({
       el.addEventListener('loadeddata', onReady);
       el.addEventListener('canplaythrough', onReady);
     }
-    el.addEventListener('playing', markPlaying);
+    el.addEventListener('playing', onPlaying);
     // Hard failure only — missing/corrupt file should not trap the site forever
     el.addEventListener('error', settle);
 
@@ -202,15 +243,27 @@ export function HeroVideo({
       el.removeEventListener('canplay', onReady);
       el.removeEventListener('loadeddata', onReady);
       el.removeEventListener('canplaythrough', onReady);
-      el.removeEventListener('playing', markPlaying);
+      el.removeEventListener('playing', onPlaying);
       el.removeEventListener('error', settle);
       window.removeEventListener('touchstart', unlock);
       window.removeEventListener('touchend', unlock);
       window.removeEventListener('scroll', unlock);
       window.removeEventListener('click', unlock);
       window.removeEventListener('pageshow', unlock);
+      const cancel = (
+        el as HTMLVideoElement & {
+          cancelVideoFrameCallback?: (h: number) => void;
+        }
+      ).cancelVideoFrameCallback;
+      if (frameHandle && typeof cancel === 'function') {
+        try {
+          cancel.call(el, frameHandle);
+        } catch {
+          /* ignore */
+        }
+      }
     };
-  }, [src]);
+  }, [activeSrc]);
 
   return (
     <div className={`absolute inset-0 bg-ll-ink ${className}`}>
@@ -231,7 +284,8 @@ export function HeroVideo({
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
           playing ? 'opacity-100' : 'opacity-0'
         }`}
-        src={src}
+        src={activeSrc}
+        poster={poster}
         autoPlay
         muted
         loop

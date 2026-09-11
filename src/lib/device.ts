@@ -30,6 +30,24 @@ export function shouldUseNativeScroll(): boolean {
 }
 
 /**
+ * Phones / tablets get the lighter hero encode.
+ * Laptops and desktops keep the full 1080p file.
+ * iPadOS desktop-mode still counts as mobile (touch MacIntel).
+ */
+export function shouldUseMobileHeroVideo(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const iOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (iOS) return true;
+  if (/Android/i.test(ua)) return true;
+  if (isCoarsePointer()) return true;
+  if (isNarrowViewport(900)) return true;
+  return false;
+}
+
+/**
  * Particle / WebGL budget for the current device.
  * Phones get fewer points and a lower DPR; tablets sit in between.
  */

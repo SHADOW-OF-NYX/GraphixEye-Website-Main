@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HeroVideo, Placeholder } from '../components/ui';
-import { heroVideo, photos } from '../data/images';
+import { heroVideo, heroVideoMobile, photos } from '../data/images';
 import {
   clients,
   faqs,
@@ -110,7 +110,7 @@ export default function Home() {
       <section ref={heroWrap} className="relative h-[200vh] md:h-[280vh] bg-ll-white">
         <div className="sticky top-0 h-app-screen overflow-hidden flex items-center justify-center bg-ll-white">
           <div ref={heroFrame} data-nav-tone="dark" className="absolute inset-0 overflow-hidden will-change-transform bg-black">
-            <HeroVideo src={heroVideo} poster={photos.hero} />
+            <HeroVideo src={heroVideo} mobileSrc={heroVideoMobile} poster={photos.hero} />
             <div ref={heroDim} className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: 0.12 }} />
           </div>
 
