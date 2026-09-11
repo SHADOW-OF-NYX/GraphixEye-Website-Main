@@ -34,6 +34,7 @@ export default function Home() {
   const heroDim = useRef<HTMLDivElement>(null);
   const heroTitle = useRef<HTMLElement>(null);
   const introCopy = useRef<HTMLDivElement>(null);
+  const scrollCue = useRef<HTMLDivElement>(null);
   const horizWrap = useRef<HTMLDivElement>(null);
   const horizTrack = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState(0);
@@ -63,6 +64,7 @@ export default function Home() {
         );
         tl.fromTo(heroDim.current, { opacity: 0.12 }, { opacity: 0.4, duration: 0.4, ease: 'none' }, 0.12);
         tl.fromTo(heroTitle.current, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.32, ease: 'none' }, 0.18);
+        tl.to(scrollCue.current, { opacity: 0, duration: 0.18, ease: 'none' }, 0.1);
         tl.to(heroTitle.current, { opacity: 0.16, duration: 0.38, ease: 'none' }, 0.58);
         tl.to(heroDim.current, { opacity: 0.58, duration: 0.38, ease: 'none' }, 0.58);
         tl.fromTo(introCopy.current, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.4, ease: 'none' }, 0.58);
@@ -155,6 +157,30 @@ export default function Home() {
               />
             </span>
           </h1>
+
+          <div
+            ref={scrollCue}
+            className="hero-scroll-cue absolute left-1/2 -translate-x-1/2 bottom-[max(1.5rem,calc(env(safe-area-inset-bottom)+0.75rem))] z-20 flex flex-col items-center gap-1.5 text-ll-white pointer-events-none drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)]"
+            aria-hidden="true"
+          >
+            <span className="text-[10px] tracking-[0.22em] uppercase text-ll-white/80">Scroll</span>
+            <svg
+              className="hero-scroll-cue__chevron"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 9l6 6 6-6"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
 
           <div ref={introCopy} className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-5 right-5 md:left-auto md:bottom-16 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
             <p className="display-md mb-4 md:mb-6 text-[clamp(1.35rem,4.5vw,2.25rem)]">

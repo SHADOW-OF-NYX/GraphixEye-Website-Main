@@ -58,6 +58,26 @@ html {
   min-height: calc(var(--app-vh) * 0.7);
 }
 
+@keyframes hero-scroll-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+.hero-scroll-cue__chevron {
+  animation: hero-scroll-nudge 1.7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-cue__chevron {
+    animation: none;
+  }
+}
+
 body {
   font-size: 14px;
   overflow-x: hidden;
