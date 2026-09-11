@@ -30,25 +30,26 @@ export default function About() {
 
       <div className="max-w-[900px] mx-auto px-6 md:px-8">
         <p className="text-[12px] tracking-[0.22em] uppercase text-black/40 mb-4">About</p>
-        <h1 className="display-xl mb-8">Saudi Arabia&apos;s one-stop creative production house in Dammam</h1>
+        <h1 className="display-xl mb-8">A global one-stop creative production firm</h1>
         <p className="text-[17px] leading-relaxed text-black/65 mb-8">
-          GraphixEye is the one-stop solution brands use when they need design, commercial printing, custom signage,
-          packaging, corporate gifting, and immersive AR/VR/MR — without splitting the job across vendors. Part of{' '}
-          {site.parent}, we have operated from Dammam&apos;s 2nd Industrial City since {site.established}. Our promise:{' '}
+          GraphixEye is the one-stop solution brands use worldwide when they need design, commercial printing, custom
+          signage, packaging, corporate gifting, and immersive AR/VR/MR — without splitting the job across vendors. Part
+          of {site.parent}, we have operated from our Dammam factory HQ since {site.established}. Our promise:{' '}
           {site.tagline}.
         </p>
         <p className="text-[16px] leading-relaxed text-black/55 mb-8">
-          Artwork, fabrication, press, finishing, and install sit on one floor. That single-factory model keeps colour,
+          Artwork, fabrication, press, finishing, and logistics sit on one floor. That single-factory model keeps colour,
           materials, and timelines accountable — whether the brief is a logo system, outdoor signage, commercial
-          printing, custom packaging, branded gifts, or an immersive activation in Riyadh, Jeddah, or the Eastern
-          Province.
+          printing, custom packaging, branded gifts, or an immersive activation in Chicago, London, Dubai, Riyadh, or
+          anywhere we ship.
         </p>
 
-        <h2 className="display-md mb-4">One factory. Full production stack.</h2>
+        <h2 className="display-md mb-4">One factory. Global footprint.</h2>
         <p className="text-[16px] leading-relaxed text-black/55 mb-10">
           Instead of a design agency plus a printer plus a signage contractor plus a packaging supplier, GraphixEye
-          delivers the full stack from Dammam and installs across the Kingdom. That is what &ldquo;one-stop&rdquo; means
-          here: one brief, one team, one set of locked specs for the next reprint or the next site.
+          delivers the full stack from our Dammam HQ for clients across the United States, United Kingdom, GCC, Europe,
+          Asia, Africa, and beyond. That is what &ldquo;one-stop&rdquo; means here: one brief, one team, one set of locked
+          specs for the next reprint or the next country.
         </p>
 
         <address className="not-italic bg-ll-sand card-r p-6 md:p-8 mb-14 text-[15px] leading-relaxed text-black/65">
@@ -116,14 +117,15 @@ export default function About() {
           <div>
             <h2 className="display-md mb-3">Work with GraphixEye</h2>
             <p className="text-[15px] text-black/55 max-w-md">
-              Request a quote for your next one-stop printing, signage, packaging, or immersive project in Saudi Arabia.
+              Request a quote for your next one-stop printing, signage, packaging, or immersive project — anywhere in the
+              world.
             </p>
           </div>
           <Link
             to="/contact"
             className="self-start pill bg-black text-ll-white h-[52px] px-8 text-[14px] inline-flex items-center hover:bg-ll-highlight transition-colors"
           >
-            Get a Free Quote in Dammam
+            Get a Free Quote
           </Link>
         </div>
       </div>

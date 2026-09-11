@@ -21,15 +21,16 @@ export default function Contact() {
         <div className="w-full md:w-1/2">
           <p className="text-[12px] tracking-widest uppercase text-black/40 mb-3">Contact</p>
           <h1 className="display-xl mb-8">
-            Contact GraphixEye<br />in Dammam
+            Contact GraphixEye<br />worldwide
           </h1>
           <p className="text-black/55 text-[16px] leading-relaxed mb-6 max-w-md">
             Request a quote for one-stop printing, packaging, signage, corporate gifting, design, or AR/VR/MR projects
-            across Saudi Arabia. {site.contactLead} We aim to respond within 24 hours.
+            from anywhere — United States, United Kingdom, GCC, and beyond. {site.contactLead} We aim to respond within
+            24 hours.
           </p>
           <p className="text-black/45 text-[15px] leading-relaxed mb-8 max-w-md">
-            GraphixEye is your one-stop printing and signage company in Dammam — visit the 2nd Industrial City factory
-            or send a brief online.
+            GraphixEye is a global printing and signage firm with factory HQ in Dammam — visit the 2nd Industrial City
+            floor or send a brief online from Chicago, London, Dubai, or anywhere else.
           </p>
           <p className="mb-12">
             <Link to="/faq" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
@@ -105,7 +106,7 @@ export default function Contact() {
               type="button"
               className="self-start pill bg-black text-ll-white h-[52px] px-8 text-[14px] hover:bg-ll-highlight transition-colors"
             >
-              Get a Free Quote in Dammam
+              Get a Free Quote
             </button>
           </form>
         </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { Placeholder } from '../components/ui';
-import { getPageSeo, SITE_URL, breadcrumbJsonLd } from '../data/seo';
+import { getPageSeo, SITE_URL, breadcrumbJsonLd, globalAreaServed } from '../data/seo';
 import { getServiceHub, worksForHub, type ServiceHub } from '../data/serviceHubs';
 import { getCategoryForWork } from '../data/works';
 
@@ -25,7 +25,7 @@ function hubJsonLd(hub: ServiceHub) {
           addressCountry: 'SA',
         },
       },
-      areaServed: ['Saudi Arabia', 'Dammam', 'Riyadh', 'Jeddah'],
+      areaServed: globalAreaServed,
       url: `${SITE_URL}/services/${hub.slug}`,
     },
     breadcrumbJsonLd([

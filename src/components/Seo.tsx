@@ -20,6 +20,21 @@ type SeoProps = {
   noindex?: boolean;
 };
 
+const OG_LOCALES = [
+  'en_US',
+  'en_GB',
+  'en_AE',
+  'en_CA',
+  'en_AU',
+  'en_IN',
+  'en_SG',
+  'en_IE',
+  'en_NZ',
+  'en_ZA',
+  'ar_SA',
+  'ar_AE',
+];
+
 export default function Seo({
   page,
   jsonLd,
@@ -52,6 +67,9 @@ export default function Seo({
       <meta name="geo.placename" content={GEO.placename} />
       <meta name="geo.position" content={GEO.position} />
       <meta name="ICBM" content={GEO.icbm} />
+      <meta name="coverage" content={GEO.coverage} />
+      <meta name="target" content="all" />
+      <meta name="audience" content="global" />
       <meta name="language" content="en, ar" />
 
       <meta property="og:title" content={ogTitle} />
@@ -59,7 +77,10 @@ export default function Seo({
       <meta property="og:type" content="website" />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={image} />
-      <meta property="og:locale" content="en_SA" />
+      <meta property="og:locale" content="en_US" />
+      {OG_LOCALES.map((locale) => (
+        <meta key={locale} property="og:locale:alternate" content={locale} />
+      ))}
       <meta property="og:site_name" content="GraphixEye" />
 
       <meta name="twitter:card" content="summary_large_image" />
@@ -83,6 +104,7 @@ export function DefaultSiteSeo() {
       <link rel="icon" type="image/png" href="/logo.png" />
       <meta property="og:image" content={OG_IMAGE} />
       <meta name="twitter:image" content={OG_IMAGE} />
+      <meta name="coverage" content="Worldwide" />
       <link rel="home" href={SITE_URL} />
     </Helmet>
   );

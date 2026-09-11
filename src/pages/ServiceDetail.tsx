@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Seo from '../components/Seo';
 import { Placeholder } from '../components/ui';
-import { breadcrumbJsonLd, serviceDetailSeo, SITE_URL } from '../data/seo';
+import { breadcrumbJsonLd, globalAreaServed, serviceDetailSeo, SITE_URL } from '../data/seo';
 import {
   bannerCropSlugs,
   getCategoryForWork,
@@ -62,7 +62,7 @@ export default function ServiceDetail() {
             description: work.summary,
             url: `${SITE_URL}/services/${work.slug}`,
             provider: { '@type': 'LocalBusiness', name: 'GraphixEye', url: SITE_URL },
-            areaServed: 'Saudi Arabia',
+            areaServed: globalAreaServed,
           },
           breadcrumbJsonLd([
             { name: 'Home', path: '/' },
@@ -75,7 +75,7 @@ export default function ServiceDetail() {
         <div className="relative card-r overflow-hidden min-h-[52vh] md:min-h-[70vh] bg-black" data-nav-tone="dark">
           <Placeholder
             src={work.image}
-            label={`${work.title} ${work.location} GraphixEye Dammam Saudi Arabia`}
+            label={`${work.title} ${work.location} GraphixEye global production`}
             eager
             className="absolute inset-0"
             imgClassName={bannerCropSlugs.has(work.slug) ? 'object-[24%_center]' : ''}

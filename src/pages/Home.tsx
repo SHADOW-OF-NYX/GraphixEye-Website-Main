@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HeroVideo, Placeholder } from '../components/ui';
 import { heroVideo, heroVideoMobile, photos } from '../data/images';
+import { GLOBAL_REACH_LINE } from '../data/geoMarkets';
 import {
   clients,
   faqs,
@@ -152,7 +153,7 @@ export default function Home() {
             <span ref={heroTitle} className="flex justify-center w-full opacity-0">
               <img
                 src="/graphixeye-wordmark.png"
-                alt="GraphixEye — one-stop printing signage packaging Dammam Saudi Arabia"
+                alt="GraphixEye — global printing signage packaging production"
                 className="block w-auto max-w-full h-auto max-h-[14vh] sm:max-h-[18vh] md:max-h-[26vh] object-contain drop-shadow-[0_2px_18px_rgba(0,0,0,0.45)]"
               />
             </span>
@@ -184,11 +185,11 @@ export default function Home() {
 
           <div ref={introCopy} className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-5 right-5 md:left-auto md:bottom-16 md:right-16 z-20 max-w-md text-ll-white opacity-0 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
             <p className="display-md mb-4 md:mb-6 text-[clamp(1.35rem,4.5vw,2.25rem)]">
-              One-stop Dammam factory for design, print, signage, packaging, and finishing.
+              One-stop global production for design, print, signage, packaging, and finishing.
             </p>
             <p className="text-[14px] leading-relaxed text-ll-white/80 mb-4 md:mb-6 hidden sm:block">
-              GraphixEye is a production house in the 2nd Industrial City — presses, finishing lines, and craftsmen
-              under one roof across Saudi Arabia. {site.tagline}. Price on request.
+              GraphixEye is a global creative production firm — presses, finishing lines, and craftsmen
+              under one roof, serving brands worldwide from our Dammam factory HQ. {site.tagline}. Price on request.
             </p>
             <ul className="space-y-2 text-[13px] text-ll-white/75 hidden md:block">
               {heroPoints.map((p) => (
@@ -202,11 +203,12 @@ export default function Home() {
       {/* ONE-STOP SERVICE HUBS */}
       <section className="px-6 md:px-12 py-16 md:py-20 border-b border-ll-stroke">
         <p className="text-[12px] tracking-[0.22em] uppercase text-black/40 mb-3">One factory · Full stack</p>
-        <h2 className="display-md mb-4 max-w-3xl">The one-stop production house for Saudi brands</h2>
-        <p className="text-[16px] leading-relaxed text-black/55 max-w-2xl mb-10">
-          Printing, signage, packaging, design, gifting, and immersive AR/VR from one Dammam floor — brief once,
-          produce once, install across the Kingdom.
+        <h2 className="display-md mb-4 max-w-3xl">The one-stop production house for global brands</h2>
+        <p className="text-[16px] leading-relaxed text-black/55 max-w-2xl mb-4">
+          Printing, signage, packaging, design, gifting, and immersive AR/VR from one factory floor — brief once,
+          produce once, deliver across the United States, United Kingdom, GCC, and worldwide.
         </p>
+        <p className="text-[15px] leading-relaxed text-black/45 max-w-2xl mb-10">{GLOBAL_REACH_LINE}</p>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {serviceHubs.map((hub) => (
             <Link
@@ -227,7 +229,7 @@ export default function Home() {
             FAQ
           </Link>
           <Link to="/contact" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
-            Get a free quote in Dammam
+            Get a free quote
           </Link>
         </div>
       </section>
@@ -247,7 +249,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6 md:gap-8">
               <h2 className="display-md max-w-sm">The Studio</h2>
               <p className="max-w-sm text-[14px] leading-relaxed text-ll-white/85">
-                Our production floor in Dammam’s 2nd Industrial City. Since {site.established} we have built identity,
+                Our production floor in Dammam’s 2nd Industrial City — the factory HQ behind our global work. Since {site.established} we have built identity,
                 environments, and print on industrial presses and finishing lines, a facility we are proud to walk you
                 through.
               </p>
@@ -417,7 +419,7 @@ export default function Home() {
         <h2 className="display-md max-w-4xl mb-6">
           Live in real operations, not just a showroom. Fifteen years across live sites. One production floor.
         </h2>
-        <p className="text-black/45 mb-10">Based in Dammam and varying by location.</p>
+        <p className="text-black/45 mb-10">Factory HQ in Dammam — delivery and install worldwide, varying by location.</p>
         <div className="flex gap-10 overflow-hidden">
           <div className="marquee-track flex gap-16 whitespace-nowrap text-[18px] font-display text-black/35">
             {[...clients, ...clients].map((c, i) => (
@@ -458,7 +460,7 @@ export default function Home() {
         </div>
         <div className="relative z-10">
           <h2 className="display-md mb-3">From the first call to the finished piece</h2>
-          <p className="text-ll-sand/70 mb-14">How a job moves through our Dammam floor</p>
+          <p className="text-ll-sand/70 mb-14">How a job moves through our global production floor</p>
           <div className="grid md:grid-cols-5 gap-8">
             {journey.map((step, i) => (
               <div key={step.title}>

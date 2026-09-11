@@ -1,11 +1,14 @@
 /** Canonical site origin used for OG, canonical, sitemap, and schema. */
+import { buildAreaServed, GLOBAL_KEYWORDS, GLOBAL_REACH_LINE } from './geoMarkets';
+
 export const SITE_URL = 'https://www.graphixeyesa.com';
 
 export const GEO = {
   region: 'SA-04',
-  placename: 'Dammam, Eastern Province, Saudi Arabia',
+  placename: 'Dammam HQ — serving clients worldwide',
   position: '26.3927;49.9777',
   icbm: '26.3927, 49.9777',
+  coverage: 'Worldwide',
 } as const;
 
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
@@ -28,6 +31,8 @@ export type PageSeo = {
   sitemap?: boolean;
 };
 
+const AREA_SERVED = buildAreaServed();
+
 export const localBusinessJsonLd = {
   '@context': 'https://schema.org',
   '@type': ['LocalBusiness', 'Organization'],
@@ -39,7 +44,7 @@ export const localBusinessJsonLd = {
   logo: LOGO_URL,
   image: OG_IMAGE,
   description:
-    'One-stop creative production house in Dammam, Saudi Arabia for graphic design, commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR immersive experiences — all from a single factory floor.',
+    'Global creative production firm with factory HQ in Dammam, Saudi Arabia — graphic design, commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR immersive experiences for clients worldwide.',
   telephone: '+966-13-802-1919',
   email: 'info@eramprintandpack.com',
   foundingDate: '2009',
@@ -60,13 +65,7 @@ export const localBusinessJsonLd = {
     latitude: 26.3927,
     longitude: 49.9777,
   },
-  areaServed: [
-    { '@type': 'Country', name: 'Saudi Arabia' },
-    { '@type': 'City', name: 'Dammam' },
-    { '@type': 'City', name: 'Riyadh' },
-    { '@type': 'City', name: 'Jeddah' },
-    { '@type': 'AdministrativeArea', name: 'Eastern Province' },
-  ],
+  areaServed: AREA_SERVED,
   knowsLanguage: ['en', 'ar'],
   priceRange: '$$',
   serviceType: [
@@ -107,10 +106,12 @@ export const webSiteJsonLd = {
   name: 'GraphixEye',
   url: SITE_URL,
   description:
-    'GraphixEye — Dammam one-stop production house for printing, signage, packaging, design, gifting, and immersive experiences across Saudi Arabia.',
+    'GraphixEye — global production firm for printing, signage, packaging, design, gifting, and immersive experiences. Factory HQ in Dammam; clients worldwide.',
   publisher: { '@id': `${SITE_URL}/#business` },
   inLanguage: ['en', 'ar'],
 };
+
+export { GLOBAL_KEYWORDS, GLOBAL_REACH_LINE, AREA_SERVED as globalAreaServed };
 
 export function faqPageJsonLd(faqs: { q: string; a: string }[]) {
   return {
@@ -143,129 +144,136 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
 export const pageSeo: Record<string, PageSeo> = {
   '/': {
     path: '/',
-    title: 'GraphixEye | Printing, Signage & Packaging Company in Dammam, Saudi Arabia',
+    title: 'GraphixEye | Global Printing, Signage & Packaging Company',
     description:
-      "GraphixEye is Dammam's one-stop production house for commercial printing, custom signage, packaging, corporate gifting, and immersive AR/VR/MR experiences across Saudi Arabia. We Do As We Promise.",
-    keywords:
-      'printing company Dammam, signage Saudi Arabia, packaging KSA, AR VR Saudi Arabia, graphic design Dammam, corporate gifting KSA',
-    ogTitle: 'GraphixEye | Printing, Signage & Packaging - Dammam, Saudi Arabia',
+      'GraphixEye is a global creative production firm — commercial printing, custom signage, packaging, corporate gifting, and AR/VR/MR experiences for clients in the United States, United Kingdom, GCC, Europe, Asia, Africa, and worldwide. Factory HQ in Dammam. We Do As We Promise.',
+    keywords: GLOBAL_KEYWORDS,
+    ogTitle: 'GraphixEye | Global Printing, Signage & Packaging',
     ogDescription:
-      "Dammam's trusted production house for printing, signage, packaging, gifting, and immersive AR/VR experiences across the Kingdom.",
+      'Global production house for printing, signage, packaging, gifting, and immersive AR/VR — serving Chicago, the UK, the GCC, and clients worldwide from our Dammam factory HQ.',
     priority: 1,
   },
   '/experience': {
     path: '/experience',
-    title: 'Our Work & Experience | Printing, Signage & Immersive Experiences | GraphixEye KSA',
+    title: 'Our Work & Experience | Global Printing, Signage & Immersive | GraphixEye',
     description:
-      "Explore GraphixEye's portfolio of printing, signage, packaging, and immersive AR/VR/MR experiences delivered for clients across Saudi Arabia. See what Dammam's top creative production house has built.",
-    ogTitle: "Our Experience | GraphixEye - Saudi Arabia's Creative Production House",
+      "Explore GraphixEye's portfolio of printing, signage, packaging, and immersive AR/VR/MR experiences delivered for international brands. Tour the factory floor that powers our global production.",
+    keywords: GLOBAL_KEYWORDS,
+    ogTitle: 'Our Experience | GraphixEye — Global Creative Production',
     ogDescription:
-      "See GraphixEye's portfolio: world-class printing, packaging, signage, gifting and AR/VR experiences across the Kingdom of Saudi Arabia.",
+      "See GraphixEye's portfolio: world-class printing, packaging, signage, gifting and AR/VR for clients across the globe.",
     priority: 0.9,
   },
   '/services': {
     path: '/services',
-    title: 'Services | Design, Signage, Printing, Packaging & Gifting | GraphixEye Dammam',
+    title: 'Services | Design, Signage, Printing, Packaging & Gifting | GraphixEye Global',
     description:
-      'Browse GraphixEye services from our Dammam factory: graphic design, signage, commercial printing, packaging, corporate gifting, and immersive AR/VR/AI solutions across Saudi Arabia.',
+      'Browse GraphixEye services worldwide: graphic design, signage, commercial printing, packaging, corporate gifting, and immersive AR/VR/AI — produced from our Dammam factory HQ for international brands.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.9,
   },
   '/services/printing': {
     path: '/services/printing',
-    title: 'Printing Dammam | Commercial Printing Company | GraphixEye',
+    title: 'Global Commercial Printing | Printing Company Worldwide | GraphixEye',
     description:
-      'Printing in Dammam from GraphixEye: offset and digital printing, large format, brochures, and catalogues. Your printing company Dammam partner serving brands across Saudi Arabia.',
-    keywords: 'printing Dammam, printing company Dammam, commercial printing Saudi Arabia, offset printing KSA, digital printing Dammam',
+      'Commercial printing for brands worldwide from GraphixEye: offset, digital, large format, brochures, and catalogues. A global printing partner with factory HQ in Dammam serving the US, UK, GCC, and beyond.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.9,
   },
   '/services/packaging': {
     path: '/services/packaging',
-    title: 'Packaging Dammam | Custom Packaging Company Saudi Arabia | GraphixEye',
+    title: 'Global Custom Packaging | Packaging Company Worldwide | GraphixEye',
     description:
-      'Packaging in Dammam from GraphixEye: custom boxes, labels, flexible and sustainable packaging. Packaging company Saudi Arabia production from our Dammam factory.',
-    keywords: 'packaging Dammam, packaging company Saudi Arabia, custom packaging KSA, product packaging Dammam, packaging design Saudi Arabia',
+      'Custom packaging for international brands from GraphixEye: boxes, labels, flexible and sustainable formats — designed and manufactured for clients across the US, UK, GCC, and worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.9,
   },
   '/services/signage': {
     path: '/services/signage',
-    title: 'Signage Dammam | Signage Company Saudi Arabia | GraphixEye',
+    title: 'Global Signage Manufacturer | Custom Signs Worldwide | GraphixEye',
     description:
-      'Signage in Dammam from GraphixEye: outdoor signs, LED, wayfinding, and fleet graphics. Signage company Dammam fabrication and install across Saudi Arabia.',
-    keywords: 'signage Dammam, signage company Dammam, custom signs Saudi Arabia, LED signage KSA, outdoor signage Dammam',
+      'Custom signage for global brands from GraphixEye: outdoor signs, LED, wayfinding, and fleet graphics — fabricated for sites in the United States, United Kingdom, GCC, and worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.9,
   },
   '/services/gifting': {
     path: '/services/gifting',
-    title: 'Corporate Gifting Saudi Arabia | Branded Gifts Dammam | GraphixEye',
+    title: 'Corporate Gifting Worldwide | Branded Gifts Global | GraphixEye',
     description:
-      'Corporate gifting Saudi Arabia from GraphixEye in Dammam: branded gifts, promotional kits, trophies, uniforms, and event merchandise for brands across the Kingdom.',
-    keywords: 'corporate gifting Saudi Arabia, branded gifts KSA, promotional gifts Dammam, custom gifts Saudi Arabia',
+      'Corporate gifting for international teams from GraphixEye: branded gifts, promotional kits, trophies, uniforms, and event merchandise shipped to clients worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.8,
   },
   '/services/design': {
     path: '/services/design',
-    title: 'Graphic Design Dammam | Branding Agency Saudi Arabia | GraphixEye',
+    title: 'Graphic Design & Branding Worldwide | GraphixEye Global',
     description:
-      'Graphic design in Dammam from GraphixEye: logos, brand systems, and production-ready artwork. Branding agency Saudi Arabia with in-house print and signage.',
-    keywords: 'graphic design Dammam, branding agency Saudi Arabia, logo design KSA, creative agency Dammam',
+      'Graphic design and branding for global brands from GraphixEye: logos, brand systems, and production-ready artwork backed by in-house print and signage worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.8,
   },
   '/services/ar-vr': {
     path: '/services/ar-vr',
-    title: 'AR VR Saudi Arabia | Immersive Experiences Dammam | GraphixEye',
+    title: 'AR VR Worldwide | Immersive Experiences Global | GraphixEye',
     description:
-      'AR VR solutions Saudi Arabia from GraphixEye: augmented, virtual, and mixed reality for events and retail, produced with immersive experiences Dammam fabrication.',
-    keywords: 'AR VR Saudi Arabia, AR VR solutions Saudi Arabia, augmented reality KSA, immersive experiences Dammam',
+      'AR, VR, and MR experiences for international events and retail from GraphixEye — immersive production for brands across the US, UK, GCC, and worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.8,
   },
   '/services/ai': {
     path: '/services/ai',
-    title: 'AI Solutions Saudi Arabia | AI Design Dammam | GraphixEye',
+    title: 'AI Creative Solutions Worldwide | GraphixEye Global',
     description:
-      'AI solutions Saudi Arabia from GraphixEye: AI design Dammam workflows that end in print-ready, brand-safe creative for campaigns across the Kingdom.',
-    keywords: 'AI solutions Saudi Arabia, artificial intelligence KSA, AI design Dammam',
+      'AI-assisted creative workflows from GraphixEye that end in print-ready, brand-safe production for campaigns worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.8,
   },
   '/about': {
     path: '/about',
-    title: "About GraphixEye | Dammam's Leading Creative Production House",
+    title: 'About GraphixEye | Global Creative Production Firm',
     description:
-      "Learn about GraphixEye - Dammam's trusted factory for printing, signage, packaging, gifting, and immersive experiences. We Do As We Promise, serving clients across Saudi Arabia since day one.",
+      'GraphixEye is a global creative production firm with factory HQ in Dammam. Printing, signage, packaging, gifting, and immersive experiences for clients worldwide since 2009. We Do As We Promise.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.7,
   },
   '/contact': {
     path: '/contact',
-    title: 'Contact GraphixEye | Printing & Signage Company Dammam, Saudi Arabia',
+    title: 'Contact GraphixEye | Global Printing & Signage Firm',
     description:
-      'Get in touch with GraphixEye in Dammam, Saudi Arabia. Request a quote for printing, packaging, signage, gifting, or AR/VR/MR projects. We respond within 24 hours.',
+      'Brief GraphixEye from anywhere in the world. Request a quote for printing, packaging, signage, gifting, or AR/VR/MR. Factory HQ in Dammam — we aim to respond within 24 hours.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.7,
   },
   '/careers': {
     path: '/careers',
-    title: 'Careers at GraphixEye | Join Our Dammam Production Team',
+    title: 'Careers at GraphixEye | Join a Global Production Team',
     description:
-      'Explore careers at GraphixEye in Dammam, Saudi Arabia. Work with a creative production house spanning design, print, signage, packaging, and immersive experiences.',
+      'Explore careers at GraphixEye. Work with a global creative production house spanning design, print, signage, packaging, and immersive experiences — factory HQ in Dammam.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.5,
   },
   '/vendors': {
     path: '/vendors',
-    title: 'Vendor Registration | Supply GraphixEye Dammam',
+    title: 'Vendor Registration | Supply GraphixEye Worldwide',
     description:
-      'Register as a vendor with GraphixEye in Dammam. Partner with our printing, packaging, and signage production house serving clients across Saudi Arabia.',
+      'Register as a vendor with GraphixEye. Partner with our global printing, packaging, and signage production firm serving clients worldwide.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.4,
   },
   '/expansions': {
     path: '/expansions',
-    title: 'Expansions | GraphixEye Capabilities Across Saudi Arabia',
+    title: 'Expansions | GraphixEye Capabilities Worldwide',
     description:
-      'Discover how GraphixEye expands brand presence through design, environments, and production from our Dammam factory across the Kingdom of Saudi Arabia.',
+      'Discover how GraphixEye expands brand presence through design, environments, and production for international clients — powered from our Dammam factory HQ.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.6,
   },
   '/faq': {
     path: '/faq',
-    title: 'FAQ | One-Stop Printing, Signage & Packaging in Dammam | GraphixEye',
+    title: 'FAQ | Global Printing, Signage & Packaging | GraphixEye',
     description:
-      'Answers about GraphixEye in Dammam: one-stop design, printing, signage, packaging, gifting, and AR/VR production across Saudi Arabia. Factory visits, timelines, and how to get a quote.',
+      'Answers about GraphixEye as a global production firm: design, printing, signage, packaging, gifting, and AR/VR for clients worldwide. Factory visits, timelines, and how to get a quote.',
+    keywords: GLOBAL_KEYWORDS,
     priority: 0.7,
   },
 };
@@ -278,9 +286,10 @@ export function getPageSeo(path: string): PageSeo | undefined {
 export function serviceDetailSeo(slug: string, title: string, summary: string): PageSeo {
   return {
     path: `/services/${slug}`,
-    title: `${title} | GraphixEye Dammam, Saudi Arabia`,
-    description: `${summary} Produced by GraphixEye in Dammam for clients across Saudi Arabia.`,
-    ogTitle: `${title} | GraphixEye KSA`,
+    title: `${title} | GraphixEye Global`,
+    description: `${summary} Produced by GraphixEye for clients worldwide from our Dammam factory HQ.`,
+    keywords: GLOBAL_KEYWORDS,
+    ogTitle: `${title} | GraphixEye`,
     ogDescription: summary,
     priority: 0.6,
   };

@@ -95,13 +95,13 @@ export default function Experience() {
             <div className="ce-inner ce-center">
               <Badge>Factory visit</Badge>
               <h1 className="ce-h1 ce-shimmer">
-                Walk the Dammam
+                Walk the factory
                 <br />
                 floor with us
               </h1>
               <p className="ce-lead">
-                Identity, signage, print, and finishing under one roof in the 2nd Industrial City -
-                a working factory we are proud to show, not a showroom built for photographs.
+                Identity, signage, print, and finishing under one roof at our Dammam factory HQ —
+                a working floor we are proud to show to partners worldwide, not a showroom built for photographs.
               </p>
               <div className="ce-actions">
                 <PrimaryButton href={`mailto:${site.email}?subject=${encodeURIComponent('Factory visit request')}`}>

@@ -14,7 +14,8 @@ export default function Footer() {
               <BrandLogo className="h-14 md:h-20" />
             </Link>
             <p className="mt-6 text-[14px] text-black/55 max-w-xs leading-relaxed">
-              One-stop design, printing, signage, packaging, gifting, and immersive production from Dammam across Saudi Arabia.
+              Global one-stop design, printing, signage, packaging, gifting, and immersive production — factory HQ in
+              Dammam, clients worldwide.
             </p>
             <address className="not-italic mt-6 text-[13px] leading-relaxed text-black/50">
               <p className="text-black/70 font-display text-[15px] mb-1">GraphixEye</p>
@@ -34,13 +35,13 @@ export default function Footer() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-16 gap-y-4 text-[15px]">
             <Link to="/services" className="hover:text-ll-highlight transition-colors">Services</Link>
-            <Link to="/services/printing" className="hover:text-ll-highlight transition-colors">Printing Dammam</Link>
-            <Link to="/services/signage" className="hover:text-ll-highlight transition-colors">Signage Dammam</Link>
-            <Link to="/services/packaging" className="hover:text-ll-highlight transition-colors">Packaging Dammam</Link>
-            <Link to="/services/design" className="hover:text-ll-highlight transition-colors">Graphic Design Dammam</Link>
-            <Link to="/services/gifting" className="hover:text-ll-highlight transition-colors">Corporate Gifting KSA</Link>
-            <Link to="/services/ar-vr" className="hover:text-ll-highlight transition-colors">AR VR Saudi Arabia</Link>
-            <Link to="/services/ai" className="hover:text-ll-highlight transition-colors">AI Solutions KSA</Link>
+            <Link to="/services/printing" className="hover:text-ll-highlight transition-colors">Printing Worldwide</Link>
+            <Link to="/services/signage" className="hover:text-ll-highlight transition-colors">Signage Worldwide</Link>
+            <Link to="/services/packaging" className="hover:text-ll-highlight transition-colors">Packaging Worldwide</Link>
+            <Link to="/services/design" className="hover:text-ll-highlight transition-colors">Graphic Design Global</Link>
+            <Link to="/services/gifting" className="hover:text-ll-highlight transition-colors">Corporate Gifting Global</Link>
+            <Link to="/services/ar-vr" className="hover:text-ll-highlight transition-colors">AR VR Worldwide</Link>
+            <Link to="/services/ai" className="hover:text-ll-highlight transition-colors">AI Solutions Global</Link>
             <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
             <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
             <Link to="/about" className="hover:text-ll-highlight transition-colors">About</Link>
