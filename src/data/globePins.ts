@@ -149,14 +149,17 @@ export function marketForPin(pin: GlobePin): Market | undefined {
 
 /**
  * Convert geographic lat/lon to a Three.js vector on a sphere (Y-up).
- * Lon 0 = Greenwich; positive east. Texture seams on GLBs sometimes need a
- * longitude offset — tweak `lonOffsetDeg` if markers sit on the wrong ocean.
+ * Lon 0 = Greenwich; positive east.
+ *
+ * `lonOffsetDeg` is calibrated to the Sketchfab Earth GLB
+ * (denis_cliofas) so pins land on the painted continents — do not
+ * change without re-running land-vs-ocean calibration against the albedo.
  */
 export function latLonToVector3(
   lat: number,
   lon: number,
   radius: number,
-  lonOffsetDeg = -90,
+  lonOffsetDeg = 132,
 ): [number, number, number] {
   const phi = ((90 - lat) * Math.PI) / 180;
   const theta = ((lon + lonOffsetDeg) * Math.PI) / 180;
@@ -164,4 +167,9 @@ export function latLonToVector3(
   const y = radius * Math.cos(phi);
   const z = radius * Math.sin(phi) * Math.sin(theta);
   return [x, y, z];
+}
+
+/** Unit direction for a lat/lon on the calibrated globe. */
+export function latLonDirection(lat: number, lon: number): [number, number, number] {
+  return latLonToVector3(lat, lon, 1);
 }

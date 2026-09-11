@@ -245,6 +245,32 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
           });
         });
         earthGroup.add(model);
+        earthGroup.updateMatrixWorld(true);
+
+        // Snap each pin onto the painted mesh along its geographic ray
+        // so markers sit on continents even where the GLB isn't a perfect sphere.
+        const snapRay = new THREE.Raycaster();
+        const origin = new THREE.Vector3();
+        const dir = new THREE.Vector3();
+        const lift = 1.012;
+        pins.forEach((pin, i) => {
+          const [dx, dy, dz] = latLonToVector3(pin.lat, pin.lon, 1);
+          dir.set(dx, dy, dz).normalize();
+          origin.copy(dir).multiplyScalar(GLOBE_RADIUS * 3);
+          snapRay.set(origin, dir.clone().negate());
+          const hits = snapRay.intersectObject(model, true);
+          if (hits.length > 0) {
+            const p = hits[0].point.clone().multiplyScalar(lift);
+            // point is in world/root space; earthGroup is at identity under root
+            earthGroup.worldToLocal(p);
+            pinPositions[i * 3] = p.x;
+            pinPositions[i * 3 + 1] = p.y;
+            pinPositions[i * 3 + 2] = p.z;
+            hitSpheres[i].position.copy(p);
+          }
+        });
+        pinGeo.attributes.position.needsUpdate = true;
+        pinGeo.computeBoundingSphere();
       },
       undefined,
       () => {
