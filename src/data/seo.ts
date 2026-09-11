@@ -276,6 +276,14 @@ export const pageSeo: Record<string, PageSeo> = {
     keywords: GLOBAL_KEYWORDS,
     priority: 0.7,
   },
+  '/markets': {
+    path: '/markets',
+    title: 'Markets Worldwide | Printing, Signage & Packaging | GraphixEye',
+    description:
+      'GraphixEye serves brands worldwide — United States (including Chicago), United Kingdom, UAE, Saudi Arabia, Europe, Asia, Africa, Canada, and Australia — from our Dammam factory HQ.',
+    keywords: GLOBAL_KEYWORDS,
+    priority: 0.9,
+  },
 };
 
 export function getPageSeo(path: string): PageSeo | undefined {

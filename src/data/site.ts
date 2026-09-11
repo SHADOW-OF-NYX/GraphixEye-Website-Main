@@ -15,6 +15,7 @@ export const site = {
 
 export const navLinks = [
   { name: 'Services', path: '/services' },
+  { name: 'Markets', path: '/markets' },
   { name: 'Expansions', path: '/expansions' },
   { name: 'Experience', path: '/experience' },
   { name: 'Careers', path: '/careers' },

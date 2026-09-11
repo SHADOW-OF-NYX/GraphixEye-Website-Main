@@ -44,6 +44,7 @@ export default function Footer() {
             <Link to="/services/ai" className="hover:text-ll-highlight transition-colors">AI Solutions Global</Link>
             <Link to="/experience" className="hover:text-ll-highlight transition-colors">Experience</Link>
             <Link to="/expansions" className="hover:text-ll-highlight transition-colors">Expansions</Link>
+            <Link to="/markets" className="hover:text-ll-highlight transition-colors">Markets Worldwide</Link>
             <Link to="/about" className="hover:text-ll-highlight transition-colors">About</Link>
             <Link to="/faq" className="hover:text-ll-highlight transition-colors">FAQ</Link>
             <Link to="/careers" className="hover:text-ll-highlight transition-colors">Careers</Link>

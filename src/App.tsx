@@ -16,6 +16,8 @@ import Vendors from './pages/Vendors';
 import Expansions from './pages/Expansions';
 import About from './pages/About';
 import Faq from './pages/Faq';
+import Markets from './pages/Markets';
+import MarketDetail from './pages/MarketDetail';
 import { DefaultSiteSeo } from './components/Seo';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
 import { scrollToTopImmediate, scrollToTopOnRouteChange } from './lib/scrollToTop';
@@ -79,6 +81,8 @@ function AppShell() {
           <Route path="/experience" element={<Experience />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
+          <Route path="/markets" element={<Markets />} />
+          <Route path="/markets/:slug" element={<MarketDetail />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/vendors" element={<Vendors />} />

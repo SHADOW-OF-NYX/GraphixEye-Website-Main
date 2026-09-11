@@ -208,7 +208,12 @@ export default function Home() {
           Printing, signage, packaging, design, gifting, and immersive AR/VR from one factory floor — brief once,
           produce once, deliver across the United States, United Kingdom, GCC, and worldwide.
         </p>
-        <p className="text-[15px] leading-relaxed text-black/45 max-w-2xl mb-10">{GLOBAL_REACH_LINE}</p>
+        <p className="text-[15px] leading-relaxed text-black/45 max-w-2xl mb-6">{GLOBAL_REACH_LINE}</p>
+        <p className="mb-10">
+          <Link to="/markets" className="text-[14px] underline underline-offset-4 hover:text-ll-highlight transition-colors">
+            See markets worldwide →
+          </Link>
+        </p>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {serviceHubs.map((hub) => (
             <Link

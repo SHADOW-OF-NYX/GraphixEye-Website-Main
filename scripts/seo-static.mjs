@@ -200,7 +200,41 @@ const pages = [
     keywords: GLOBAL_KEYWORDS,
     priority: 0.7,
   },
+  {
+    path: '/markets',
+    title: 'Markets Worldwide | Printing, Signage & Packaging | GraphixEye',
+    description:
+      'GraphixEye serves brands worldwide — United States (including Chicago), United Kingdom, UAE, Saudi Arabia, Europe, Asia, Africa, Canada, and Australia — from our Dammam factory HQ.',
+    keywords: GLOBAL_KEYWORDS,
+    priority: 0.9,
+  },
 ];
+
+const marketSlugs = [
+  'united-states',
+  'united-kingdom',
+  'united-arab-emirates',
+  'saudi-arabia',
+  'europe',
+  'asia',
+  'africa',
+  'canada',
+  'australia',
+];
+
+for (const slug of marketSlugs) {
+  const name = slug
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  pages.push({
+    path: `/markets/${slug}`,
+    title: `${name} | Printing, Signage & Packaging | GraphixEye`,
+    description: `GraphixEye printing, signage, packaging, and immersive production for ${name} — factory HQ in Dammam, clients and sales teams worldwide.`,
+    keywords: GLOBAL_KEYWORDS,
+    priority: 0.85,
+  });
+}
 
 const workSlugs = [
   'logo-design',
