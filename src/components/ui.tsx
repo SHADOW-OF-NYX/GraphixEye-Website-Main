@@ -104,9 +104,9 @@ export function Placeholder({
 }
 
 /**
- * Hero background video. iOS Safari is strict: muted + playsInline must be in
- * the DOM, and play() often needs a retry on the first user gesture when Low
- * Power Mode / data-saver blocks autoplay.
+ * Hero background video.
+ * Keep a real <img> poster underneath until `playing` fires — Safari often paints
+ * a black frame while a large mp4 buffers, which looked like "no video".
  */
 export function HeroVideo({
   src,
@@ -118,6 +118,7 @@ export function HeroVideo({
   className?: string;
 }) {
   const ref = React.useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = React.useState(false);
 
   React.useEffect(() => {
     const el = ref.current;
@@ -129,10 +130,9 @@ export function HeroVideo({
     el.setAttribute('muted', '');
     el.setAttribute('playsinline', '');
     el.setAttribute('webkit-playsinline', '');
-    el.setAttribute('autoplay', '');
 
     let settled = false;
-    let playing = false;
+    let isPlaying = false;
     const timers: number[] = [];
 
     const settle = () => {
@@ -141,20 +141,21 @@ export function HeroVideo({
       markHeroReady();
     };
 
+    const markPlaying = () => {
+      isPlaying = true;
+      setPlaying(true);
+      settle();
+    };
+
     const tryPlay = () => {
-      if (playing || !el) return;
+      if (isPlaying || !el) return;
       el.muted = true;
       const attempt = el.play();
       if (attempt && typeof attempt.then === 'function') {
-        attempt
-          .then(() => {
-            playing = true;
-            settle();
-          })
-          .catch(() => {
-            // Keep poster visible; retry on gesture / timers below.
-            settle();
-          });
+        attempt.then(markPlaying).catch(() => {
+          // Poster stays visible; gesture/timers retry below.
+          settle();
+        });
       } else {
         settle();
       }
@@ -167,17 +168,18 @@ export function HeroVideo({
       el.addEventListener('loadedmetadata', onReady);
       el.addEventListener('canplay', onReady);
       el.addEventListener('loadeddata', onReady);
-      el.addEventListener('canplaythrough', onReady);
     }
+    el.addEventListener('playing', markPlaying);
     el.addEventListener('error', settle);
-    el.addEventListener('playing', () => {
-      playing = true;
-      settle();
-    });
 
+    // Kick the network fetch; src is on the element for broadest Safari support
+    try {
+      el.load();
+    } catch {
+      /* ignore */
+    }
     tryPlay();
 
-    // iOS often unlocks media only after a touch / scroll
     const unlock = () => tryPlay();
     window.addEventListener('touchstart', unlock, { passive: true });
     window.addEventListener('touchend', unlock, { passive: true });
@@ -188,18 +190,18 @@ export function HeroVideo({
     });
     window.addEventListener('pageshow', unlock);
 
-    // Keep poking briefly — Low Power Mode can delay the first successful play()
-    for (const ms of [300, 800, 1600, 2800, 4500]) {
+    for (const ms of [400, 1000, 2000, 3500, 6000]) {
       timers.push(window.setTimeout(tryPlay, ms));
     }
-    timers.push(window.setTimeout(settle, 2500));
+    // Don't block the site on the 90MB+ hero file
+    timers.push(window.setTimeout(settle, 1800));
 
     return () => {
       timers.forEach((id) => window.clearTimeout(id));
       el.removeEventListener('loadedmetadata', onReady);
       el.removeEventListener('canplay', onReady);
       el.removeEventListener('loadeddata', onReady);
-      el.removeEventListener('canplaythrough', onReady);
+      el.removeEventListener('playing', markPlaying);
       el.removeEventListener('error', settle);
       window.removeEventListener('touchstart', unlock);
       window.removeEventListener('touchend', unlock);
@@ -210,21 +212,33 @@ export function HeroVideo({
   }, [src]);
 
   return (
-    <video
-      ref={ref}
-      className={`absolute inset-0 h-full w-full object-cover ${className}`}
-      poster={poster}
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="auto"
-      // Disable iOS AirPlay / PiP chrome that can surface a play affordance
-      disablePictureInPicture
-      controls={false}
-      aria-label="GraphixEye factory"
-    >
-      <source src={src} type="video/mp4" />
-    </video>
+    <div className={`absolute inset-0 ${className}`}>
+      {poster ? (
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+          decoding="async"
+          fetchPriority="high"
+        />
+      ) : null}
+      <video
+        ref={ref}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${
+          playing ? 'opacity-100' : 'opacity-0'
+        }`}
+        src={src}
+        poster={poster}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        controls={false}
+        disablePictureInPicture
+        aria-label="GraphixEye factory"
+      />
+    </div>
   );
 }
