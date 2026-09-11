@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { onMediaQueryChange, shouldUseNativeScroll } from '../lib/device';
+import { registerLenis } from '../lib/scrollToTop';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,6 +28,7 @@ export default function SmoothScroll() {
         lenis.destroy();
         lenis = null;
       }
+      registerLenis(null);
       document.documentElement.classList.remove('lenis', 'lenis-smooth');
     };
 
@@ -47,6 +49,7 @@ export default function SmoothScroll() {
         duration: 1.15,
         smoothWheel: true,
       });
+      registerLenis(lenis);
 
       lenis.on('scroll', () => {
         ScrollTrigger.update();

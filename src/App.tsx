@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Preloader from './components/Preloader';
@@ -17,12 +18,25 @@ import About from './pages/About';
 import Faq from './pages/Faq';
 import { DefaultSiteSeo } from './components/Seo';
 import { preloadExpansions, scheduleExpansionsPreload } from './lib/particles/preloadExpansions';
+import { scrollToTopImmediate, scrollToTopOnRouteChange } from './lib/scrollToTop';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useEffect(() => {
+    scrollToTopOnRouteChange();
+    // Pins / morph tracks mount a beat later — refresh then re-clamp to top
+    const refresh = window.setTimeout(() => {
+      ScrollTrigger.refresh();
+      scrollToTopImmediate();
+    }, 120);
+    return () => window.clearTimeout(refresh);
   }, [pathname]);
 
   return null;

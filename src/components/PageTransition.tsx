@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
+import { scrollToTopImmediate, scrollToTopOnRouteChange } from '../lib/scrollToTop';
 
 type Origin = { x: number; y: number };
 
@@ -48,6 +49,7 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
 
       if (!veil || !disc || running.current || reduceMotion) {
         navigate(to);
+        scrollToTopOnRouteChange();
         return;
       }
 
@@ -78,16 +80,19 @@ export function PageTransitionProvider({ children }: { children: React.ReactNode
           ease: 'power3.inOut',
           onComplete: () => {
             navigate(to);
+            scrollToTopImmediate();
             // Two frames lets the incoming route mount and paint while hidden,
-            // so the reveal never uncovers a half-built page
+            // so the reveal never uncovers a half-built page mid-scroll
             requestAnimationFrame(() =>
               requestAnimationFrame(() => {
+                scrollToTopOnRouteChange();
                 gsap.to(veil, {
                   opacity: 0,
                   duration: REVEAL_SECONDS,
                   delay: 0.1,
                   ease: 'power2.out',
                   onComplete: () => {
+                    scrollToTopImmediate();
                     veil.style.pointerEvents = 'none';
                     gsap.set(disc, { scale: 0 });
                     running.current = false;
