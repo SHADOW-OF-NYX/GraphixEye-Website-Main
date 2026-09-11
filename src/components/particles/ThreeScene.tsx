@@ -515,10 +515,15 @@ export default function ThreeScene() {
       sizes.set(sizesEye)
       alphas.set(baseAlphas)
       paintEyeRGB(colorsArr, eyeInk)
-      if (baked?.eye) eyeLive.set(baked.eye)
-      // Blink weights read the raw baked palette — its thresholds key off the
-      // original bright iris blues, not the ink-mapped versions
-      const eyeCoreFade = buildEyeCoreFadeWeights(shapePos[0], baked?.eyeColors ?? null)
+      // Must subsample — scaled N is smaller than the baked 32k buffers on phones.
+      // A full .set() throws RangeError and aborts init (blank Safari Expansions).
+      if (baked?.eye) eyeLive.set(subsampleVec3(baked.eye, N))
+      else eyeLive.set(shapePos[0])
+      // Blink weights key off the original bright iris blues (not ink-mapped)
+      const eyeCoreFade = buildEyeCoreFadeWeights(
+        shapePos[0],
+        baked?.eyeColors ? subsampleVec3(baked.eyeColors, N) : null,
+      )
 
       const geometry = new THREE.BufferGeometry()
       geometry.setAttribute('position', new THREE.BufferAttribute(posArr, 3))
@@ -532,8 +537,8 @@ export default function ThreeScene() {
         fragmentShader: FRAGMENT_SHADER,
         uniforms: {
           uPixelRatio: { value: dpr },
-          // Slightly larger on Safari where we skip the composer path
-          uScale: { value: skipComposer ? 3.8 : 3.0 },
+          // Larger on Safari/phones so NormalBlending ink reads on cream without composer
+          uScale: { value: skipComposer ? 5.2 : 3.0 },
         },
         depthWrite: false,
         blending: THREE.NormalBlending,
@@ -640,11 +645,8 @@ export default function ThreeScene() {
       })
       disposeList.push(() => entryTween.kill())
 
-      gsap.fromTo(canvas, { opacity: 0 }, { opacity: 1, duration: 0.7, ease: 'power1.out' })
-      // Safari can stall GSAP opacity tweens on newly attached canvases
-      window.setTimeout(() => {
-        if (canvas.style.opacity !== '1') canvas.style.opacity = '1'
-      }, 900)
+      gsap.fromTo(canvas, { opacity: 0.15 }, { opacity: 1, duration: 0.55, ease: 'power1.out' })
+      canvas.style.opacity = '1'
 
       const draw = () => {
         if (composer) composer.render()
@@ -973,7 +975,11 @@ export default function ThreeScene() {
       disposeList.push(() => cancelAnimationFrame(rafId))
     }
 
-    init().catch(console.error)
+    init().catch((err) => {
+      console.error('[Expansions] ThreeScene init failed', err)
+      // Last resort: keep the canvas opaque so a failure is visible in logs, not a silent cream page
+      if (canvas) canvas.style.opacity = '1'
+    })
 
     return () => {
       cancelled = true
@@ -985,7 +991,7 @@ export default function ThreeScene() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full block pointer-events-none"
-      style={{ opacity: 0 }}
+      style={{ opacity: 1 }}
     />
   )
 }
