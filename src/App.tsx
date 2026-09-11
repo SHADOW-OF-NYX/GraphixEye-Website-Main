@@ -50,7 +50,8 @@ function AppShell() {
   const isCareers = pathname === '/careers';
   const isVendors = pathname === '/vendors';
   const isExperience = pathname === '/experience';
-  const isDarkExperience = isCareers || isVendors || isExperience;
+  const isMarketsGlobe = pathname === '/markets';
+  const isDarkExperience = isCareers || isVendors || isExperience || isMarketsGlobe;
 
   // If user navigates before idle preload finishes, prioritize immediately
   useEffect(() => {
@@ -62,7 +63,7 @@ function AppShell() {
       className={`font-sans min-h-screen ${
         isDarkExperience
           ? `text-ll-white ${
-              isVendors ? 'bg-ll-ink' : isExperience ? 'bg-[#0c100e]' : 'bg-black'
+              isVendors ? 'bg-ll-ink' : isExperience ? 'bg-[#0c100e]' : isMarketsGlobe ? 'bg-[#07060c]' : 'bg-black'
             }`
           : 'text-black bg-ll-white'
       }`}
