@@ -7,6 +7,8 @@ import { loadVendorBaked, type VendorBakedId } from '../../lib/particles/loadVen
 import { loadExperienceBaked, type ExperienceBakedId } from '../../lib/particles/loadExperience';
 import {
   getParticleBudget,
+  isNarrowViewport,
+  isSafariOrIOS,
   scaledParticleCount,
   subsampleScalar,
   subsampleVec3,
@@ -179,18 +181,18 @@ const FEELS: Record<PaletteName, Feel> = {
     morphCatchup: 4.2,
   },
   /*
-   * Experience — craft dust. Elongated grain/fiber points, restrained bloom,
-   * slow settling drift. Feels like paper dust in a shaft of workshop light.
+   * Experience — craft dust. Soft round glow on phones (fiber stretch reads as
+   * smears on tall screens); mild fiber on desktop where bloom softens the edge.
    */
   experience: {
     count: 34_000,
     fragmentShader: /* glsl */ `
       uniform float uAlpha;
+      uniform float uFiber;
       varying vec3 vColor;
       void main() {
         vec2 c = gl_PointCoord - 0.5;
-        // Stretch into a soft fiber rather than a round glow
-        c.y *= 2.6;
+        c.y *= uFiber;
         float d = length(c);
         if (d > 0.5) discard;
         float a = smoothstep(0.5, 0.08, d);
@@ -205,8 +207,9 @@ const FEELS: Record<PaletteName, Feel> = {
     twinkle: 0.05,
     sparkle: 0,
     drift: 'grain',
-    morphHold: 0.46,
-    morphCatchup: 1.55,
+    // Wider morph window — was 0.46 (only ~8% blend), which felt like a snap
+    morphHold: 0.24,
+    morphCatchup: 2.85,
   },
 };
 
@@ -1325,16 +1328,16 @@ const CONFIG: Record<SceneVariant, ShapeConfig> = {
    * side-to-side yaw. Haas keeps its baked animation.
    */
   warehouse: {
-    // Slightly wider interior — yaw sways in place so the view never leaves the bay
-    camera: { x: 0.18, y: -0.08, z: 0.78, lookX: 0, lookY: -0.18, lookZ: -0.42, fov: 48 },
+    // Pulled back from the near-clip — close cam + soft attenuation = streaked points on phones
+    camera: { x: 0.14, y: -0.02, z: 1.55, lookX: 0, lookY: -0.14, lookZ: -0.38, fov: 46 },
     bloom: 1.3,
-    pointScale: 3.6,
+    pointScale: 2.55,
     alpha: 0.88,
     noiseAmp: 0.0008,
     rotX: 0,
     spinX: 0,
-    spinY: 0.32,
-    spinYAmp: 0.28,
+    spinY: 0.26,
+    spinYAmp: 0.16,
     spinZ: 0,
     wave: 0,
   },
@@ -1379,12 +1382,13 @@ const VERTEX_SHADER = /* glsl */ `
   uniform float uScale;
   uniform float uDpr;
   uniform float uMaxPoint;
+  uniform float uNearFloor;
   varying vec3 vColor;
 
   void main() {
     vColor = aColor;
     vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    float ps = aSize * uScale * uDpr / max(-mv.z, 0.15);
+    float ps = aSize * uScale * uDpr / max(-mv.z, uNearFloor);
     gl_PointSize = clamp(ps, 0.85, uMaxPoint);
     gl_Position = projectionMatrix * mv;
   }
@@ -1613,12 +1617,23 @@ export default function CareerParticles({
 
       /*
        * Safari/iOS: UnrealBloomPass often composites to a blank frame.
-       * Draw points directly and compensate with larger, brighter dots.
+       * Draw points directly and compensate with larger, brighter dots —
+       * but keep Experience boosts modest so fibers don't smear on phones.
        */
       const skipBloom = budget.skipBloom;
-      const scaleBoost = skipBloom ? 2.35 : 1;
-      const alphaBoost = skipBloom ? 1.25 : 1;
-      const maxPoint = skipBloom ? Math.max(10, 9 * dpr) : Math.max(5, 5 * dpr);
+      const mobileLike = isNarrowViewport(900) || isSafariOrIOS();
+      const isExperience = palette === 'experience';
+      const scaleBoost = skipBloom ? (isExperience ? 1.45 : 2.35) : 1;
+      const alphaBoost = skipBloom ? (isExperience ? 1.12 : 1.25) : 1;
+      const maxPoint = skipBloom
+        ? isExperience
+          ? Math.max(5.5, 5.2 * dpr)
+          : Math.max(10, 9 * dpr)
+        : Math.max(5, 5 * dpr);
+      const fiber = isExperience ? (mobileLike ? 1.05 : 1.75) : 1;
+      const nearFloor = isExperience ? 0.48 : 0.15;
+      const morphCatchup = mobileLike && isExperience ? 4.2 : feel.morphCatchup;
+      const scrubLag = mobileLike && isExperience ? 0.55 : isExperience ? 1.15 : 1.4;
 
       const material = new THREE.ShaderMaterial({
         uniforms: {
@@ -1626,6 +1641,8 @@ export default function CareerParticles({
           uDpr: { value: dpr },
           uAlpha: { value: Math.min(1, configs[0].alpha * alphaBoost) },
           uMaxPoint: { value: maxPoint },
+          uFiber: { value: fiber },
+          uNearFloor: { value: nearFloor },
         },
         vertexShader: VERTEX_SHADER,
         fragmentShader: feel.fragmentShader,
@@ -1699,7 +1716,7 @@ export default function CareerParticles({
             trigger: track as HTMLElement,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 1.4,
+            scrub: scrubLag,
             onUpdate: (self) => {
               scrollState.target = self.progress;
             },
@@ -1730,7 +1747,7 @@ export default function CareerParticles({
 
         // Ease the displayed progress toward the scroll target for softer morphs
         scrollState.display +=
-          (scrollState.target - scrollState.display) * Math.min(1, delta * feel.morphCatchup);
+          (scrollState.target - scrollState.display) * Math.min(1, delta * morphCatchup);
 
         let ai = 0;
         let bi = 0;
@@ -1868,19 +1885,20 @@ export default function CareerParticles({
         points.rotation.y = spinY;
         points.rotation.z = spinZ;
 
-        // Blended camera
+        // Blended camera — ease harder than particle morph so dollies don't punch
+        const uCam = u * u * (3 - 2 * u);
         camera.position.set(
-          lerp(ca.camera.x, cb.camera.x, u),
-          lerp(ca.camera.y, cb.camera.y, u),
-          lerp(ca.camera.z, cb.camera.z, u),
+          lerp(ca.camera.x, cb.camera.x, uCam),
+          lerp(ca.camera.y, cb.camera.y, uCam),
+          lerp(ca.camera.z, cb.camera.z, uCam),
         );
         lookTarget.set(
-          lerp(ca.camera.lookX, cb.camera.lookX, u),
-          lerp(ca.camera.lookY, cb.camera.lookY, u),
-          lerp(ca.camera.lookZ, cb.camera.lookZ, u),
+          lerp(ca.camera.lookX, cb.camera.lookX, uCam),
+          lerp(ca.camera.lookY, cb.camera.lookY, uCam),
+          lerp(ca.camera.lookZ, cb.camera.lookZ, uCam),
         );
         camera.lookAt(lookTarget);
-        const fov = lerp(ca.camera.fov, cb.camera.fov, u);
+        const fov = lerp(ca.camera.fov, cb.camera.fov, uCam);
         if (Math.abs(camera.fov - fov) > 0.01) {
           camera.fov = fov;
           camera.updateProjectionMatrix();

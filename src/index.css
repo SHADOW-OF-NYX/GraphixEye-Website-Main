@@ -1308,6 +1308,18 @@ h4,
     padding: 5rem 0;
   }
 
+  /*
+   * Experience morph assumes equal scroll slices per stop. Keep full-viewport
+   * sections on phones so warehouse → press → office doesn't snap mid-copy.
+   */
+  .ce-page--experience .ce-morph-content .ce-hero,
+  .ce-page--experience .ce-morph-content .ce-wave-section,
+  .ce-page--experience .ce-morph-content .ce-galaxy-section,
+  .ce-page--experience .ce-morph-content .ce-helix-section {
+    min-height: var(--app-vh);
+    padding: 5rem 0;
+  }
+
   .ce-hero {
     padding-top: 7rem;
     padding-bottom: 4rem;
