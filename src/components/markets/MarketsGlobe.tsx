@@ -250,23 +250,29 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
         // Snap each pin onto the painted mesh along its geographic ray
         // so markers sit on continents even where the GLB isn't a perfect sphere.
         const snapRay = new THREE.Raycaster();
-        const origin = new THREE.Vector3();
+        snapRay.far = GLOBE_RADIUS * 6;
         const dir = new THREE.Vector3();
-        const lift = 1.012;
+        const worldOrigin = new THREE.Vector3();
+        const worldDir = new THREE.Vector3();
+        const localHit = new THREE.Vector3();
+        const lift = 1.018;
         pins.forEach((pin, i) => {
           const [dx, dy, dz] = latLonToVector3(pin.lat, pin.lon, 1);
           dir.set(dx, dy, dz).normalize();
-          origin.copy(dir).multiplyScalar(GLOBE_RADIUS * 3);
-          snapRay.set(origin, dir.clone().negate());
+          // Cast inward in world space from outside the globe
+          worldOrigin.copy(dir).multiplyScalar(GLOBE_RADIUS * 3);
+          earthGroup.localToWorld(worldOrigin);
+          worldDir.copy(dir).negate().transformDirection(earthGroup.matrixWorld);
+          snapRay.set(worldOrigin, worldDir);
           const hits = snapRay.intersectObject(model, true);
           if (hits.length > 0) {
-            const p = hits[0].point.clone().multiplyScalar(lift);
-            // point is in world/root space; earthGroup is at identity under root
-            earthGroup.worldToLocal(p);
-            pinPositions[i * 3] = p.x;
-            pinPositions[i * 3 + 1] = p.y;
-            pinPositions[i * 3 + 2] = p.z;
-            hitSpheres[i].position.copy(p);
+            localHit.copy(hits[0].point);
+            earthGroup.worldToLocal(localHit);
+            localHit.multiplyScalar(lift);
+            pinPositions[i * 3] = localHit.x;
+            pinPositions[i * 3 + 1] = localHit.y;
+            pinPositions[i * 3 + 2] = localHit.z;
+            hitSpheres[i].position.copy(localHit);
           }
         });
         pinGeo.attributes.position.needsUpdate = true;
@@ -336,18 +342,19 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
         pinPositions[index * 3 + 1],
         pinPositions[index * 3 + 2],
       );
-
-      // Face the pin toward the camera (+Z), with a soft latitude tilt
-      const targetRotY = Math.atan2(local.x, local.z);
-      const targetRotX = THREE.MathUtils.clamp(-Math.asin(THREE.MathUtils.clamp(local.y / PIN_RADIUS, -1, 1)) * 0.55, -0.55, 0.55);
+      const pinDir = local.clone().normalize();
+      // Rotate globe so this pin faces the camera (+Z)
+      const faceCam = new THREE.Quaternion().setFromUnitVectors(pinDir, new THREE.Vector3(0, 0, 1));
+      const targetEuler = new THREE.Euler().setFromQuaternion(faceCam, 'YXZ');
 
       const narrow = isNarrowViewport(900);
       const slideX = narrow ? 0 : -1.35;
       const slideY = narrow ? 0.28 : 0;
 
       gsap.to(earthGroup.rotation, {
-        x: targetRotX,
-        y: targetRotY,
+        x: targetEuler.x,
+        y: targetEuler.y,
+        z: targetEuler.z,
         duration: 1.1,
         ease: 'power3.inOut',
       });
@@ -358,20 +365,18 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
         ease: 'power3.inOut',
       });
 
-      // After facing front, pin sits near (0, local.y', +r) — zoom in on that front point
-      const lookY = local.y * 0.65;
       const zoomZ = narrow ? 2.55 : 2.35;
       gsap.to(camera.position, {
         x: narrow ? 0 : -0.15,
-        y: lookY * 0.35 + 0.08,
+        y: 0.12,
         z: zoomZ,
         duration: 1.15,
         ease: 'power3.inOut',
       });
       gsap.to(lookAt, {
         x: 0,
-        y: lookY,
-        z: GLOBE_RADIUS * 0.55,
+        y: 0,
+        z: GLOBE_RADIUS * 0.85,
         duration: 1.15,
         ease: 'power3.inOut',
       });
@@ -383,6 +388,12 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       pinMat.uniforms.uSelected.value = -1;
       if (fromUi && notifySelect) onSelectRef.current(null);
       autoSpin = true;
+      gsap.to(earthGroup.rotation, {
+        x: 0,
+        z: 0,
+        duration: 0.9,
+        ease: 'power3.inOut',
+      });
       gsap.to(root.position, { x: 0, y: 0, duration: 0.9, ease: 'power3.inOut' });
       gsap.to(camera.position, {
         x: camHome.x,

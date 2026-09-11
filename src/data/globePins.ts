@@ -151,15 +151,15 @@ export function marketForPin(pin: GlobePin): Market | undefined {
  * Convert geographic lat/lon to a Three.js vector on a sphere (Y-up).
  * Lon 0 = Greenwich; positive east.
  *
- * `lonOffsetDeg` is calibrated to the Sketchfab Earth GLB
- * (denis_cliofas) so pins land on the painted continents — do not
- * change without re-running land-vs-ocean calibration against the albedo.
+ * Offset 180° matches this Sketchfab Earth GLB after its FBX→glTF
+ * axis conversion (north = +Y, same convention as Three.js SphereGeometry
+ * + equirectangular maps). Confirmed against Australia/Africa mesh clusters.
  */
 export function latLonToVector3(
   lat: number,
   lon: number,
   radius: number,
-  lonOffsetDeg = 132,
+  lonOffsetDeg = 180,
 ): [number, number, number] {
   const phi = ((90 - lat) * Math.PI) / 180;
   const theta = ((lon + lonOffsetDeg) * Math.PI) / 180;
