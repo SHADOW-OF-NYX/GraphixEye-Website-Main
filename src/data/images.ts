@@ -18,10 +18,10 @@ export const photos = {
   },
 };
 
-/** Drop a replacement file at public/videos/hero.mp4 to swap the header video. */
-export const heroVideo = '/videos/hero.mp4?v=5';
+/** Full-length factory walk — loops on the home hero. */
+export const heroVideo = '/videos/hero.mp4?v=6';
 
-/** 720p / Main@L4.0 / faststart — phones & tablets only (see shouldUseMobileHeroVideo). */
-export const heroVideoMobile = '/videos/hero-mobile.mp4?v=2';
+/** Full-length 480p encode for phones & tablets (see shouldUseMobileHeroVideo). */
+export const heroVideoMobile = '/videos/hero-mobile.mp4?v=3';
 
 export { u };
