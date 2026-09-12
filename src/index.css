@@ -1518,10 +1518,64 @@ h4,
   height: 100%;
   cursor: grab;
   touch-action: none;
+  position: relative;
 }
 
 .markets-globe canvas {
   outline: none;
+}
+
+.markets-globe-labels {
+  z-index: 5;
+}
+
+.markets-map-pin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transform: translate(-50%, -100%);
+  color: var(--pin-color, #ff8f5c);
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+  transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+}
+
+.markets-map-pin__icon {
+  display: block;
+  line-height: 0;
+}
+
+.markets-map-pin__label {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: rgba(8, 7, 12, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.markets-map-pin:hover,
+.markets-map-pin.is-selected {
+  transform: translate(-50%, -100%) scale(1.12);
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65));
+  z-index: 2;
+}
+
+.markets-map-pin.is-dimmed {
+  opacity: 0.35;
+}
+
+.markets-map-pin.is-selected .markets-map-pin__label {
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .markets-panel {
