@@ -23,6 +23,77 @@ type GlobeApi = {
   focusById: (id: string | null) => void;
 };
 
+type Marker = {
+  root: THREE.Group;
+  sprite: THREE.Sprite;
+  hit: THREE.Mesh;
+  baseScale: number;
+  surface: THREE.Vector3;
+};
+
+function makePinTexture(fill: string, label: string, active: boolean): THREE.CanvasTexture {
+  const w = 256;
+  const h = active ? 320 : 220;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d')!;
+
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(w / 2, h - (active ? 28 : 18), active ? 28 : 18, active ? 10 : 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  const cx = w / 2;
+  const cy = active ? 118 : 88;
+  const r = active ? 52 : 34;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + r + (active ? 70 : 48));
+  ctx.bezierCurveTo(cx + r + 18, cy + 36, cx + r + 8, cy - r * 0.2, cx, cy - r);
+  ctx.bezierCurveTo(cx - r - 8, cy - r * 0.2, cx - r - 18, cy + 36, cx, cy + r + (active ? 70 : 48));
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.lineWidth = active ? 6 : 4;
+  ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy - 6, active ? 18 : 12, 0, Math.PI * 2);
+  ctx.fillStyle = active ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.7)';
+  ctx.fill();
+
+  if (active) {
+    ctx.font = '600 28px "Segoe UI", system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const text = label.length > 14 ? `${label.slice(0, 13)}…` : label;
+    const metrics = ctx.measureText(text);
+    const padX = 16;
+    const tw = metrics.width + padX * 2;
+    const th = 36;
+    const tx = cx - tw / 2;
+    const ty = h - 78;
+    ctx.fillStyle = 'rgba(8,7,12,0.88)';
+    ctx.beginPath();
+    const rr = 10;
+    ctx.moveTo(tx + rr, ty);
+    ctx.arcTo(tx + tw, ty, tx + tw, ty + th, rr);
+    ctx.arcTo(tx + tw, ty + th, tx, ty + th, rr);
+    ctx.arcTo(tx, ty + th, tx, ty, rr);
+    ctx.arcTo(tx, ty, tx + tw, ty, rr);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, cx, ty + th / 2 + 1);
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 export default function MarketsGlobe({ onSelect, selectedId, className = '' }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const onSelectRef = useRef(onSelect);
@@ -68,7 +139,7 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
     root.add(earthGroup);
 
     // Soft ambient dust around the globe
-    const dustCount = mobile ? 900 : 1800;
+    const dustCount = mobile ? 700 : 1400;
     const dustPos = new Float32Array(dustCount * 3);
     const dustCol = new Float32Array(dustCount * 3);
     for (let i = 0; i < dustCount; i++) {
@@ -89,10 +160,10 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
     dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
     dustGeo.setAttribute('color', new THREE.BufferAttribute(dustCol, 3));
     const dustMat = new THREE.PointsMaterial({
-      size: mobile ? 0.018 : 0.022,
+      size: mobile ? 0.016 : 0.02,
       vertexColors: true,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.45,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       sizeAttenuation: true,
@@ -127,94 +198,90 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       atmoMat.dispose();
     });
 
-    const pinPositions = new Float32Array(pins.length * 3);
-    const pinColors = new Float32Array(pins.length * 3);
-    const pinSizes = new Float32Array(pins.length);
-    const pinIndices = new Float32Array(pins.length);
+    const markers: Marker[] = [];
     const hitSpheres: THREE.Mesh[] = [];
-    const tmpColor = new THREE.Color();
+    const pinPositions = new Float32Array(pins.length * 3);
+    const textureCache = new Map<string, THREE.CanvasTexture>();
+    let selectedIndex = -1;
+
+    const getTexture = (pin: GlobePin) => {
+      const key = `${pin.color}|${pin.label}|${pin.status}`;
+      let tex = textureCache.get(key);
+      if (!tex) {
+        const fill = pin.status === 'active' ? pin.color : '#8a8794';
+        tex = makePinTexture(fill, pin.label, pin.status === 'active');
+        textureCache.set(key, tex);
+      }
+      return tex;
+    };
 
     pins.forEach((pin, i) => {
       const [x, y, z] = latLonToVector3(pin.lat, pin.lon, PIN_RADIUS);
       pinPositions[i * 3] = x;
       pinPositions[i * 3 + 1] = y;
       pinPositions[i * 3 + 2] = z;
-      tmpColor.set(pin.color);
-      pinColors[i * 3] = tmpColor.r;
-      pinColors[i * 3 + 1] = tmpColor.g;
-      pinColors[i * 3 + 2] = tmpColor.b;
-      pinSizes[i] = pin.isHq ? 1.55 : 1;
-      pinIndices[i] = i;
+
+      const surface = new THREE.Vector3(x, y, z);
+      const markerRoot = new THREE.Group();
+      markerRoot.position.copy(surface);
+
+      const tex = getTexture(pin);
+      const mat = new THREE.SpriteMaterial({
+        map: tex,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        opacity: pin.status === 'active' ? 1 : 0.72,
+      });
+      const sprite = new THREE.Sprite(mat);
+      const baseScale = pin.status === 'active' ? (pin.isHq ? 0.28 : 0.24) : 0.18;
+      sprite.scale.set(baseScale * 0.8, baseScale, 1);
+      // Tip of pin sits on the surface; sprite center is above
+      sprite.center.set(0.5, 0);
+      sprite.position.set(0, 0, 0);
+      markerRoot.add(sprite);
 
       const hit = new THREE.Mesh(
-        new THREE.SphereGeometry(0.065, 8, 8),
+        new THREE.SphereGeometry(pin.status === 'active' ? 0.09 : 0.07, 8, 8),
         new THREE.MeshBasicMaterial({ visible: false }),
       );
-      hit.position.set(x, y, z);
+      hit.position.copy(surface);
       hit.userData.pinIndex = i;
       earthGroup.add(hit);
       hitSpheres.push(hit);
+
+      earthGroup.add(markerRoot);
+      markers.push({ root: markerRoot, sprite, hit, baseScale, surface: surface.clone() });
     });
 
-    const pinGeo = new THREE.BufferGeometry();
-    pinGeo.setAttribute('position', new THREE.BufferAttribute(pinPositions, 3));
-    pinGeo.setAttribute('color', new THREE.BufferAttribute(pinColors, 3));
-    pinGeo.setAttribute('aSize', new THREE.BufferAttribute(pinSizes, 1));
-    pinGeo.setAttribute('aIndex', new THREE.BufferAttribute(pinIndices, 1));
-
-    const pinMat = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-        uDpr: { value: renderer.getPixelRatio() },
-        uSelected: { value: -1 },
-      },
-      vertexShader: /* glsl */ `
-        attribute float aSize;
-        attribute float aIndex;
-        attribute vec3 color;
-        varying vec3 vColor;
-        varying float vPulse;
-        uniform float uTime;
-        uniform float uDpr;
-        uniform float uSelected;
-        void main() {
-          vColor = color;
-          float pulse = 0.85 + 0.15 * sin(uTime * 2.4 + aIndex * 0.7);
-          if (abs(aIndex - uSelected) < 0.5) pulse = 1.35 + 0.25 * sin(uTime * 5.0);
-          vPulse = pulse;
-          vec4 mv = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = clamp(aSize * pulse * 14.0 * uDpr / max(-mv.z, 0.5), 4.0, 48.0);
-          gl_Position = projectionMatrix * mv;
-        }
-      `,
-      fragmentShader: /* glsl */ `
-        varying vec3 vColor;
-        varying float vPulse;
-        void main() {
-          vec2 c = gl_PointCoord - 0.5;
-          float d = length(c);
-          if (d > 0.5) discard;
-          float core = smoothstep(0.5, 0.08, d);
-          float halo = smoothstep(0.5, 0.2, d) * 0.45;
-          float a = (core + halo) * 0.95;
-          gl_FragColor = vec4(vColor * (0.85 + 0.35 * vPulse), a);
-        }
-      `,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    });
-
-    const pinPoints = new THREE.Points(pinGeo, pinMat);
-    earthGroup.add(pinPoints);
     cleanup.push(() => {
-      pinGeo.dispose();
-      pinMat.dispose();
-      hitSpheres.forEach((h) => {
-        h.geometry.dispose();
-        (h.material as THREE.Material).dispose();
+      markers.forEach((m) => {
+        (m.sprite.material as THREE.SpriteMaterial).dispose();
+        m.hit.geometry.dispose();
+        (m.hit.material as THREE.Material).dispose();
       });
+      textureCache.forEach((t) => t.dispose());
     });
+
+    const setMarkerSelected = (index: number) => {
+      selectedIndex = index;
+      markers.forEach((m, i) => {
+        const active = pins[i].status === 'active';
+        const selected = i === index;
+        const scale = m.baseScale * (selected ? 1.35 : hovering === i ? 1.15 : 1);
+        m.sprite.scale.set(scale * 0.8, scale, 1);
+        (m.sprite.material as THREE.SpriteMaterial).opacity = selected
+          ? 1
+          : active
+            ? 0.95
+            : hovering === i
+              ? 0.9
+              : 0.65;
+        m.sprite.renderOrder = selected ? 20 : active ? 10 : 1;
+      });
+    };
+
+    let hovering = -1;
 
     const loader = new GLTFLoader();
     loader.load(
@@ -247,19 +314,16 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
         earthGroup.add(model);
         earthGroup.updateMatrixWorld(true);
 
-        // Snap each pin onto the painted mesh along its geographic ray
-        // so markers sit on continents even where the GLB isn't a perfect sphere.
         const snapRay = new THREE.Raycaster();
         snapRay.far = GLOBE_RADIUS * 6;
         const dir = new THREE.Vector3();
         const worldOrigin = new THREE.Vector3();
         const worldDir = new THREE.Vector3();
         const localHit = new THREE.Vector3();
-        const lift = 1.018;
+        const lift = 1.022;
         pins.forEach((pin, i) => {
           const [dx, dy, dz] = latLonToVector3(pin.lat, pin.lon, 1);
           dir.set(dx, dy, dz).normalize();
-          // Cast inward in world space from outside the globe
           worldOrigin.copy(dir).multiplyScalar(GLOBE_RADIUS * 3);
           earthGroup.localToWorld(worldOrigin);
           worldDir.copy(dir).negate().transformDirection(earthGroup.matrixWorld);
@@ -272,11 +336,11 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
             pinPositions[i * 3] = localHit.x;
             pinPositions[i * 3 + 1] = localHit.y;
             pinPositions[i * 3 + 2] = localHit.z;
-            hitSpheres[i].position.copy(localHit);
+            markers[i].surface.copy(localHit);
+            markers[i].root.position.copy(localHit);
+            markers[i].hit.position.copy(localHit);
           }
         });
-        pinGeo.attributes.position.needsUpdate = true;
-        pinGeo.computeBoundingSphere();
       },
       undefined,
       () => {
@@ -299,7 +363,6 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
 
     const raycaster = new THREE.Raycaster();
     const pointer = new THREE.Vector2();
-    let hovering = -1;
 
     const resize = () => {
       const w = Math.max(1, host.clientWidth);
@@ -307,7 +370,6 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      pinMat.uniforms.uDpr.value = renderer.getPixelRatio();
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -330,20 +392,15 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
     const focusPin = (index: number, fromUi = true) => {
       const pin = pins[index];
       if (!pin) return;
-      if (pinMat.uniforms.uSelected.value === index) return;
+      if (selectedIndex === index) return;
 
       killCamTweens();
       autoSpin = false;
-      pinMat.uniforms.uSelected.value = index;
+      setMarkerSelected(index);
       if (fromUi && notifySelect) onSelectRef.current(pin);
 
-      const local = new THREE.Vector3(
-        pinPositions[index * 3],
-        pinPositions[index * 3 + 1],
-        pinPositions[index * 3 + 2],
-      );
+      const local = markers[index].surface.clone();
       const pinDir = local.clone().normalize();
-      // Rotate globe so this pin faces the camera (+Z)
       const faceCam = new THREE.Quaternion().setFromUnitVectors(pinDir, new THREE.Vector3(0, 0, 1));
       const targetEuler = new THREE.Euler().setFromQuaternion(faceCam, 'YXZ');
 
@@ -383,9 +440,9 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
     };
 
     const clearFocus = (fromUi = true) => {
-      if (pinMat.uniforms.uSelected.value < 0) return;
+      if (selectedIndex < 0) return;
       killCamTweens();
-      pinMat.uniforms.uSelected.value = -1;
+      setMarkerSelected(-1);
       if (fromUi && notifySelect) onSelectRef.current(null);
       autoSpin = true;
       gsap.to(earthGroup.rotation, {
@@ -439,6 +496,7 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       if (next !== hovering) {
         hovering = next;
         host.style.cursor = next >= 0 ? 'pointer' : 'grab';
+        setMarkerSelected(selectedIndex);
       }
     };
 
@@ -464,7 +522,7 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       dragDist += Math.abs(dx) + Math.abs(dy);
       lastX = e.clientX;
       lastY = e.clientY;
-      if (pinMat.uniforms.uSelected.value >= 0) return;
+      if (selectedIndex >= 0) return;
       earthGroup.rotation.y += dx * 0.005;
       earthGroup.rotation.x = Math.max(-0.6, Math.min(0.6, earthGroup.rotation.x + dy * 0.004));
       autoSpin = false;
@@ -482,7 +540,7 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       if (wasDrag) {
         window.clearTimeout(resumeSpinTimer);
         resumeSpinTimer = window.setTimeout(() => {
-          if (pinMat.uniforms.uSelected.value < 0) autoSpin = true;
+          if (selectedIndex < 0) autoSpin = true;
         }, 1800);
         return;
       }
@@ -491,7 +549,7 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
       const hits = raycaster.intersectObjects(hitSpheres, false);
       if (!hits.length) return;
       const idx = hits[0].object.userData.pinIndex as number;
-      if (pinMat.uniforms.uSelected.value === idx) clearFocus(true);
+      if (selectedIndex === idx) clearFocus(true);
       else focusPin(idx, true);
     };
 
@@ -511,16 +569,27 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
 
     let frame = 0;
     let last = performance.now();
+    const earthWorld = new THREE.Vector3();
+    const markerWorld = new THREE.Vector3();
+    const outward = new THREE.Vector3();
+    const toCamera = new THREE.Vector3();
     const tick = () => {
       frame = requestAnimationFrame(tick);
       const now = performance.now();
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      pinMat.uniforms.uTime.value = now / 1000;
       dust.rotation.y += dt * 0.02;
-      if (autoSpin && pinMat.uniforms.uSelected.value < 0) {
+      if (autoSpin && selectedIndex < 0) {
         earthGroup.rotation.y += spinY * dt;
       }
+      // Hide markers on the far side of the globe
+      earthGroup.getWorldPosition(earthWorld);
+      markers.forEach((m, i) => {
+        m.root.getWorldPosition(markerWorld);
+        outward.copy(markerWorld).sub(earthWorld).normalize();
+        toCamera.copy(camera.position).sub(earthWorld).normalize();
+        m.sprite.visible = outward.dot(toCamera) > 0.05 || selectedIndex === i;
+      });
       camera.lookAt(lookAt);
       renderer.render(scene, camera);
     };
@@ -534,7 +603,6 @@ export default function MarketsGlobe({ onSelect, selectedId, className = '' }: P
     };
   }, []);
 
-  // Panel close / external selection sync
   useEffect(() => {
     apiRef.current?.focusById(selectedId);
   }, [selectedId]);

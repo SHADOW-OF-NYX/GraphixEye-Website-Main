@@ -129,7 +129,7 @@ export const markets: Market[] = [
       'Regional rollouts often need bilingual or multi-script artwork and finishes that travel. GraphixEye coordinates production from our factory HQ so Asia programmes keep one visual standard.',
       'From Singapore and Hong Kong to Mumbai, Delhi, Tokyo, Seoul, and Southeast Asian hubs, we support print and environment jobs that must match across markets.',
     ],
-    cities: ['Singapore', 'Hong Kong', 'Tokyo', 'Seoul', 'Shanghai', 'Beijing', 'Mumbai', 'Delhi', 'Bangalore', 'Bangkok', 'Kuala Lumpur', 'Jakarta', 'Manila'],
+    cities: ['Singapore', 'Hong Kong', 'Tokyo', 'Seoul', 'Shanghai', 'Beijing', 'Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Chennai', 'Bangkok', 'Kuala Lumpur', 'Jakarta', 'Manila'],
     servicesFocus: ['Commercial printing', 'Signage', 'Packaging', 'Gifting', 'Design', 'AR / VR'],
     keywordsExtra: ['printing Singapore', 'printing India', 'signage Asia', 'packaging Asia', 'printing Hong Kong'],
   },

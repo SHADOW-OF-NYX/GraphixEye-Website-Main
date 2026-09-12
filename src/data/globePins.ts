@@ -1,6 +1,8 @@
 import type { Market } from './markets';
 import { markets } from './markets';
 
+export type PinStatus = 'active' | 'coming-soon';
+
 /** One clickable project hub on the globe. */
 export type GlobePin = {
   id: string;
@@ -8,13 +10,14 @@ export type GlobePin = {
   marketSlug: string;
   lat: number;
   lon: number;
-  /** Hex color for this market's particles */
+  /** Hex color for this market */
   color: string;
+  status: PinStatus;
   /** Factory HQ gets a brighter pulse */
   isHq?: boolean;
 };
 
-/** Distinct glow per market — warm brand accents, no purple default. */
+/** Distinct accent per market — warm brand accents, no purple default. */
 export const MARKET_COLORS: Record<string, string> = {
   'united-states': '#ff6b5a',
   'united-kingdom': '#3ecfbf',
@@ -26,6 +29,50 @@ export const MARKET_COLORS: Record<string, string> = {
   canada: '#7ec4d4',
   australia: '#c9a66b',
 };
+
+/** Markets / cities where services are available now. */
+const ACTIVE_MARKET_SLUGS = new Set([
+  'united-kingdom',
+  'united-arab-emirates',
+  'saudi-arabia',
+]);
+
+const ACTIVE_CITIES = new Set([
+  'Chicago',
+  'Pune',
+  'Chennai',
+  // UK (also covered by market slug — listed for clarity)
+  'London',
+  'Manchester',
+  'Birmingham',
+  'Leeds',
+  'Glasgow',
+  'Liverpool',
+  'Edinburgh',
+  'Bristol',
+  'Cardiff',
+  'Belfast',
+  // GCC
+  'Dubai',
+  'Abu Dhabi',
+  'Sharjah',
+  'Ajman',
+  'Ras Al Khaimah',
+  'Fujairah',
+  'Umm Al Quwain',
+  'Dammam',
+  'Riyadh',
+  'Jeddah',
+  'Khobar',
+  'Jubail',
+  'Dhahran',
+  'Yanbu',
+  'Abha',
+]);
+
+export function isPinActive(marketSlug: string, city: string): boolean {
+  return ACTIVE_MARKET_SLUGS.has(marketSlug) || ACTIVE_CITIES.has(city);
+}
 
 const CITY_COORDS: Record<string, [number, number]> = {
   // USA
@@ -50,7 +97,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
   Bristol: [51.4545, -2.5879],
   Cardiff: [51.4816, -3.1791],
   Belfast: [54.5973, -5.9301],
-  // UAE
+  // UAE / GCC
   Dubai: [25.2048, 55.2708],
   'Abu Dhabi': [24.4539, 54.3773],
   Sharjah: [25.3463, 55.4209],
@@ -58,7 +105,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
   'Ras Al Khaimah': [25.7895, 55.9432],
   Fujairah: [25.1288, 56.3265],
   'Umm Al Quwain': [25.5647, 55.5552],
-  // KSA
+  // KSA / GCC
   Dammam: [26.3927, 49.9777],
   Riyadh: [24.7136, 46.6753],
   Jeddah: [21.4858, 39.1925],
@@ -93,6 +140,8 @@ const CITY_COORDS: Record<string, [number, number]> = {
   Mumbai: [19.076, 72.8777],
   Delhi: [28.7041, 77.1025],
   Bangalore: [12.9716, 77.5946],
+  Pune: [18.5204, 73.8567],
+  Chennai: [13.0827, 80.2707],
   Bangkok: [13.7563, 100.5018],
   'Kuala Lumpur': [3.139, 101.6869],
   Jakarta: [-6.2088, 106.8456],
@@ -121,7 +170,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
   Canberra: [-35.2809, 149.13],
 };
 
-/** All project hubs we can serve — one pin per city in markets data. */
+/** All hubs on the globe — active first, then coming soon. */
 export function buildGlobePins(): GlobePin[] {
   const pins: GlobePin[] = [];
   for (const market of markets) {
@@ -129,6 +178,7 @@ export function buildGlobePins(): GlobePin[] {
     for (const city of market.cities) {
       const coords = CITY_COORDS[city];
       if (!coords) continue;
+      const active = isPinActive(market.slug, city);
       pins.push({
         id: `${market.slug}__${city.toLowerCase().replace(/\s+/g, '-')}`,
         label: city,
@@ -136,10 +186,13 @@ export function buildGlobePins(): GlobePin[] {
         lat: coords[0],
         lon: coords[1],
         color,
+        status: active ? 'active' : 'coming-soon',
         isHq: city === 'Dammam',
       });
     }
   }
+  // Active pins render above muted ones when overlapping
+  pins.sort((a, b) => Number(b.status === 'active') - Number(a.status === 'active'));
   return pins;
 }
 

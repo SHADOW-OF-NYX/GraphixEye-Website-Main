@@ -1550,3 +1550,32 @@ h4,
 .markets-panel__card {
   -webkit-overflow-scrolling: touch;
 }
+
+.markets-legend-pin {
+  width: 10px;
+  height: 14px;
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.markets-legend-pin::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.markets-legend-pin--active::before {
+  background: #ff8f5c;
+}
+
+.markets-legend-pin--soon::before {
+  background: #8a8794;
+}
