@@ -58,8 +58,7 @@ export default function Markets() {
             Where we can take your project
           </h1>
           <p className="mt-3 text-[14px] md:text-[15px] text-white/55 max-w-md leading-relaxed">
-            Tap a location pin to zoom in. Services are live in Chicago, the UK, Pune, Chennai, and the GCC — other
-            hubs are coming soon.
+            Tap a location pin to zoom in. Services are live in Chicago, London, Pune, Chennai, and the GCC.
           </p>
         </div>
 
@@ -71,10 +70,6 @@ export default function Markets() {
           <span className="inline-flex items-center gap-2 text-[11px] text-white/60">
             <span className="markets-legend-pin markets-legend-pin--active" aria-hidden />
             Services available
-          </span>
-          <span className="inline-flex items-center gap-2 text-[11px] text-white/45">
-            <span className="markets-legend-pin markets-legend-pin--soon" aria-hidden />
-            Coming soon
           </span>
         </div>
 
